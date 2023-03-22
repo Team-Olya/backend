@@ -3,6 +3,8 @@ package com.teamolha.talantino.config;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.teamolha.talantino.repository.TalentRepository;
+import com.teamolha.talantino.mapper.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,6 +13,9 @@ import org.springframework.security.config.annotation.web.configurers.oauth2.ser
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -30,6 +35,8 @@ import java.security.interfaces.RSAPublicKey;
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
@@ -41,6 +48,9 @@ public class WebSecurityConfig {
                         .requestMatchers("/actuator/health").permitAll() // for DevOps
                         .requestMatchers("/talents/register").permitAll()
                         .requestMatchers("/talents").permitAll()
+                        .requestMatchers(antMatcher("/h2/**")).permitAll() // for H2 console
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/test").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin((form) -> form
@@ -71,16 +81,18 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-        //TODO: change UserDetails for database implementation
-        UserDetails user =
-                User.withUsername("user")
-                        .password("{noop}password")
-                        .roles("USER")
-                        .build();
-
-        return new InMemoryUserDetailsManager(user);
+    @Bean
+    public UserDetailsService userDetailsService(
+            TalentRepository talentRepository,
+            Mappers mapper
+    ) {
+        return email -> talentRepository.findByEmailIgnoreCase(email)
+                .map(mapper::toUserDetails)
+                .orElseThrow(() -> new UsernameNotFoundException(email + " not found"));
     }
 
     @Bean
