@@ -1,6 +1,7 @@
 package com.teamolha.talantino.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.Collection;
@@ -19,14 +20,19 @@ public class Talent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @NotNull
     private String name;
 
+    @NotNull
     private String surname;
 
+    @NotNull
     private String email;
 
+    @NotNull
     private String password;
 
+    @NotNull
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST,
             CascadeType.DETACH, CascadeType.REFRESH},
             fetch = FetchType.EAGER)
