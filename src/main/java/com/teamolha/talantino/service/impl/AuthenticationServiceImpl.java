@@ -2,6 +2,7 @@ package com.teamolha.talantino.service.impl;
 
 import com.teamolha.talantino.model.entity.Kind;
 import com.teamolha.talantino.model.entity.Talent;
+import com.teamolha.talantino.model.response.LoginResponse;
 import com.teamolha.talantino.repository.KindRepository;
 import com.teamolha.talantino.repository.TalentRepository;
 import com.teamolha.talantino.service.AuthenticationService;
@@ -30,7 +31,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private KindRepository kindRepository;
     final PasswordEncoder passwordEncoder;
 
-    public String generateJwtToken(Authentication authentication) {
+    public LoginResponse login(Authentication authentication) {
         var now = Instant.now();
         var claims = JwtClaimsSet.builder()
                 .issuer("self")
@@ -39,7 +40,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .subject(authentication.getName())
                 .claim("scope", createScope(authentication))
                 .build();
-        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+        var user = talentRepository.findByEmailIgnoreCase(authentication.getName()).get();
+        return new LoginResponse (
+                jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue(),
+                user.getName(),
+                user.getSurname(),
+                user.getAvatar()
+        );
     }
 
     private String createScope(Authentication authentication) {

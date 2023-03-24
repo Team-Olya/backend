@@ -1,6 +1,7 @@
 package com.teamolha.talantino.controller;
 
 import com.teamolha.talantino.model.request.CreateTalent;
+import com.teamolha.talantino.model.response.LoginResponse;
 import com.teamolha.talantino.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -19,8 +20,8 @@ public class AuthenticationController {
 
     @PostMapping("/talents/login")
     @ResponseStatus(HttpStatus.OK)
-    String login(Authentication authentication) {
-        return authService.generateJwtToken(authentication);
+    LoginResponse login(Authentication authentication) {
+        return authService.login(authentication);
     }
 
     @PostMapping("/talents/register")
