@@ -15,15 +15,15 @@ public class InitConfig implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        for (int i = 0; i < 20; i++) {
-            Talent talent = Talent.builder()
-                    .password("$2a$12$ngG1dPTpSEwbX.n99q2hKeatPahmBJnmzq9hTq.m5G8PMYeK3hKcC")
-                    .email("johndoe" + i +"@mail.com")
-                    .kind(Kind.builder().kind("Developer" + i).build())
-                    .name("John")
-                    .surname("Doe" + i)
-                    .build();
-            talentRepository.save(talent);
-        }
+//        for (int i = 0; i < 20; i++) {
+//            Talent talent = Talent.builder()
+//                    .password("$2a$12$ngG1dPTpSEwbX.n99q2hKeatPahmBJnmzq9hTq.m5G8PMYeK3hKcC")
+//                    .email("johndoe" + i +"@mail.com")
+//                    .kind(Kind.builder().kind("Developer" + i).build())
+//                    .name("John")
+//                    .surname("Doe" + i)
+//                    .build();
+//            talentRepository.save(talent);
+//        }
     }
 }
