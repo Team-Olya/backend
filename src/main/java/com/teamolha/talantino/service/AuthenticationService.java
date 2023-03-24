@@ -2,6 +2,7 @@ package com.teamolha.talantino.service;
 
 import com.teamolha.talantino.model.entity.Kind;
 import com.teamolha.talantino.model.entity.Talent;
+import com.teamolha.talantino.model.response.LoginResponse;
 import com.teamolha.talantino.repository.KindRepository;
 import com.teamolha.talantino.repository.TalentRepository;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.stream.Collectors;
 
 public interface AuthenticationService {
-    String generateJwtToken(Authentication authentication);
+    LoginResponse login(Authentication authentication);
 
-    public void register(String email, String password, String name, String surname, String kind);
+    void register(String email, String password, String name, String surname, String kind);
 }
