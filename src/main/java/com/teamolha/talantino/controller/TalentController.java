@@ -1,10 +1,13 @@
 package com.teamolha.talantino.controller;
 
+import com.teamolha.talantino.model.response.TalentsPageResponse;
 import com.teamolha.talantino.service.TalentService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -25,7 +28,8 @@ public class TalentController {
     }
 
     @GetMapping("/talents")
-    public Object listTalents(
+    @ResponseStatus(HttpStatus.OK)
+    public TalentsPageResponse listTalents(
             @RequestParam(required = false ,defaultValue = "9") Integer amount,
             @RequestParam(required = false, defaultValue = "0") Integer page
     ){

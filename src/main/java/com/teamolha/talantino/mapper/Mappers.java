@@ -10,7 +10,6 @@ import static org.mapstruct.ReportingPolicy.IGNORE;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = IGNORE)
 public interface Mappers {
 
-    // TODO: Make UserDetails Mapper from UserEntity
     default UserDetails toUserDetails(Talent talent) {
         return User.withUsername(talent.getEmail())
                 .password(talent.getPassword())

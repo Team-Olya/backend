@@ -1,37 +1,26 @@
 package com.teamolha.talantino.service;
 
+import com.teamolha.talantino.model.entity.Kind;
+import com.teamolha.talantino.model.entity.Talent;
+import com.teamolha.talantino.repository.KindRepository;
+import com.teamolha.talantino.repository.TalentRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
-@Service
-public class AuthenticationService {
-    private final JwtEncoder jwtEncoder;
+public interface AuthenticationService {
+    String generateJwtToken(Authentication authentication);
 
-    public String generateJwtToken(Authentication authentication) {
-        var now = Instant.now();
-        var claims = JwtClaimsSet.builder()
-                .issuer("self")
-                .issuedAt(now)
-                .expiresAt(now.plus(30, ChronoUnit.MINUTES))
-                .subject(authentication.getName())
-                .claim("scope", createScope(authentication))
-                .build();
-        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-    }
-
-    private String createScope(Authentication authentication) {
-        return authentication.getAuthorities()
-                .stream().map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(" "));
-    }
+    public void register(String email, String password, String name, String surname, String kind);
 }

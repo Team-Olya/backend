@@ -52,15 +52,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/test").authenticated()
                         .anyRequest().authenticated()
-                )
-                .formLogin((form) -> form
-                        .loginPage("/talents/login").permitAll()
-                        .loginProcessingUrl("/talents/register")
-                        .usernameParameter("email")
-                        .passwordParameter("password")
-                        .successForwardUrl("/talents")
-                )
-                .logout((logout) -> logout.permitAll());
+                );
 
         http    .httpBasic(withDefaults())
                 .sessionManagement(c -> c
