@@ -18,7 +18,7 @@ public class TalentServiceImpl implements TalentService {
 
     public TalentsPageResponse pageTalents(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        List<TalentGeneralResponse> talents = talentRepository.findAll(pageable).stream()
+        List<TalentGeneralResponse> talents = talentRepository.findAllByOrderByIdDesc(pageable).stream()
                 .map(TalentGeneralResponse::new)
                 .toList();
         return TalentsPageResponse.builder()
