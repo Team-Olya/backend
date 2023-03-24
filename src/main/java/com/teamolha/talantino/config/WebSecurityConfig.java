@@ -61,7 +61,7 @@ public class WebSecurityConfig {
                         .disable())
                 .headers(c -> c
                         .frameOptions()
-                        .sameOrigin());
+                        .disable());
 
         http    .cors().disable();
 
