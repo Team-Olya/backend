@@ -1,17 +1,21 @@
 package com.teamolha.talantino.controller;
 
-import ch.qos.logback.core.model.Model;
+import com.teamolha.talantino.service.TalentService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 @AllArgsConstructor
 public class TalentController {
 
+    TalentService talentService;
+
     // TODO:implement endpoint
-    @GetMapping("/talents")
+    @GetMapping("/test")
     public void talentsPage(Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
             // User is authenticated
@@ -20,5 +24,12 @@ public class TalentController {
         }
     }
 
+    @GetMapping("/talents")
+    public Object listTalents(
+            @RequestParam(required = false ,defaultValue = "9") Integer amount,
+            @RequestParam(required = false, defaultValue = "0") Integer page
+    ){
+        return talentService.pageTalents(page,amount);
+    }
 
 }
