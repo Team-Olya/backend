@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Validated
+@CrossOrigin(origins = "*")
 @AllArgsConstructor
 public class AuthenticationController {
     AuthenticationService authService;
