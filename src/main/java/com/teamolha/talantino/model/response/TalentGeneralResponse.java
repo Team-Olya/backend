@@ -1,4 +1,4 @@
-package com.teamolha.talantino.model.entity.response;
+package com.teamolha.talantino.model.response;
 
 import com.teamolha.talantino.model.entity.Talent;
 import lombok.*;

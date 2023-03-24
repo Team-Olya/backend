@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface TalentRepository extends JpaRepository<Talent, Long> {
-
     Optional<Talent> findByEmailIgnoreCase(String email);
+    boolean existsByEmailIgnoreCase(String email);
 }
