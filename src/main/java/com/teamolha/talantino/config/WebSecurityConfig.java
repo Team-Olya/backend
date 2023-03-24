@@ -63,8 +63,6 @@ public class WebSecurityConfig {
                         .frameOptions()
                         .sameOrigin());
 
-        http    .cors().disable();
-
         http    .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .exceptionHandling(c -> c
                         .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
