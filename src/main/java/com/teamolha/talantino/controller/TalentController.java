@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 
 @RestController
@@ -36,7 +37,11 @@ public class TalentController {
     }
 
     @GetMapping("/talents/{talent-id}")
-    public TalentProfileResponse talentProfile(@PathVariable("talent-id") long talentId) {
-        return talentService.talentProfile(talentId);
+    public TalentProfileResponse talentProfile(@PathVariable("talent-id") long talentId, Authentication auth) {
+        if (auth != null && auth.isAuthenticated()) {
+            return talentService.talentProfile(talentId);
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
+        }
     }
 }
