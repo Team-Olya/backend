@@ -7,6 +7,7 @@ import lombok.*;
 //@Table(name = "link")
 @Getter
 @Setter
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

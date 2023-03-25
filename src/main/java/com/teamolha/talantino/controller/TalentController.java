@@ -1,5 +1,6 @@
 package com.teamolha.talantino.controller;
 
+import com.teamolha.talantino.model.response.TalentProfileResponse;
 import com.teamolha.talantino.model.response.TalentsPageResponse;
 import com.teamolha.talantino.service.TalentService;
 import lombok.AllArgsConstructor;
@@ -34,4 +35,8 @@ public class TalentController {
         return talentService.pageTalents(page,amount);
     }
 
+    @GetMapping("/talents/{talent-id}")
+    public TalentProfileResponse talentProfile(@PathVariable("talent-id") long talentId) {
+        return talentService.talentProfile(talentId);
+    }
 }
