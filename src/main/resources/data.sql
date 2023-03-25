@@ -3,17 +3,50 @@ insert into kind (kind) values ('JS Developer');
 insert into kind (kind) values ('Java Developer');
 insert into kind (kind) values ('Project Manager');
 
-insert into talent (name, surname, email, password, kind_id, experience) values ('Olha', 'Shutylieva', 'os@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 4, 5);
-insert into talent (name, surname, email, password, kind_id, experience) values ('Alexey', 'Pedun', 'ap@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 1, 5);
-insert into talent (name, surname, email, password, kind_id, experience) values ('Ekaterina', 'Nikitenko', 'en@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 1, 5);
-insert into talent (name, surname, email, password, kind_id, experience) values ('Anastasiia', 'Mashchenko', 'am@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 1, 5);
-insert into talent (name, surname, email, password, kind_id, experience) values ('Max', 'Koropets', 'mk@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 1, 5);
-insert into talent (name, surname, email, password, kind_id, experience) values ('Bohdan', 'Rohozianskyi', 'br@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 2, 5);
-insert into talent (name, surname, email, password, kind_id, experience) values ('Maksym', 'Lavrovskyi', 'ml@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 2, 5);
-insert into talent (name, surname, email, password, kind_id, experience) values ('Dmytro', 'Kataiev', 'dk@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 2, 5);
-insert into talent (name, surname, email, password, kind_id, experience) values ('Vladyslav', 'Liubchyk', 'vl@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 3, 5);
-insert into talent (name, surname, email, password, kind_id, experience) values ('Yaroslava', 'Nechaieva', 'yn@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 3, 5);
-insert into talent (name, surname, email, password, kind_id, experience) values ('Sofiia', 'Kazantseva', 'sk@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 3, 5);
+insert into talent (name, surname, email, password, kind_id, experience, description, location)
+values ('Olha', 'Shutylieva', 'os@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 4, 5,
+        'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
+        'Ukraine');
+insert into talent (name, surname, email, password, kind_id, experience, description, location)
+values ('Alexey', 'Pedun', 'ap@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 1, 5,
+        'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
+        'Ukraine');
+insert into talent (name, surname, email, password, kind_id, experience, description, location)
+values ('Ekaterina', 'Nikitenko', 'en@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 1, 5,
+        'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
+        'Ukraine');
+insert into talent (name, surname, email, password, kind_id, experience, description, location)
+values ('Anastasiia', 'Mashchenko', 'am@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 1, 5,
+        'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
+        'Ukraine');
+insert into talent (name, surname, email, password, kind_id, experience, description, location)
+values ('Max', 'Koropets', 'mk@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 1, 5,
+        'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
+        'Ukraine');
+insert into talent (name, surname, email, password, kind_id, experience, description, location)
+values ('Bohdan', 'Rohozianskyi', 'br@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 2, 5,
+        'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
+        'Ukraine');
+insert into talent (name, surname, email, password, kind_id, experience, description, location)
+values ('Maksym', 'Lavrovskyi', 'ml@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 2, 5,
+        'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
+        'Ukraine');
+insert into talent (name, surname, email, password, kind_id, experience, description, location)
+values ('Dmytro', 'Kataiev', 'dk@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 2, 5,
+        'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
+        'Ukraine');
+insert into talent (name, surname, email, password, kind_id, experience, description, location)
+values ('Vladyslav', 'Liubchyk', 'vl@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 3, 5,
+        'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
+        'Ukraine');
+insert into talent (name, surname, email, password, kind_id, experience, description, location)
+values ('Yaroslava', 'Nechaieva', 'yn@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 3, 5,
+        'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
+        'Ukraine');
+insert into talent (name, surname, email, password, kind_id, experience, description, location)
+values ('Sofiia', 'Kazantseva', 'sk@mail.com', '$2a$12$R9IF9TpsXkhFvyjhwymqwuFbqt2pCurh5DlGQhdk.ZApXv2ZUyB5q', 3, 5,
+        'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
+        'Ukraine');
 
 insert into link (url, talent_id) values ('google.com', 1);
 insert into link (url, talent_id) values ('bing.com', 2);
