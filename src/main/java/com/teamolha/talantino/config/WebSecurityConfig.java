@@ -48,6 +48,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/actuator/health").permitAll() // for DevOps
                         .requestMatchers("/talents/register").permitAll()
                         .requestMatchers("/talents").permitAll()
+                        .requestMatchers(antMatcher("/talents/{talent-id}")).authenticated()
                         .requestMatchers(antMatcher("/h2/**")).permitAll() // for H2 console
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/test").authenticated()

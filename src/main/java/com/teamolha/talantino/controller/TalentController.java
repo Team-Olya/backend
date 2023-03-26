@@ -1,11 +1,13 @@
 package com.teamolha.talantino.controller;
 
+import com.teamolha.talantino.model.response.TalentProfileResponse;
 import com.teamolha.talantino.model.response.TalentsPageResponse;
 import com.teamolha.talantino.service.TalentService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 
 @RestController
@@ -34,4 +36,12 @@ public class TalentController {
         return talentService.pageTalents(page,amount);
     }
 
+    @GetMapping("/talents/{talent-id}")
+    public TalentProfileResponse talentProfile(@PathVariable("talent-id") long talentId, Authentication auth) {
+        if (auth != null && auth.isAuthenticated()) {
+            return talentService.talentProfile(talentId);
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
+        }
+    }
 }
