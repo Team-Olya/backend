@@ -2,21 +2,16 @@ package com.teamolha.talantino.mapper;
 
 import com.teamolha.talantino.model.entity.Link;
 import com.teamolha.talantino.model.entity.Talent;
-import com.teamolha.talantino.model.response.LinkResponse;
 import com.teamolha.talantino.model.response.TalentProfileResponse;
 import com.teamolha.talantino.model.response.UpdatedTalentResponse;
 import org.mapstruct.Mapper;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.List;
-
 import static org.mapstruct.ReportingPolicy.IGNORE;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = IGNORE)
 public interface Mappers {
-
-    LinkResponse toLinkResponse(Link link);
 
     default UpdatedTalentResponse toUpdatedTalent(Talent talent) {
         return UpdatedTalentResponse.builder()

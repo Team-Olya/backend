@@ -5,12 +5,14 @@ import com.teamolha.talantino.model.entity.Kind;
 import com.teamolha.talantino.model.entity.Link;
 import com.teamolha.talantino.model.entity.Talent;
 import com.teamolha.talantino.model.request.TalentUpdateRequest;
-import com.teamolha.talantino.model.response.*;
+import com.teamolha.talantino.model.response.TalentGeneralResponse;
+import com.teamolha.talantino.model.response.TalentProfileResponse;
+import com.teamolha.talantino.model.response.TalentsPageResponse;
+import com.teamolha.talantino.model.response.UpdatedTalentResponse;
 import com.teamolha.talantino.repository.KindRepository;
 import com.teamolha.talantino.repository.LinkRepository;
 import com.teamolha.talantino.repository.TalentRepository;
 import com.teamolha.talantino.service.TalentService;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -88,6 +89,21 @@ public class TalentServiceImpl implements TalentService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
         return updateTalent(talent, updateTalent);
+    }
+
+    @Override
+    public void deleteTalent(long talentId, String email) {
+        Optional<Talent> talentOptional = talentRepository.findById(talentId);
+        if (talentOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Talent with ID " + talentId + " not found");
+        }
+
+        Talent talent = talentOptional.get();
+        if (!email.equals(talent.getEmail())) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+
+        linkRepository.deleteByTalent(talent);
+        talentRepository.delete(talent);
     }
 
     private UpdatedTalentResponse updateTalent(Talent oldTalent, TalentUpdateRequest newTalent) {
