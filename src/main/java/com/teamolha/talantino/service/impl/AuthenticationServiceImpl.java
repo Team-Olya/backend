@@ -42,6 +42,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
         var user = talentRepository.findByEmailIgnoreCase(authentication.getName()).get();
         return new LoginResponse (
+                user.getId(),
                 jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue(),
                 user.getName(),
                 user.getSurname(),
@@ -78,4 +79,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .build()
         );
     }
+
+
 }
