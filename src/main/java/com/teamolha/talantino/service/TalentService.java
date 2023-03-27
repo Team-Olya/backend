@@ -13,4 +13,6 @@ public interface TalentService {
     TalentProfileResponse talentProfile(String email);
 
     UpdatedTalentResponse updateTalentProfile(long talentId, String email, TalentUpdateRequest updateTalent);
+
+    void deleteTalent(long talentId, String email);
 }

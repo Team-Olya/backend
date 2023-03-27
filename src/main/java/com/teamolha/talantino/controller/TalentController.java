@@ -6,12 +6,13 @@ import com.teamolha.talantino.model.response.TalentsPageResponse;
 import com.teamolha.talantino.model.response.UpdatedTalentResponse;
 import com.teamolha.talantino.service.TalentService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-
+@Slf4j
 @RestController
 @AllArgsConstructor
 public class TalentController {
@@ -48,4 +49,12 @@ public class TalentController {
         }
     }
 
+    @DeleteMapping("/talents/{talent-id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteTalent(@PathVariable("talent-id") long talentId, Authentication auth) {
+        if (auth != null && auth.isAuthenticated()) {
+            log.info("auth name = {}", auth.getName());
+            talentService.deleteTalent(talentId, auth.getName());
+        } else throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+    }
 }
