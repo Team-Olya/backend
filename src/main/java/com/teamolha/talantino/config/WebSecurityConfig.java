@@ -26,6 +26,7 @@ import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthen
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -64,7 +65,9 @@ public class WebSecurityConfig {
                         .frameOptions()
                         .disable());
 
-        http    .cors().disable();
+        http    .cors().configurationSource(
+                request -> new CorsConfiguration().applyPermitDefaultValues()
+        );
 
         http    .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .exceptionHandling(c -> c
