@@ -1,31 +1,28 @@
 package com.teamolha.talantino.model.response;
 
-import com.teamolha.talantino.model.entity.Link;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 import java.util.List;
 
 @Builder
-public record TalentProfileResponse(
+public record UpdatedTalentResponse (
         long id,
-
+        @NotNull
         String name,
-
+        @NotNull
         String surname,
-
-        String email,
-
+        @NotNull
         String kind,
-
-        String description,
-
+        @NotNull
         String avatar,
-
+        @NotNull
+        String description,
+        @NotNull
         int experience,
-
+        @NotNull
         String location,
-
+        @NotNull
         List<String> links
 ) {
 }
-
