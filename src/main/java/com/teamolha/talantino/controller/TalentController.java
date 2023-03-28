@@ -25,7 +25,7 @@ public class TalentController {
     }
 
     @GetMapping("/talents/{talent-id}")
-    public TalentProfileResponse talentProfile(@PathVariable("talent-id") long talentId, Authentication auth) {
+    public TalentProfileResponse talentProfile(@PathVariable("talent-id") long talentId) {
         return talentService.talentProfile(talentId);
     }
 
@@ -38,7 +38,6 @@ public class TalentController {
 
     @DeleteMapping("/talents/{talent-id}")
     public void deleteTalent(@PathVariable("talent-id") long talentId, Authentication auth) {
-        log.info("auth name = {}", auth.getName());
         talentService.deleteTalent(talentId, auth.getName());
     }
 }

@@ -1,6 +1,5 @@
 package com.teamolha.talantino.model.response;
 
-import com.teamolha.talantino.model.entity.Link;
 import lombok.Builder;
 
 import java.util.List;
@@ -25,7 +24,11 @@ public record TalentProfileResponse(
 
         String location,
 
-        List<String> links
+        List<String> links,
+
+        Long prevId,
+
+        Long nextId
 ) {
 }
 
