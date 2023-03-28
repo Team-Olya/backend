@@ -75,23 +75,20 @@ public class WebSecurityConfig {
                         .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
                 );
 
+        http    .cors().disable();
+
         return http.build();
     }
 
     @Bean
-    public WebMvcConfigurer configurer() {
+    public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
-            public void addCorsMappings(final CorsRegistry registry) {
+            public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedHeaders("Access-Control-Allow-Origin",
-                                "*",
-                                "Access-Control-Allow-Methods",
-                                "POST, GET, DELETE, PATCH, PUT",
-                                "Access-Control-Allow-Headers",
-                                "Origin, X-Requested-With, Content-Type, Accept")
                         .allowedOrigins("*")
-                        .allowedMethods("*");
+                        .allowedMethods("*")
+                        .allowedHeaders("*");
             }
         };
     }
