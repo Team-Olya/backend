@@ -31,7 +31,7 @@ public interface Mappers {
                 .build();
     }
 
-    default TalentProfileResponse toTalentProfileResponse(Talent talent) {
+    default TalentProfileResponse toTalentProfileResponse(Talent talent, Long prevId, Long nextId) {
         return TalentProfileResponse.builder()
                 .id(talent.getId())
                 .name(talent.getName())
@@ -48,6 +48,8 @@ public interface Mappers {
                         .map(Link::getUrl)
                         .toList()
                 )
+                .prevId(prevId)
+                .nextId(nextId)
                 .build();
     }
 

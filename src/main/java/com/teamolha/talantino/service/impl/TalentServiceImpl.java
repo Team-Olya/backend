@@ -42,8 +42,10 @@ public class TalentServiceImpl implements TalentService {
 
     @Override
     public TalentProfileResponse talentProfile(String email) {
+        var talent = talentRepository.findByEmailIgnoreCase(email).get();
+
         return mapper.toTalentProfileResponse(
-                talentRepository.findByEmailIgnoreCase(email).get()
+                talent, getPrevTalentId(talent.getId()), getNextTalentId(talent.getId())
         );
     }
 
@@ -68,24 +70,20 @@ public class TalentServiceImpl implements TalentService {
     @Transactional(readOnly = true)
     @Override
     public TalentProfileResponse talentProfile(long talentId) {
-        Optional<Talent> talentOptional = talentRepository.findById(talentId);
-        if (talentOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Talent with ID " + talentId + " not found!");
-        }
+        var talent = talentRepository.findById(talentId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Talent with ID " + talentId + " not found!"));
 
-        return mapper.toTalentProfileResponse(talentOptional.get());
+        return mapper.toTalentProfileResponse(talent, getPrevTalentId(talentId), getNextTalentId(talentId));
     }
 
     @Override
     public UpdatedTalentResponse updateTalentProfile(long talentId, String email, TalentUpdateRequest updateTalent) {
-        Optional<Talent> talentOptional = talentRepository.findById(talentId);
-        if(talentOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Talent with ID " + talentId + " not found!");
-        }
-        var talent = talentOptional.get();
-        if(!talent.getEmail().equals(email)) {
+        var talent = talentRepository.findById(talentId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Talent with ID " + talentId + " not found!"));
+
+        if (!talent.getEmail().equals(email)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
         return updateTalent(talent, updateTalent);
@@ -93,17 +91,24 @@ public class TalentServiceImpl implements TalentService {
 
     @Override
     public void deleteTalent(long talentId, String email) {
-        Optional<Talent> talentOptional = talentRepository.findById(talentId);
-        if (talentOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Talent with ID " + talentId + " not found");
-        }
+        var talent = talentRepository.findById(talentId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Talent with ID " + talentId + " not found"));
 
-        Talent talent = talentOptional.get();
-        if (!email.equals(talent.getEmail())) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        if (!email.equals(talent.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
 
         linkRepository.deleteByTalent(talent);
         talentRepository.delete(talent);
+    }
+
+    private Long getPrevTalentId(long talentId) {
+        return talentRepository.findPrevTalent(talentId);
+    }
+
+    private Long getNextTalentId(long talentId) {
+        return talentRepository.findNextTalent(talentId);
     }
 
     private UpdatedTalentResponse updateTalent(Talent oldTalent, TalentUpdateRequest newTalent) {
