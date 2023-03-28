@@ -75,7 +75,6 @@ public class WebSecurityConfig {
                         .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
                 );
 
-        http    .cors().disable();
 
         return http.build();
     }
