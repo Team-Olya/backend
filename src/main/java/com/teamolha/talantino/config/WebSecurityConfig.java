@@ -27,6 +27,8 @@ import org.springframework.security.oauth2.server.resource.web.access.BearerToke
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -50,7 +52,8 @@ public class WebSecurityConfig {
                         .requestMatchers("/talents/register").permitAll()
                         .requestMatchers("/talents/login").permitAll()
                         .requestMatchers("/talents").permitAll()
-                        .requestMatchers(antMatcher("/talents/{talent-id}")).authenticated()
+                        .requestMatchers(antMatcher("/talents/*")).authenticated()
+                        .requestMatchers(antMatcher("/api/auth")).authenticated()
                         .requestMatchers(antMatcher("/h2/**")).permitAll() // for H2 console
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/test").authenticated()
@@ -66,10 +69,6 @@ public class WebSecurityConfig {
                         .frameOptions()
                         .disable());
 
-        http    .cors().configurationSource(
-                request -> new CorsConfiguration().applyPermitDefaultValues()
-        );
-
         http    .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .exceptionHandling(c -> c
                         .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
@@ -77,6 +76,24 @@ public class WebSecurityConfig {
                 );
 
         return http.build();
+    }
+
+    @Bean
+    public WebMvcConfigurer configurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(final CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedHeaders("Access-Control-Allow-Origin",
+                                "*",
+                                "Access-Control-Allow-Methods",
+                                "POST, GET, DELETE, PATCH, PUT",
+                                "Access-Control-Allow-Headers",
+                                "Origin, X-Requested-With, Content-Type, Accept")
+                        .allowedOrigins("*")
+                        .allowedMethods("*");
+            }
+        };
     }
 
     @Bean

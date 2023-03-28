@@ -23,16 +23,11 @@ public class AuthenticationController {
     TalentService talentService;
 
     @GetMapping("/api/auth")
-    @ResponseStatus(HttpStatus.OK)
     TalentProfileResponse getMyProfile(Authentication authentication) {
-        if(authentication != null && authentication.isAuthenticated()) {
-           return talentService.talentProfile(authentication.getName());
-        }
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        return talentService.talentProfile(authentication.getName());
     }
 
     @PostMapping("/talents/login")
-    @ResponseStatus(HttpStatus.OK)
     LoginResponse login(Authentication authentication) {
         return authService.login(authentication);
     }
