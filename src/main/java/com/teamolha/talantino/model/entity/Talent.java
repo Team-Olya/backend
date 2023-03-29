@@ -41,6 +41,7 @@ public class Talent {
 
     private String avatar;
 
+    @Lob
     private String description;
 
     private int experience;
