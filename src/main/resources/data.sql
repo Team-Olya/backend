@@ -48,18 +48,18 @@ values ('Sofiia', 'Kazantseva', 'sk@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9o
         'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
         'Ukraine');
 
-insert into link (url, talent_id) values ('google.com', 1);
-insert into link (url, talent_id) values ('bing.com', 2);
-insert into link (url, talent_id) values ('discord.com', 2);
-insert into link (url, talent_id) values ('google.com', 3);
-insert into link (url, talent_id) values ('twitch.tv', 4);
-insert into link (url, talent_id) values ('youtube.com', 4);
-insert into link (url, talent_id) values ('reddit.com', 5);
-insert into link (url, talent_id) values ('twitter.com', 6);
-insert into link (url, talent_id) values ('telegram.com', 7);
-insert into link (url, talent_id) values ('spotify.com', 7);
-insert into link (url, talent_id) values ('linkedin.com', 8);
-insert into link (url, talent_id) values ('github.com', 9);
-insert into link (url, talent_id) values ('dota2.com', 10);
-insert into link (url, talent_id) values ('blizzard.com', 10);
-insert into link (url, talent_id) values ('softserveinc.com', 11);
+insert into link (url, talent_id) values ('https://google.com', 1);
+insert into link (url, talent_id) values ('https://bing.com', 2);
+insert into link (url, talent_id) values ('https://discord.com', 2);
+insert into link (url, talent_id) values ('https://google.com', 3);
+insert into link (url, talent_id) values ('https://twitch.tv', 4);
+insert into link (url, talent_id) values ('https://youtube.com', 4);
+insert into link (url, talent_id) values ('https://reddit.com', 5);
+insert into link (url, talent_id) values ('https://twitter.com', 6);
+insert into link (url, talent_id) values ('https://telegram.com', 7);
+insert into link (url, talent_id) values ('https://spotify.com', 7);
+insert into link (url, talent_id) values ('https://linkedin.com', 8);
+insert into link (url, talent_id) values ('https://github.com', 9);
+insert into link (url, talent_id) values ('https://dota2.com', 10);
+insert into link (url, talent_id) values ('https://blizzard.com', 10);
+insert into link (url, talent_id) values ('https://softserveinc.com', 11);
