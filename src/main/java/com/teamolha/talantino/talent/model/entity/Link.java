@@ -1,4 +1,4 @@
-package com.teamolha.talantino.model.entity;
+package com.teamolha.talantino.talent.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

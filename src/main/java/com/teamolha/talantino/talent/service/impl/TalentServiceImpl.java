@@ -1,18 +1,18 @@
-package com.teamolha.talantino.service.impl;
+package com.teamolha.talantino.talent.service.impl;
 
-import com.teamolha.talantino.mapper.Mappers;
-import com.teamolha.talantino.model.entity.Kind;
-import com.teamolha.talantino.model.entity.Link;
-import com.teamolha.talantino.model.entity.Talent;
-import com.teamolha.talantino.model.request.TalentUpdateRequest;
-import com.teamolha.talantino.model.response.TalentGeneralResponse;
-import com.teamolha.talantino.model.response.TalentProfileResponse;
-import com.teamolha.talantino.model.response.TalentsPageResponse;
-import com.teamolha.talantino.model.response.UpdatedTalentResponse;
-import com.teamolha.talantino.repository.KindRepository;
-import com.teamolha.talantino.repository.LinkRepository;
-import com.teamolha.talantino.repository.TalentRepository;
-import com.teamolha.talantino.service.TalentService;
+import com.teamolha.talantino.talent.mapper.Mappers;
+import com.teamolha.talantino.talent.model.entity.Kind;
+import com.teamolha.talantino.talent.model.entity.Link;
+import com.teamolha.talantino.talent.model.entity.Talent;
+import com.teamolha.talantino.talent.model.request.TalentUpdateRequest;
+import com.teamolha.talantino.talent.model.response.TalentGeneralResponse;
+import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
+import com.teamolha.talantino.talent.model.response.TalentsPageResponse;
+import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
+import com.teamolha.talantino.talent.repository.KindRepository;
+import com.teamolha.talantino.talent.repository.LinkRepository;
+import com.teamolha.talantino.talent.repository.TalentRepository;
+import com.teamolha.talantino.talent.service.TalentService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -84,7 +83,7 @@ public class TalentServiceImpl implements TalentService {
                         "Talent with ID " + talentId + " not found!"));
 
         if (!talent.getEmail().equals(email)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         return updateTalent(talent, updateTalent);
     }
@@ -96,7 +95,7 @@ public class TalentServiceImpl implements TalentService {
                         "Talent with ID " + talentId + " not found"));
 
         if (!email.equals(talent.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
         linkRepository.deleteByTalent(talent);

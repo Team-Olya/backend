@@ -1,6 +1,6 @@
-package com.teamolha.talantino.repository;
+package com.teamolha.talantino.talent.repository;
 
-import com.teamolha.talantino.model.entity.Talent;
+import com.teamolha.talantino.talent.model.entity.Talent;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -26,9 +26,5 @@ public interface TalentRepository extends JpaRepository<Talent, Long> {
             "(ORDER BY id) AS next_value FROM talent) subquery WHERE id=:id",
             nativeQuery = true)
     Long findNextTalent(long id);
-
-    Optional<Talent> findFirstByIdAfter(long id);
-
-    Optional<Talent> findFirstByIdBefore(long id);
 
 }

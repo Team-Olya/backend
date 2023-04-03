@@ -1,9 +1,9 @@
-package com.teamolha.talantino.mapper;
+package com.teamolha.talantino.talent.mapper;
 
-import com.teamolha.talantino.model.entity.Link;
-import com.teamolha.talantino.model.entity.Talent;
-import com.teamolha.talantino.model.response.TalentProfileResponse;
-import com.teamolha.talantino.model.response.UpdatedTalentResponse;
+import com.teamolha.talantino.talent.model.entity.Link;
+import com.teamolha.talantino.talent.model.entity.Talent;
+import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
+import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
 import org.mapstruct.Mapper;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
