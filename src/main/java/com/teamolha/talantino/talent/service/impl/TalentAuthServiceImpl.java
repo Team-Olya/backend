@@ -1,11 +1,11 @@
-package com.teamolha.talantino.service.impl;
+package com.teamolha.talantino.talent.service.impl;
 
-import com.teamolha.talantino.model.entity.Kind;
-import com.teamolha.talantino.model.entity.Talent;
-import com.teamolha.talantino.model.response.LoginResponse;
-import com.teamolha.talantino.repository.KindRepository;
-import com.teamolha.talantino.repository.TalentRepository;
-import com.teamolha.talantino.service.AuthenticationService;
+import com.teamolha.talantino.talent.model.entity.Kind;
+import com.teamolha.talantino.talent.model.entity.Talent;
+import com.teamolha.talantino.talent.model.response.LoginResponse;
+import com.teamolha.talantino.talent.repository.KindRepository;
+import com.teamolha.talantino.talent.repository.TalentRepository;
+import com.teamolha.talantino.talent.service.TalentAuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Transactional
 @Service
 @AllArgsConstructor
-public class AuthenticationServiceImpl implements AuthenticationService {
+public class TalentAuthServiceImpl implements TalentAuthService {
     private final JwtEncoder jwtEncoder;
     private TalentRepository talentRepository;
     private KindRepository kindRepository;

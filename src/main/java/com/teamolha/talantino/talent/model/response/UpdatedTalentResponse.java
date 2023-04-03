@@ -1,10 +1,13 @@
-package com.teamolha.talantino.model.request;
+package com.teamolha.talantino.talent.model.response;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
 import java.util.List;
 
-public record TalentUpdateRequest(
+@Builder
+public record UpdatedTalentResponse (
+        long id,
         @NotNull
         String name,
         @NotNull

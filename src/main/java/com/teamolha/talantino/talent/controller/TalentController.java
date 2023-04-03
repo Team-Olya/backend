@@ -1,10 +1,10 @@
-package com.teamolha.talantino.controller;
+package com.teamolha.talantino.talent.controller;
 
-import com.teamolha.talantino.model.request.TalentUpdateRequest;
-import com.teamolha.talantino.model.response.TalentProfileResponse;
-import com.teamolha.talantino.model.response.TalentsPageResponse;
-import com.teamolha.talantino.model.response.UpdatedTalentResponse;
-import com.teamolha.talantino.service.TalentService;
+import com.teamolha.talantino.talent.model.request.TalentUpdateRequest;
+import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
+import com.teamolha.talantino.talent.model.response.TalentsPageResponse;
+import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
+import com.teamolha.talantino.talent.service.TalentService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;

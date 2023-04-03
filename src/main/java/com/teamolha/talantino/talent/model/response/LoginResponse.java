@@ -1,4 +1,4 @@
-package com.teamolha.talantino.model.response;
+package com.teamolha.talantino.talent.model.response;
 
 public record LoginResponse(
         long id,

@@ -1,4 +1,4 @@
-package com.teamolha.talantino.model.request;
+package com.teamolha.talantino.talent.model.request;
 
 import com.teamolha.talantino.validation.Password;
 import jakarta.validation.constraints.NotNull;

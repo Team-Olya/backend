@@ -1,7 +1,7 @@
-package com.teamolha.talantino.repository;
+package com.teamolha.talantino.talent.repository;
 
-import com.teamolha.talantino.model.entity.Link;
-import com.teamolha.talantino.model.entity.Talent;
+import com.teamolha.talantino.talent.model.entity.Link;
+import com.teamolha.talantino.talent.model.entity.Talent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
