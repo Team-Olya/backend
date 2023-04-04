@@ -1,5 +1,6 @@
 package com.teamolha.talantino.talent.model.entity;
 
+import com.teamolha.talantino.proof.model.entity.Proof;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -52,6 +53,11 @@ public class Talent {
             CascadeType.DETACH, CascadeType.REFRESH},
             mappedBy = "talent")
     private List<Link> links;
+
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST,
+            CascadeType.DETACH, CascadeType.REFRESH},
+            mappedBy = "talent")
+    private List<Proof> proofs;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private Collection<String> authorities;

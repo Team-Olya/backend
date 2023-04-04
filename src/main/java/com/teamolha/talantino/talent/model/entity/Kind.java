@@ -6,7 +6,6 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-//@Table(name = "kind_of_talent")
 @Getter
 @Setter
 @Builder
