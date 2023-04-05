@@ -69,11 +69,11 @@ public class ProofServiceImpl implements ProofService {
                 PageRequest.of(page, amount, Sort.Direction.DESC, sort) :
                 PageRequest.of(page, amount, Sort.Direction.ASC, sort);
 
-        long totalAmount = status.equals("none") ?
+        long totalAmount = status.equals("ALL") ?
                 proofRepository.findByTalent_Id(talentId).size():
                 proofRepository.findByStatusAndTalent_Id(status, talentId).size();
 
-        var proofs = status.equals("none") ?
+        var proofs = status.equals("ALL") ?
                 proofRepository.findByTalent_Id(talentId, pageable)
                         .stream()
                         .map(mapper::toProofDTO)

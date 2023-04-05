@@ -16,7 +16,7 @@ public class ProofStatusValidator implements ConstraintValidator<ProofStatus, St
         boolean valid = value.equals(Status.DRAFT.name())
                 || value.equals(Status.HIDDEN.name())
                 || value.equals(Status.PUBLISHED.name())
-                || value.equals("none");
+                || value.equals("ALL");
         if (!valid) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Proof status must be DRAFT, HIDDEN or PUBLISHED");
