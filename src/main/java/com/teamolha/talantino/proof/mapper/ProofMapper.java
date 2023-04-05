@@ -9,5 +9,14 @@ import static org.mapstruct.ReportingPolicy.IGNORE;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = IGNORE)
 public interface ProofMapper {
 
-    ProofDTO toProofDTO(Proof proof);
+    default ProofDTO toProofDTO(Proof proof) {
+        return ProofDTO.builder()
+                .id(proof.getId())
+                .date(proof.getDate())
+                .title(proof.getTitle())
+                .description(proof.getDescription())
+                .authorId(proof.getTalent().getId())
+                .status(proof.getStatus())
+                .build();
+    }
 }
