@@ -26,5 +26,4 @@ public interface TalentRepository extends JpaRepository<Talent, Long> {
             "(ORDER BY id) AS next_value FROM talent) subquery WHERE id=:id",
             nativeQuery = true)
     Long findNextTalent(long id);
-
 }
