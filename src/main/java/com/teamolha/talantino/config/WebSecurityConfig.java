@@ -52,7 +52,6 @@ public class WebSecurityConfig {
                         .requestMatchers(antMatcher("/api/auth")).authenticated()
                         .requestMatchers(antMatcher("/h2/**")).permitAll() // for H2 console
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/proofs/test").permitAll()
                         .requestMatchers("/test").authenticated()
                         .anyRequest().authenticated()
                 );

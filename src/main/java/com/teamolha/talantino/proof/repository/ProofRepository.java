@@ -1,8 +1,11 @@
 package com.teamolha.talantino.proof.repository;
 
 import com.teamolha.talantino.proof.model.entity.Proof;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 public interface ProofRepository extends JpaRepository<Proof, Long> {
     @Query(value = "SELECT prev_value FROM (SELECT *, LAG(id) OVER " +
