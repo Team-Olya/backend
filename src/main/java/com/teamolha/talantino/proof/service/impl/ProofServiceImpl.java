@@ -1,6 +1,7 @@
 package com.teamolha.talantino.proof.service.impl;
 
 import com.teamolha.talantino.proof.mapper.ProofMapper;
+import com.teamolha.talantino.proof.model.Status;
 import com.teamolha.talantino.proof.model.response.ProofDTO;
 import com.teamolha.talantino.proof.model.response.ProofsPageDTO;
 import com.teamolha.talantino.proof.repository.ProofRepository;
@@ -23,7 +24,7 @@ public class ProofServiceImpl implements ProofService {
 
     @Override
     public ProofsPageDTO pageProofs(String sort, int page, int count) {
-        int totalAmount = proofRepository.findAll().size();
+        int totalAmount = proofRepository.findByStatus(Status.PUBLISHED.name()).size();
 
         if (count <= 0) {
             return ProofsPageDTO.builder()
@@ -35,7 +36,7 @@ public class ProofServiceImpl implements ProofService {
                 PageRequest.of(page, count, Sort.Direction.DESC, "date") :
                 PageRequest.of(page, count, Sort.Direction.ASC, "date");
 
-        List<ProofDTO> proofs = proofRepository.findAll(pageable)
+        List<ProofDTO> proofs = proofRepository.findByStatus(Status.PUBLISHED.name(), pageable)
                 .stream().map(mapper::toProofDTO).toList();
 
         return ProofsPageDTO.builder()

@@ -48,6 +48,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/talents/register").permitAll()
                         .requestMatchers("/talents/login").permitAll()
                         .requestMatchers("/talents").permitAll()
+                        .requestMatchers("/proofs").permitAll()
                         .requestMatchers(antMatcher("/talents/*")).authenticated()
                         .requestMatchers(antMatcher("/api/auth")).authenticated()
                         .requestMatchers(antMatcher("/h2/**")).permitAll() // for H2 console

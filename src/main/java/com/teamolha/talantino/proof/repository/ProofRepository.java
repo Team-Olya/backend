@@ -17,4 +17,8 @@ public interface ProofRepository extends JpaRepository<Proof, Long> {
             "(ORDER BY id) AS next_value FROM proof) subquery WHERE id=:id",
             nativeQuery = true)
     Long findNextProofId(long id);
+
+    List<Proof> findByStatus(String status, Pageable pageable);
+
+    List<Proof> findByStatus(String status);
 }
