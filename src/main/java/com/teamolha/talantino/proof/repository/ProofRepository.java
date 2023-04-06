@@ -32,4 +32,8 @@ public interface ProofRepository extends JpaRepository<Proof, Long> {
     List<Proof> findByTalent_Id(long talentId);
 
     long countById(Long id);
+
+    @Query(value = "select * from proof order by :sort :type",
+            nativeQuery = true)
+    List<Proof> findSortingProofs(String sort, String type);
 }

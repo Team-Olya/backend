@@ -32,6 +32,7 @@ public class Proof {
     private String title;
 
     @NotBlank
+    @Lob
     private String description;
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST,

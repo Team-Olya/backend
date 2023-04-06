@@ -1,6 +1,7 @@
 package com.teamolha.talantino.proof.controller;
 
 import com.teamolha.talantino.proof.model.request.CreateProof;
+import com.teamolha.talantino.proof.model.response.ProofsPageDTO;
 import com.teamolha.talantino.proof.model.response.TalentProofList;
 import com.teamolha.talantino.proof.service.ProofService;
 import com.teamolha.talantino.validation.ProofSort;
@@ -39,5 +40,15 @@ public class ProofController {
             @PathVariable("talent-id") Long talentId,
             @RequestBody @Valid CreateProof proof){
         proofService.createProof(auth.getName(), talentId, proof);
+    }
+
+    @GetMapping("/proofs")
+    public ProofsPageDTO getAllProofs(
+            @RequestParam(required = false, defaultValue = "date") @Valid @ProofSort String sort,
+            @RequestParam(required = false, defaultValue = "desc") @Valid @SortType String type,
+            @RequestParam(required = false, defaultValue = "9") Integer amount,
+            @RequestParam(required = false, defaultValue = "0") Integer page
+    ) {
+        return proofService.pageProofs(sort, type, page, amount);
     }
 }
