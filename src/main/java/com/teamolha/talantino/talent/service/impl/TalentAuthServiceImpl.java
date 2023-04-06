@@ -7,6 +7,7 @@ import com.teamolha.talantino.talent.repository.KindRepository;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import com.teamolha.talantino.talent.service.TalentAuthService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 @Transactional
 @Service
 @AllArgsConstructor
+@Slf4j
 public class TalentAuthServiceImpl implements TalentAuthService {
     private final JwtEncoder jwtEncoder;
     private TalentRepository talentRepository;
@@ -40,7 +42,8 @@ public class TalentAuthServiceImpl implements TalentAuthService {
                 .subject(authentication.getName())
                 .claim("scope", createScope(authentication))
                 .build();
-        var user = talentRepository.findByEmailIgnoreCase(authentication.getName()).get();
+        var user = talentRepository.findByEmailIgnoreCase(authentication.getName()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong authentication data!"));
         return new LoginResponse (
                 user.getId(),
                 jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue(),
