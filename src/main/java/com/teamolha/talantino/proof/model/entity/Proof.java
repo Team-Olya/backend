@@ -5,8 +5,10 @@ import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.validation.ProofStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -23,8 +25,8 @@ public class Proof {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "publication_date")
-    @NotBlank
-    private Date date;
+    @NotNull
+    private LocalDateTime date;
 
     @NotBlank
     private String title;
@@ -36,7 +38,7 @@ public class Proof {
             CascadeType.DETACH, CascadeType.REFRESH},
             fetch = FetchType.EAGER)
     @JoinColumn(name = "talent_id")
-    @NotBlank
+    @NotNull
     private Talent talent;
 
     @NotBlank

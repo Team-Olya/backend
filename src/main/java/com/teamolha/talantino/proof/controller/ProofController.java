@@ -1,5 +1,6 @@
 package com.teamolha.talantino.proof.controller;
 
+import com.teamolha.talantino.proof.model.request.CreateProof;
 import com.teamolha.talantino.proof.model.response.TalentProofList;
 import com.teamolha.talantino.proof.service.ProofService;
 import com.teamolha.talantino.validation.ProofSort;
@@ -7,12 +8,10 @@ import com.teamolha.talantino.validation.ProofStatus;
 import com.teamolha.talantino.validation.SortType;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Validated
@@ -31,5 +30,14 @@ public class ProofController {
             @RequestParam(required = false, defaultValue = "0") Integer page
     ) {
         return proofService.talentProofs(auth.getName(), sort, type, status, amount, page, talentId);
+    }
+
+    @PostMapping("/talents/{talent-id}/proofs")
+    @ResponseStatus(HttpStatus.CREATED)
+    void createProof(
+            Authentication auth,
+            @PathVariable("talent-id") Long talentId,
+            @RequestBody @Valid CreateProof proof){
+        proofService.createProof(auth.getName(), talentId, proof);
     }
 }

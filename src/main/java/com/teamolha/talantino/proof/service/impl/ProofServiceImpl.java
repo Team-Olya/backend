@@ -2,6 +2,8 @@ package com.teamolha.talantino.proof.service.impl;
 
 import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.model.Status;
+import com.teamolha.talantino.proof.model.entity.Proof;
+import com.teamolha.talantino.proof.model.request.CreateProof;
 import com.teamolha.talantino.proof.model.response.ProofDTO;
 import com.teamolha.talantino.proof.model.response.ProofsPageDTO;
 import com.teamolha.talantino.proof.model.response.TalentProofList;
@@ -17,7 +19,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Slf4j
@@ -26,7 +32,6 @@ import java.util.List;
 public class ProofServiceImpl implements ProofService {
 
     ProofMapper mapper;
-
     ProofRepository proofRepository;
     private final TalentRepository talentRepository;
 
@@ -88,6 +93,28 @@ public class ProofServiceImpl implements ProofService {
                 .totalAmount(totalAmount)
                 .proofs(proofs)
                 .build();
+    }
+    @Override
+    public void createProof(String email, Long talentId, CreateProof proof){
+        var talent = talentRepository.findById(talentId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Talent with ID " + talentId + " not found!"));
+
+        if (!email.equals(talent.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC);
+
+        proofRepository.save(
+                Proof.builder()
+                        .title(proof.title())
+                        .date(date)
+                        .description(proof.description())
+                        .talent(talent)
+                        .status(proof.status())
+                        .build()
+        );
     }
 
 }
