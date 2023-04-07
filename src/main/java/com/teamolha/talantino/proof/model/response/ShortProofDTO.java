@@ -11,7 +11,6 @@ public record ShortProofDTO(
         LocalDateTime date,
         String title,
         @Size(min = 2, max = 200)
-        String description,
-        Long authorId
+        String description
 ) {
 }

@@ -29,7 +29,6 @@ public interface ProofMapper {
                 .description(proof.getDescription().length() > 200 ?
                         proof.getDescription().substring(0, 200) :
                         proof.getDescription())
-                .authorId(proof.getTalent().getId())
                 .build();
     }
 }
