@@ -1,5 +1,6 @@
 package com.teamolha.talantino.talent.service.impl;
 
+import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.talent.mapper.Mappers;
 import com.teamolha.talantino.talent.model.entity.Kind;
 import com.teamolha.talantino.talent.model.entity.Link;
@@ -38,6 +39,8 @@ public class TalentServiceImpl implements TalentService {
     TalentRepository talentRepository;
 
     KindRepository kindRepository;
+
+    ProofRepository proofRepository;
 
     @Override
     public TalentProfileResponse talentProfile(String email) {
@@ -99,6 +102,7 @@ public class TalentServiceImpl implements TalentService {
         }
 
         linkRepository.deleteByTalent(talent);
+        proofRepository.deleteByTalent(talent);
         talentRepository.delete(talent);
     }
 
