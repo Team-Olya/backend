@@ -7,6 +7,6 @@ import java.util.List;
 @Builder
 public record ProofsPageDTO(
         int totalAmount,
-        List<ProofDTO> proofs
+        List<ShortProofDTO> proofs
 ) {
 }

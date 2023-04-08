@@ -4,8 +4,8 @@ import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.model.Status;
 import com.teamolha.talantino.proof.model.entity.Proof;
 import com.teamolha.talantino.proof.model.request.CreateProof;
-import com.teamolha.talantino.proof.model.response.ProofDTO;
 import com.teamolha.talantino.proof.model.response.ProofsPageDTO;
+import com.teamolha.talantino.proof.model.response.ShortProofDTO;
 import com.teamolha.talantino.proof.model.response.TalentProofList;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.proof.service.ProofService;
@@ -19,10 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.Date;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
 
@@ -36,21 +33,17 @@ public class ProofServiceImpl implements ProofService {
     private final TalentRepository talentRepository;
 
     @Override
-    public ProofsPageDTO pageProofs(String sort, int page, int count) {
+    public ProofsPageDTO pageProofs(String sort, String type, int page, int count) {
         int totalAmount = proofRepository.findByStatus(Status.PUBLISHED.name()).size();
 
-        if (count <= 0) {
-            return ProofsPageDTO.builder()
-                    .totalAmount(totalAmount)
-                    .build();
-        }
+        if (count <= 0 || page < 0) return ProofsPageDTO.builder().totalAmount(totalAmount).build();
 
-        Pageable pageable = sort.equals("desc") ?
-                PageRequest.of(page, count, Sort.Direction.DESC, "date") :
-                PageRequest.of(page, count, Sort.Direction.ASC, "date");
+        Pageable pageable = type.equals("desc") ?
+                PageRequest.of(page, count, Sort.Direction.DESC, sort) :
+                PageRequest.of(page, count, Sort.Direction.ASC, sort);
 
-        List<ProofDTO> proofs = proofRepository.findByStatus(Status.PUBLISHED.name(), pageable)
-                .stream().map(mapper::toProofDTO).toList();
+        List<ShortProofDTO> proofs = proofRepository.findByStatus(Status.PUBLISHED.name(), pageable)
+                .stream().map(mapper::toShortProofDTO).toList();
 
         return ProofsPageDTO.builder()
                 .totalAmount(totalAmount)
@@ -60,10 +53,11 @@ public class ProofServiceImpl implements ProofService {
 
     @Override
     public TalentProofList talentProofs(String name, String sort, String sortType, String status, Integer amount, Integer page, Long talentId) {
-        if(talentRepository.findById(talentId).isEmpty()) {
+        if (talentRepository.findById(talentId).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Talent with id " + talentId + " not found");
-        };
+                    "Talent with id " + talentId + " not found");
+        }
+        ;
 
         if (talentRepository.findByEmailIgnoreCase(name).orElseThrow().getId() != talentId && !status.equals(Status.PUBLISHED.name())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
@@ -75,27 +69,27 @@ public class ProofServiceImpl implements ProofService {
                 PageRequest.of(page, amount, Sort.Direction.ASC, sort);
 
         long totalAmount = status.equals("ALL") ?
-                proofRepository.findByTalent_Id(talentId).size():
+                proofRepository.findByTalent_Id(talentId).size() :
                 proofRepository.findByStatusAndTalent_Id(status, talentId).size();
 
         var proofs = status.equals("ALL") ?
                 proofRepository.findByTalent_Id(talentId, pageable)
                         .stream()
                         .map(mapper::toProofDTO)
-                        .toList():
+                        .toList() :
                 proofRepository.findByStatusAndTalent_Id(status, talentId, pageable)
                         .stream()
                         .map(mapper::toProofDTO)
-                        .toList()
-                ;
+                        .toList();
 
         return TalentProofList.builder()
                 .totalAmount(totalAmount)
                 .proofs(proofs)
                 .build();
     }
+
     @Override
-    public void createProof(String email, Long talentId, CreateProof proof){
+    public void createProof(String email, Long talentId, CreateProof proof) {
         var talent = talentRepository.findById(talentId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Talent with ID " + talentId + " not found!"));
