@@ -3,10 +3,8 @@ package com.teamolha.talantino.proof.service.impl;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.model.Status;
 import com.teamolha.talantino.proof.model.entity.Proof;
-import com.teamolha.talantino.proof.model.request.CreateProof;
-import com.teamolha.talantino.proof.model.response.ProofsPageDTO;
-import com.teamolha.talantino.proof.model.response.ShortProofDTO;
-import com.teamolha.talantino.proof.model.response.TalentProofList;
+import com.teamolha.talantino.proof.model.request.ProofRequest;
+import com.teamolha.talantino.proof.model.response.*;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.proof.service.ProofService;
 import com.teamolha.talantino.talent.repository.TalentRepository;
@@ -57,7 +55,6 @@ public class ProofServiceImpl implements ProofService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "Talent with id " + talentId + " not found");
         }
-        ;
 
         if (talentRepository.findByEmailIgnoreCase(name).orElseThrow().getId() != talentId && !status.equals(Status.PUBLISHED.name())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
@@ -89,7 +86,7 @@ public class ProofServiceImpl implements ProofService {
     }
 
     @Override
-    public void createProof(String email, Long talentId, CreateProof proof) {
+    public void createProof(String email, Long talentId, ProofRequest proof) {
         var talent = talentRepository.findById(talentId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Talent with ID " + talentId + " not found!"));
@@ -109,6 +106,33 @@ public class ProofServiceImpl implements ProofService {
                         .status(proof.status())
                         .build()
         );
+    }
+    @Override
+    public ProofDTO updateProof(String email, Long talentId, Long proofId, ProofRequest newProof){
+        var talent = talentRepository.findById(talentId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Talent with ID " + talentId + " not found"));
+
+        if (!email.equals(talent.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        var proof = proofRepository.findById(proofId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Proof with ID " + proofId + " not found"));
+
+        if (!talentId.equals(proof.getTalent().getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        return editProof(proof, newProof);
+    }
+
+    private ProofDTO editProof(Proof proof, ProofRequest newProof){
+        proof.setTitle(newProof.title());
+        proof.setDescription(newProof.description());
+        proof.setStatus(newProof.status());
+        proofRepository.save(proof);
+        return mapper.toProofDTO(proof);
     }
 
 }
