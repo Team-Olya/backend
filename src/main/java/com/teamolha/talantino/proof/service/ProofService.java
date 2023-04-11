@@ -14,4 +14,6 @@ public interface ProofService {
     void createProof(String email, Long talentId, ProofRequest proof);
 
     ProofDTO updateProof(String email, Long talentId, Long proofId, ProofRequest newProof);
+
+    void deleteProof(Long talentId, Long proofId, String email);
 }

@@ -10,11 +10,13 @@ import com.teamolha.talantino.validation.ProofStatus;
 import com.teamolha.talantino.validation.SortType;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @Validated
 @AllArgsConstructor
@@ -61,5 +63,14 @@ public class ProofController {
             Authentication auth
     ){
         return proofService.updateProof(auth.getName(), talentId, proofId, proofUpdateRequest);
+    }
+
+    @DeleteMapping("/talents/{talent-id}/proofs/{proof-id}")
+    public void deleteProof(
+            @PathVariable("talent-id") Long talentId,
+            @PathVariable("proof-id") Long proofId,
+            Authentication auth
+    ) {
+        proofService.deleteProof(talentId, proofId, auth.getName());
     }
 }
