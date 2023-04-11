@@ -107,8 +107,9 @@ public class ProofServiceImpl implements ProofService {
                         .build()
         );
     }
+
     @Override
-    public ProofDTO updateProof(String email, Long talentId, Long proofId, ProofRequest newProof){
+    public ProofDTO updateProof(String email, Long talentId, Long proofId, ProofRequest newProof) {
         var talent = talentRepository.findById(talentId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Talent with ID " + talentId + " not found"));
@@ -127,7 +128,24 @@ public class ProofServiceImpl implements ProofService {
         return editProof(proof, newProof);
     }
 
-    private ProofDTO editProof(Proof proof, ProofRequest newProof){
+    @Override
+    public void deleteProof(Long talentId, Long proofId, String email) {
+        var talent = talentRepository.findById(talentId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Talent with ID " + talentId + " not found"));
+        if (!email.equals(talent.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        var proof = proofRepository.findById(proofId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Proof with ID " + proofId + " not found"));
+        if (proof.getTalent().getId() == talent.getId()) {
+            proofRepository.delete(proof);
+        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+    }
+
+    private ProofDTO editProof(Proof proof, ProofRequest newProof) {
         proof.setTitle(newProof.title());
         proof.setDescription(newProof.description());
         proof.setStatus(newProof.status());
