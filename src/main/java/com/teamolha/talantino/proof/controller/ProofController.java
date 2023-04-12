@@ -24,11 +24,11 @@ public class ProofController {
     ProofService proofService;
 
     @GetMapping("/talents/{talent-id}/proofs")
-    TalentProofList getTalentProofs (
+    TalentProofList getTalentProofs(
             Authentication auth,
             @PathVariable("talent-id") Long talentId,
             @RequestParam(required = false, defaultValue = "date") @Valid @ProofSort String sort,
-            @RequestParam(required = false, defaultValue = "desc")  @Valid @SortType String type,
+            @RequestParam(required = false, defaultValue = "desc") @Valid @SortType String type,
             @RequestParam(required = false, defaultValue = "PUBLISHED") @Valid @ProofStatus String status,
             @RequestParam(required = false, defaultValue = "9") Integer amount,
             @RequestParam(required = false, defaultValue = "0") Integer page
@@ -41,7 +41,7 @@ public class ProofController {
     void createProof(
             Authentication auth,
             @PathVariable("talent-id") Long talentId,
-            @RequestBody @Valid ProofRequest proof){
+            @RequestBody @Valid ProofRequest proof) {
         proofService.createProof(auth.getName(), talentId, proof);
     }
 
@@ -61,7 +61,7 @@ public class ProofController {
             @PathVariable("proof-id") Long proofId,
             @RequestBody @Valid ProofRequest proofUpdateRequest,
             Authentication auth
-    ){
+    ) {
         return proofService.updateProof(auth.getName(), talentId, proofId, proofUpdateRequest);
     }
 
@@ -72,5 +72,10 @@ public class ProofController {
             Authentication auth
     ) {
         proofService.deleteProof(talentId, proofId, auth.getName());
+    }
+
+    @GetMapping("/proofs/{proof-id}")
+    public ProofDTO getProof(@PathVariable("proof-id") Long proofId) {
+        return proofService.getProof(proofId);
     }
 }

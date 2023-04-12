@@ -145,6 +145,20 @@ public class ProofServiceImpl implements ProofService {
         } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 
+    @Override
+    public ProofDTO getProof(Long proofId) {
+        var proof = proofRepository.findById(proofId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Proof with ID " + proofId + " not found"));
+
+        if (!proof.getStatus().equals(Status.PUBLISHED.name())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You can see only PUBLISHED proofs");
+        }
+
+        return mapper.toProofDTO(proof);
+    }
+
     private ProofDTO editProof(Proof proof, ProofRequest newProof) {
         proof.setTitle(newProof.title());
         proof.setDescription(newProof.description());
