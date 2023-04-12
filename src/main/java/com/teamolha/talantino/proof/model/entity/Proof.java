@@ -32,8 +32,8 @@ public class Proof {
     private String title;
 
     @NotBlank
-    @Lob
-    private String description;
+    @Column(columnDefinition = "TEXT")
+    private String description; // TODO: ограничить в сервисе
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST,
             CascadeType.DETACH, CascadeType.REFRESH},

@@ -42,8 +42,8 @@ public class Talent {
 
     private String avatar;
 
-    @Lob
-    private String description;
+    @Column(columnDefinition = "TEXT")
+    private String description; // todo: ограничить в сервисе
 
     private int experience;
 
