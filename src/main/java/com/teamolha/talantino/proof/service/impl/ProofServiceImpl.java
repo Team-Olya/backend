@@ -125,6 +125,16 @@ public class ProofServiceImpl implements ProofService {
         if (!talentId.equals(proof.getTalent().getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+
+        if (!proof.getStatus().equals(Status.DRAFT.name()) && (!proof.getTitle().equals(newProof.title()) ||
+                !proof.getDescription().equals(newProof.description()))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "It is forbidden to edit the contents of a proof that is published or hidden");
+        }
+        if (!proof.getStatus().equals(Status.DRAFT.name()) && newProof.status().equals(Status.DRAFT.name())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You cannot edit the status of an already published or hidden proof back to a draft");
+        }
         return editProof(proof, newProof);
     }
 
