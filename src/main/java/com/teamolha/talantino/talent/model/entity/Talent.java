@@ -40,10 +40,11 @@ public class Talent {
     @JoinColumn(name = "kind_id")
     private Kind kind;
 
+    @Column(columnDefinition = "TEXT")
     private String avatar;
 
     @Column(columnDefinition = "TEXT")
-    private String description; // todo: ограничить в сервисе
+    private String description;
 
     private int experience;
 
