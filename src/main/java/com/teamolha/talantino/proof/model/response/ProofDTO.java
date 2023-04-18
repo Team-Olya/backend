@@ -3,7 +3,6 @@ package com.teamolha.talantino.proof.model.response;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Builder
 public record ProofDTO(
@@ -14,6 +13,6 @@ public record ProofDTO(
         Long authorId,
         String status,
         Integer totalKudos,
-        Boolean isLiked
+        Boolean isKudosed
 ) {
 }

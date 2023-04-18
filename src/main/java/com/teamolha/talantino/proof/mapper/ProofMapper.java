@@ -31,14 +31,14 @@ public interface ProofMapper {
                 .authorId(proof.getTalent().getId())
                 .status(proof.getStatus())
                 .totalKudos(proof.getKudos().size())
-                .isLiked(talent.getLikedProofs().contains(proof))
+                .isKudosed(talent.getKudosedProofs().contains(proof))
                 .build();
     }
 
     default ShortProofDTO toShortProofDTO(Proof proof, Talent talent) {
-        boolean isLiked = false;
+        boolean isKudosed = false;
         if (talent != null) {
-            isLiked = talent.getLikedProofs().contains(proof);
+            isKudosed = talent.getKudosedProofs().contains(proof);
         }
 
         return ShortProofDTO.builder()
@@ -49,7 +49,7 @@ public interface ProofMapper {
                         proof.getDescription().substring(0, 200) :
                         proof.getDescription())
                 .totalKudos(proof.getKudos().size())
-                .isLiked(isLiked)
+                .isKudosed(isKudosed)
                 .build();
     }
 }
