@@ -3,6 +3,7 @@ package com.teamolha.talantino.proof.mapper;
 import com.teamolha.talantino.proof.model.entity.Proof;
 import com.teamolha.talantino.proof.model.response.ProofDTO;
 import com.teamolha.talantino.proof.model.response.ShortProofDTO;
+import com.teamolha.talantino.talent.model.entity.Talent;
 import org.mapstruct.Mapper;
 
 import static org.mapstruct.ReportingPolicy.IGNORE;
@@ -21,7 +22,25 @@ public interface ProofMapper {
                 .build();
     }
 
-    default ShortProofDTO toShortProofDTO(Proof proof) {
+    default ProofDTO toProofDTO(Proof proof, Talent talent) {
+        return ProofDTO.builder()
+                .id(proof.getId())
+                .date(proof.getDate())
+                .title(proof.getTitle())
+                .description(proof.getDescription())
+                .authorId(proof.getTalent().getId())
+                .status(proof.getStatus())
+                .totalKudos(proof.getKudos().size())
+                .isLiked(talent.getLikedProofs().contains(proof))
+                .build();
+    }
+
+    default ShortProofDTO toShortProofDTO(Proof proof, Talent talent) {
+        boolean isLiked = false;
+        if (talent != null) {
+            isLiked = talent.getLikedProofs().contains(proof);
+        }
+
         return ShortProofDTO.builder()
                 .id(proof.getId())
                 .date(proof.getDate())
@@ -29,6 +48,8 @@ public interface ProofMapper {
                 .description(proof.getDescription().length() > 200 ?
                         proof.getDescription().substring(0, 200) :
                         proof.getDescription())
+                .totalKudos(proof.getKudos().size())
+                .isLiked(isLiked)
                 .build();
     }
 }

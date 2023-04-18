@@ -7,6 +7,7 @@ import com.teamolha.talantino.proof.model.request.ProofRequest;
 import com.teamolha.talantino.proof.model.response.*;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.proof.service.ProofService;
+import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -31,7 +33,7 @@ public class ProofServiceImpl implements ProofService {
     private final TalentRepository talentRepository;
 
     @Override
-    public ProofsPageDTO pageProofs(String sort, String type, int page, int count) {
+    public ProofsPageDTO pageProofs(Authentication auth, String sort, String type, int page, int count) {
         int totalAmount = proofRepository.findByStatus(Status.PUBLISHED.name()).size();
 
         if (count <= 0 || page < 0) return ProofsPageDTO.builder().totalAmount(totalAmount).build();
@@ -40,8 +42,11 @@ public class ProofServiceImpl implements ProofService {
                 PageRequest.of(page, count, Sort.Direction.DESC, sort) :
                 PageRequest.of(page, count, Sort.Direction.ASC, sort);
 
+        var talent = (auth == null) ? null :
+                talentRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
+
         List<ShortProofDTO> proofs = proofRepository.findByStatus(Status.PUBLISHED.name(), pageable)
-                .stream().map(mapper::toShortProofDTO).toList();
+                .stream().map(proof -> mapper.toShortProofDTO(proof, talent)).toList();
 
         return ProofsPageDTO.builder()
                 .totalAmount(totalAmount)
@@ -69,14 +74,16 @@ public class ProofServiceImpl implements ProofService {
                 proofRepository.findByTalent_Id(talentId).size() :
                 proofRepository.findByStatusAndTalent_Id(status, talentId).size();
 
+        var talent = talentRepository.findByEmailIgnoreCase(name).orElse(null);
+
         var proofs = status.equals("ALL") ?
                 proofRepository.findByTalent_Id(talentId, pageable)
                         .stream()
-                        .map(mapper::toProofDTO)
+                        .map(proof -> mapper.toProofDTO(proof, talent))
                         .toList() :
                 proofRepository.findByStatusAndTalent_Id(status, talentId, pageable)
                         .stream()
-                        .map(mapper::toProofDTO)
+                        .map(proof -> mapper.toProofDTO(proof, talent))
                         .toList();
 
         return TalentProofList.builder()
@@ -110,17 +117,13 @@ public class ProofServiceImpl implements ProofService {
 
     @Override
     public ProofDTO updateProof(String email, Long talentId, Long proofId, ProofRequest newProof) {
-        var talent = talentRepository.findById(talentId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Talent with ID " + talentId + " not found"));
+        var talent = getTalent(talentId);
 
         if (!email.equals(talent.getEmail())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        var proof = proofRepository.findById(proofId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Proof with ID " + proofId + " not found"));
+        Proof proof = getProofEntity(proofId);
 
         if (!talentId.equals(proof.getTalent().getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -140,16 +143,13 @@ public class ProofServiceImpl implements ProofService {
 
     @Override
     public void deleteProof(Long talentId, Long proofId, String email) {
-        var talent = talentRepository.findById(talentId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Talent with ID " + talentId + " not found"));
+        var talent = getTalent(talentId);
+
         if (!email.equals(talent.getEmail())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        var proof = proofRepository.findById(proofId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Proof with ID " + proofId + " not found"));
+        Proof proof = getProofEntity(proofId);
         if (proof.getTalent().getId() == talent.getId()) {
             proofRepository.delete(proof);
         } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -157,9 +157,7 @@ public class ProofServiceImpl implements ProofService {
 
     @Override
     public ProofDTO getProof(Long proofId) {
-        var proof = proofRepository.findById(proofId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Proof with ID " + proofId + " not found"));
+        Proof proof = getProofEntity(proofId);
 
         if (!proof.getStatus().equals(Status.PUBLISHED.name())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
@@ -167,6 +165,24 @@ public class ProofServiceImpl implements ProofService {
         }
 
         return mapper.toProofDTO(proof);
+    }
+
+    @Override
+    public int getNumberOfKudos(Long proofId) {
+        var proof = getProofEntity(proofId);
+        return proof.getKudos().size();
+    }
+
+    @Override
+    public void setKudos(Authentication auth, Long proofId) {
+        var talent = talentRepository.findByEmailIgnoreCase(auth.getName()).get();
+        var proof = getProofEntity(proofId);
+        var likedProofs = talent.getLikedProofs();
+        if (!likedProofs.contains(proof)) {
+            likedProofs.add(proof);
+            talent.setLikedProofs(likedProofs);
+            talentRepository.save(talent);
+        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Proof has already been liked");
     }
 
     private ProofDTO editProof(Proof proof, ProofRequest newProof) {
@@ -177,4 +193,15 @@ public class ProofServiceImpl implements ProofService {
         return mapper.toProofDTO(proof);
     }
 
+    private Talent getTalent(Long talentId) {
+        return talentRepository.findById(talentId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Talent with ID " + talentId + " not found"));
+    }
+
+    private Proof getProofEntity(Long proofId) {
+        return proofRepository.findById(proofId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Proof with ID " + proofId + " not found"));
+    }
 }

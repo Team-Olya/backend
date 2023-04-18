@@ -10,6 +10,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -41,6 +42,13 @@ public class Proof {
     @JoinColumn(name = "talent_id")
     @NotNull
     private Talent talent;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REFRESH, CascadeType.DETACH})
+    @JoinTable(name = "kudos",
+            joinColumns = @JoinColumn(name = "proof_id"),
+            inverseJoinColumns = @JoinColumn(name = "talent_id"))
+    private List<Talent> kudos;
 
     @NotBlank
     private String status;

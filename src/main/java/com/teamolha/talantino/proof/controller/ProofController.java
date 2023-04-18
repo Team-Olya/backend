@@ -47,12 +47,13 @@ public class ProofController {
 
     @GetMapping("/proofs")
     public ProofsPageDTO getAllProofs(
+            Authentication auth,
             @RequestParam(required = false, defaultValue = "date") @Valid @ProofSort String sort,
             @RequestParam(required = false, defaultValue = "desc") @Valid @SortType String type,
             @RequestParam(required = false, defaultValue = "9") Integer amount,
             @RequestParam(required = false, defaultValue = "0") Integer page
     ) {
-        return proofService.pageProofs(sort, type, page, amount);
+        return proofService.pageProofs(auth, sort, type, page, amount);
     }
 
     @PatchMapping("talents/{talent-id}/proofs/{proof-id}")
@@ -77,5 +78,16 @@ public class ProofController {
     @GetMapping("/proofs/{proof-id}")
     public ProofDTO getProof(@PathVariable("proof-id") Long proofId) {
         return proofService.getProof(proofId);
+    }
+
+    @GetMapping("/proofs/{proof-id}/kudos")
+    public int getNumberOfKudos(@PathVariable("proof-id") Long proofId) {
+        return proofService.getNumberOfKudos(proofId);
+    }
+
+    @PostMapping("/proofs/{proof-id}/kudos")
+    public void setKudos(Authentication auth,
+                         @PathVariable("proof-id") Long proofId) {
+        proofService.setKudos(auth, proofId);
     }
 }

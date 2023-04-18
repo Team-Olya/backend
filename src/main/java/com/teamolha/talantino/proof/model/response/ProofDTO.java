@@ -12,6 +12,8 @@ public record ProofDTO(
         String title,
         String description,
         Long authorId,
-        String status
+        String status,
+        Integer totalKudos,
+        Boolean isLiked
 ) {
 }

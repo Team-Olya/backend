@@ -52,6 +52,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/proofs").permitAll()
                         .requestMatchers(antMatcher("/talents/*")).authenticated()
                         .requestMatchers(antMatcher("/proofs/*")).authenticated()
+                        .requestMatchers(antMatcher("/proofs/**/kudos")).permitAll()
                         .requestMatchers(antMatcher("/api/auth")).authenticated()
                         .requestMatchers(antMatcher("/h2/**")).permitAll() // for H2 console
                         .requestMatchers("/error").permitAll()
