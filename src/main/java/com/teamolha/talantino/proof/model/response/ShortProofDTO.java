@@ -11,6 +11,8 @@ public record ShortProofDTO(
         LocalDateTime date,
         String title,
         @Size(min = 2, max = 200)
-        String description
+        String description,
+        Integer totalKudos,
+        Boolean isLiked
 ) {
 }
