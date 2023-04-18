@@ -65,7 +65,7 @@ public class Talent {
     @JoinTable(name = "kudos",
             joinColumns = @JoinColumn(name = "talent_id"),
             inverseJoinColumns = @JoinColumn(name = "proof_id"))
-    private List<Proof> likedProofs;
+    private List<Proof> kudosedProofs;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private Collection<String> authorities;

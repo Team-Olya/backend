@@ -177,12 +177,12 @@ public class ProofServiceImpl implements ProofService {
     public void setKudos(Authentication auth, Long proofId) {
         var talent = talentRepository.findByEmailIgnoreCase(auth.getName()).get();
         var proof = getProofEntity(proofId);
-        var likedProofs = talent.getLikedProofs();
-        if (!likedProofs.contains(proof)) {
-            likedProofs.add(proof);
-            talent.setLikedProofs(likedProofs);
+        var kudosedProofs = talent.getKudosedProofs();
+        if (!kudosedProofs.contains(proof)) {
+            kudosedProofs.add(proof);
+            talent.setKudosedProofs(kudosedProofs);
             talentRepository.save(talent);
-        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Proof has already been liked");
+        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Proof has already been kudosed");
     }
 
     private ProofDTO editProof(Proof proof, ProofRequest newProof) {
