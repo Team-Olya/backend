@@ -178,6 +178,15 @@ public class ProofServiceImpl implements ProofService {
         var talent = talentRepository.findByEmailIgnoreCase(auth.getName()).get();
         var proof = getProofEntity(proofId);
         var kudosedProofs = talent.getKudosedProofs();
+
+        if (proof.getTalent().equals(talent)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't put kudos on your own proof");
+        }
+
+        if (!proof.getStatus().equals(Status.PUBLISHED.name())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only put kudos in published proofs");
+        }
+
         if (!kudosedProofs.contains(proof)) {
             kudosedProofs.add(proof);
             talent.setKudosedProofs(kudosedProofs);
