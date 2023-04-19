@@ -36,9 +36,10 @@ public interface ProofMapper {
     }
 
     default ShortProofDTO toShortProofDTO(Proof proof, Talent talent) {
-        boolean isKudosed = false;
+        boolean isKudosed = false, isAuthor = false;
         if (talent != null) {
             isKudosed = talent.getKudosedProofs().contains(proof);
+            isAuthor = talent.getProofs().contains(proof);
         }
 
         return ShortProofDTO.builder()
@@ -50,6 +51,7 @@ public interface ProofMapper {
                         proof.getDescription())
                 .totalKudos(proof.getKudos().size())
                 .isKudosed(isKudosed)
+                .isAuthor(isAuthor)
                 .build();
     }
 }
