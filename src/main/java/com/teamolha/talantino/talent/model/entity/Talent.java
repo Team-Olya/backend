@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-//@Table(name = "talent")
 @Getter
 @Setter
 @Builder
@@ -59,13 +58,6 @@ public class Talent {
             CascadeType.DETACH, CascadeType.REFRESH},
             mappedBy = "talent")
     private List<Proof> proofs;
-
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.REFRESH, CascadeType.DETACH})
-    @JoinTable(name = "kudos",
-            joinColumns = @JoinColumn(name = "talent_id"),
-            inverseJoinColumns = @JoinColumn(name = "proof_id"))
-    private List<Proof> kudosedProofs;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private Collection<String> authorities;

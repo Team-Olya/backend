@@ -1,6 +1,7 @@
 package com.teamolha.talantino.proof.model.entity;
 
 import com.teamolha.talantino.proof.model.Status;
+import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.validation.ProofStatus;
 import jakarta.persistence.*;
@@ -43,12 +44,10 @@ public class Proof {
     @NotNull
     private Talent talent;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.REFRESH, CascadeType.DETACH})
-    @JoinTable(name = "kudos",
-            joinColumns = @JoinColumn(name = "proof_id"),
-            inverseJoinColumns = @JoinColumn(name = "talent_id"))
-    private List<Talent> kudos;
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST,
+            CascadeType.DETACH, CascadeType.REFRESH},
+            mappedBy = "proofId")
+    private List<Kudos> kudos;
 
     @NotBlank
     private String status;

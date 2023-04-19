@@ -113,3 +113,28 @@ values (CURRENT_TIMESTAMP, 'Counter Strike profile', '<steam link>', 9, 'DRAFT')
 
 insert into proof (publication_date, title, description, talent_id, status)
 values (CURRENT_TIMESTAMP, 'Java Hibernate project', '<git hub link>', 10, 'HIDDEN');
+
+insert into sponsor (name, surname, email, password, balance)
+values ('Халифа', 'ибн Заид аль-Нахайян', 'sponsor1@mail.com',
+        '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', '100');
+
+insert into sponsor (name, surname, email, password, balance)
+values ('Мохаммед', 'Хусейн Али аль-Амуди', 'sponsor2@mail.com',
+    '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', '100');
+
+insert into sponsor (name, surname, email, password, balance)
+values ('Абдул', 'Азиз аль-Гурар', 'sponsor3@mail.com',
+    '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', '100');
+
+insert into sponsor (name, surname, email, password, balance)
+values ('Мансур', 'ибн Заид аль-Нахайян', 'sponsor4@mail.com',
+        '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', '100');
+
+insert into kudos (sponsor_id, proof_id, amount)
+values ('1', '1', '2');
+
+insert into kudos (sponsor_id, proof_id, amount)
+values ('2', '1', '3');
+
+insert into kudos (sponsor_id, proof_id, amount)
+values ('1', '4', '5');

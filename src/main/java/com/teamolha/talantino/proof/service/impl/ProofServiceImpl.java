@@ -175,23 +175,23 @@ public class ProofServiceImpl implements ProofService {
 
     @Override
     public void setKudos(Authentication auth, Long proofId) {
-        var talent = talentRepository.findByEmailIgnoreCase(auth.getName()).get();
-        var proof = getProofEntity(proofId);
-        var kudosedProofs = talent.getKudosedProofs();
-
-        if (proof.getTalent().equals(talent)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't put kudos on your own proof");
-        }
-
-        if (!proof.getStatus().equals(Status.PUBLISHED.name())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only put kudos in published proofs");
-        }
-
-        if (!kudosedProofs.contains(proof)) {
-            kudosedProofs.add(proof);
-            talent.setKudosedProofs(kudosedProofs);
-            talentRepository.save(talent);
-        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Proof has already been kudosed");
+//        var talent = talentRepository.findByEmailIgnoreCase(auth.getName()).get();
+//        var proof = getProofEntity(proofId);
+//        var kudosedProofs = talent.getKudosedProofs();
+//
+//        if (proof.getTalent().equals(talent)) {
+//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't put kudos on your own proof");
+//        }
+//
+//        if (!proof.getStatus().equals(Status.PUBLISHED.name())) {
+//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only put kudos in published proofs");
+//        }
+//
+//        if (!kudosedProofs.contains(proof)) {
+//            kudosedProofs.add(proof);
+//            talent.setKudosedProofs(kudosedProofs);
+//            talentRepository.save(talent);
+//        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Proof has already been kudosed");
     }
 
     private ProofDTO editProof(Proof proof, ProofRequest newProof) {
