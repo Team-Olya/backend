@@ -1,10 +1,9 @@
-package com.teamolha.talantino.talent.service;
+package com.teamolha.talantino.general.service;
 
 import com.teamolha.talantino.talent.model.response.LoginResponse;
 import org.springframework.security.core.Authentication;
 
-public interface TalentAuthService {
+public interface AuthService {
     LoginResponse login(Authentication authentication);
-
-    void register(String email, String password, String name, String surname, String kind);
+    Object myProfile(Authentication email);
 }

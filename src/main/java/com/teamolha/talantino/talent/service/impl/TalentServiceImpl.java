@@ -1,6 +1,8 @@
 package com.teamolha.talantino.talent.service.impl;
 
+import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.proof.repository.ProofRepository;
+import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.mapper.Mappers;
 import com.teamolha.talantino.talent.model.entity.Kind;
 import com.teamolha.talantino.talent.model.entity.Link;
@@ -19,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -42,6 +45,36 @@ public class TalentServiceImpl implements TalentService {
     KindRepository kindRepository;
 
     ProofRepository proofRepository;
+
+    SponsorRepository sponsorRepository;
+
+    PasswordEncoder passwordEncoder;
+
+    @Override
+    public void register(String email, String password, String name, String surname, String kind) {
+        if (talentRepository.existsByEmailIgnoreCase(email) || sponsorRepository.existsByEmailIgnoreCase(email)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    email + " is already occupied!"
+            );
+        }
+        if (!kindRepository.existsByKindIgnoreCase(kind)) {
+            kindRepository.save(
+                    Kind.builder()
+                            .kind(kind)
+                            .build()
+            );
+        }
+        talentRepository.save(
+                Talent.builder()
+                        .email(email)
+                        .password(passwordEncoder.encode(password))
+                        .name(name)
+                        .surname(surname)
+                        .kind(kindRepository.findByKindIgnoreCase(kind))
+                        .authorities(List.of(Roles.TALENT.name()))
+                        .build()
+        );
+    }
 
     @Override
     public TalentProfileResponse talentProfile(String email) {

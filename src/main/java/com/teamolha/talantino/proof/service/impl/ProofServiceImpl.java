@@ -9,7 +9,6 @@ import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.proof.service.ProofService;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.repository.TalentRepository;
-import com.teamolha.talantino.validation.ProofStatus;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -27,6 +27,7 @@ import java.util.Optional;
 
 @Slf4j
 @Service
+@Transactional
 @AllArgsConstructor
 public class ProofServiceImpl implements ProofService {
 
@@ -34,6 +35,7 @@ public class ProofServiceImpl implements ProofService {
     ProofRepository proofRepository;
     private final TalentRepository talentRepository;
 
+    @Transactional(readOnly = true)
     @Override
     public ProofsPageDTO pageProofs(Authentication auth, String sort, String type, int page, int count) {
         int totalAmount = proofRepository.findByStatus(Status.PUBLISHED.name()).size();
@@ -56,6 +58,7 @@ public class ProofServiceImpl implements ProofService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public TalentProofList talentProofs(String name, String sort, String sortType, String status, Integer amount, Integer page, Long talentId) {
         if (talentRepository.findById(talentId).isEmpty()) {
@@ -157,6 +160,7 @@ public class ProofServiceImpl implements ProofService {
         } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ProofDTO getProof(Long proofId) {
         Proof proof = getProofEntity(proofId);
@@ -169,12 +173,14 @@ public class ProofServiceImpl implements ProofService {
         return mapper.toProofDTO(proof);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public int getNumberOfKudos(Long proofId) {
         var proof = getProofEntity(proofId);
         return proof.getKudos().size();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public void setKudos(Authentication auth, Long proofId) {
 //        var talent = talentRepository.findByEmailIgnoreCase(auth.getName()).get();
@@ -195,6 +201,7 @@ public class ProofServiceImpl implements ProofService {
 //            talentRepository.save(talent);
 //        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Proof has already been kudosed");
     }
+
 
     private ProofDTO editProof(Proof proof, ProofRequest newProof) {
         Optional.ofNullable(newProof.title()).ifPresent(proof::setTitle);
