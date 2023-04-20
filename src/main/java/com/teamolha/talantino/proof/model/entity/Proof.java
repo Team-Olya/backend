@@ -50,5 +50,6 @@ public class Proof {
     private List<Kudos> kudos;
 
     @NotBlank
+    @ProofStatus
     private String status;
 }

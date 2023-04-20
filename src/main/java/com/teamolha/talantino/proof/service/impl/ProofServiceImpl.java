@@ -9,6 +9,7 @@ import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.proof.service.ProofService;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.repository.TalentRepository;
+import com.teamolha.talantino.validation.ProofStatus;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -195,9 +197,9 @@ public class ProofServiceImpl implements ProofService {
     }
 
     private ProofDTO editProof(Proof proof, ProofRequest newProof) {
-        proof.setTitle(newProof.title());
-        proof.setDescription(newProof.description());
-        proof.setStatus(newProof.status());
+        Optional.ofNullable(newProof.title()).ifPresent(proof::setTitle);
+        Optional.ofNullable(newProof.description()).ifPresent(proof::setDescription);
+        Optional.ofNullable(newProof.status()).ifPresent(proof::setStatus);
         proofRepository.save(proof);
         return mapper.toProofDTO(proof);
     }
