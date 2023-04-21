@@ -4,6 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record SponsorProfileResponse(
+        String role,
         Long id,
         String name,
         String surname,

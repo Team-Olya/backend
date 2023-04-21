@@ -26,9 +26,7 @@ public class AuthController {
 
     @GetMapping("/auth/me")
     Object getMyProfile(Authentication authentication) {
-        var ret = authService.myProfile(authentication);
-        log.warn("{}", ret.toString());
-        return ret;
+        return authService.myProfile(authentication);
     }
 
     @PostMapping("/login")
