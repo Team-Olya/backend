@@ -44,5 +44,4 @@ public class Sponsor {
 
     @ElementCollection(fetch = FetchType.EAGER)
     private Collection<String> authorities;
-
 }

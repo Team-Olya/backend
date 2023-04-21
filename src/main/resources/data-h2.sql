@@ -64,6 +64,18 @@ insert into link (url, talent_id) values ('https://dota2.com', 10);
 insert into link (url, talent_id) values ('https://blizzard.com', 10);
 insert into link (url, talent_id) values ('https://softserveinc.com', 11);
 
+insert into talent_authorities (authorities, talent_id) values ('TALENT', 1);
+insert into talent_authorities (authorities, talent_id) values ('TALENT', 2);
+insert into talent_authorities (authorities, talent_id) values ('TALENT', 3);
+insert into talent_authorities (authorities, talent_id) values ('TALENT', 4);
+insert into talent_authorities (authorities, talent_id) values ('TALENT', 5);
+insert into talent_authorities (authorities, talent_id) values ('TALENT', 6);
+insert into talent_authorities (authorities, talent_id) values ('TALENT', 7);
+insert into talent_authorities (authorities, talent_id) values ('TALENT', 8);
+insert into talent_authorities (authorities, talent_id) values ('TALENT', 9);
+insert into talent_authorities (authorities, talent_id) values ('TALENT', 10);
+insert into talent_authorities (authorities, talent_id) values ('TALENT', 11);
+
 insert into proof (publication_date, title, description, talent_id, status)
 values (CURRENT_TIMESTAMP, 'Java Spring Boot project', 'lil morty', 1, 'PUBLISHED');
 insert into proof (publication_date, title, description, talent_id, status)
@@ -130,11 +142,11 @@ insert into sponsor (name, surname, email, password, balance)
 values ('Мансур', 'ибн Заид аль-Нахайян', 'sponsor4@mail.com',
         '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', '100');
 
-insert into kudos (sponsor_id, proof_id, amount)
-values ('1', '1', '2');
+insert into sponsor_authorities (authorities, sponsor_id) values ('SPONSOR', 1);
+insert into sponsor_authorities (authorities, sponsor_id) values ('SPONSOR', 2);
+insert into sponsor_authorities (authorities, sponsor_id) values ('SPONSOR', 3);
+insert into sponsor_authorities (authorities, sponsor_id) values ('SPONSOR', 4);
 
-insert into kudos (sponsor_id, proof_id, amount)
-values ('2', '1', '3');
-
-insert into kudos (sponsor_id, proof_id, amount)
-values ('1', '4', '5');
+insert into kudos (sponsor_id, proof_id, amount) values ('1', '1', '2');
+insert into kudos (sponsor_id, proof_id, amount) values ('2', '1', '3');
+insert into kudos (sponsor_id, proof_id, amount) values ('1', '4', '5');
