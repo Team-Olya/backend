@@ -2,6 +2,7 @@ package com.teamolha.talantino.general.service.impl;
 
 import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.general.service.AuthService;
+import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
 import com.teamolha.talantino.sponsor.model.response.SponsorProfileResponse;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.mapper.Mappers;
@@ -32,6 +33,7 @@ public class AuthServiceImpl implements AuthService {
     private JwtEncoder jwtEncoder;
     private final SponsorRepository sponsorRepository;
     private Mappers talentMapper;
+    private SponsorMapper sponsorMapper;
 
     @Override
     public Object myProfile(Authentication authentication) {
@@ -55,13 +57,7 @@ public class AuthServiceImpl implements AuthService {
                     .orElseThrow(() ->
                             new ResponseStatusException(HttpStatus.NOT_FOUND)
                     );
-            return SponsorProfileResponse.builder()
-                    .id(sponsor.getId())
-                    .name(sponsor.getName())
-                    .surname(sponsor.getSurname())
-                    .avatar(sponsor.getAvatar())
-                    .balance(sponsor.getBalance())
-                    .build();
+            return sponsorMapper.toSponsorProfileResponse(sponsor);
         }
 
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);

@@ -6,6 +6,8 @@ import java.util.List;
 
 @Builder
 public record TalentProfileResponse(
+        String role,
+
         long id,
 
         String name,
