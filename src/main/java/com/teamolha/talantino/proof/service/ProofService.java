@@ -22,5 +22,5 @@ public interface ProofService {
 
     int getNumberOfKudos(Long proofId);
 
-    void setKudos(Authentication auth, Long proofId);
+    void setKudos(Authentication auth, Long proofId, int amount);
 }

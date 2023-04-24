@@ -2,11 +2,14 @@ package com.teamolha.talantino.proof.service.impl;
 
 import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.model.Status;
+import com.teamolha.talantino.proof.model.entity.Kudos;
 import com.teamolha.talantino.proof.model.entity.Proof;
 import com.teamolha.talantino.proof.model.request.ProofRequest;
 import com.teamolha.talantino.proof.model.response.*;
+import com.teamolha.talantino.proof.repository.KudosRepository;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.proof.service.ProofService;
+import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import lombok.AllArgsConstructor;
@@ -33,7 +36,9 @@ public class ProofServiceImpl implements ProofService {
 
     ProofMapper mapper;
     ProofRepository proofRepository;
-    private final TalentRepository talentRepository;
+    TalentRepository talentRepository;
+    SponsorRepository sponsorRepository;
+    KudosRepository kudosRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -180,26 +185,36 @@ public class ProofServiceImpl implements ProofService {
         return proof.getKudos().size();
     }
 
-    @Transactional(readOnly = true)
     @Override
-    public void setKudos(Authentication auth, Long proofId) {
-//        var talent = talentRepository.findByEmailIgnoreCase(auth.getName()).get();
-//        var proof = getProofEntity(proofId);
-//        var kudosedProofs = talent.getKudosedProofs();
-//
-//        if (proof.getTalent().equals(talent)) {
-//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't put kudos on your own proof");
-//        }
-//
-//        if (!proof.getStatus().equals(Status.PUBLISHED.name())) {
-//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only put kudos in published proofs");
-//        }
-//
-//        if (!kudosedProofs.contains(proof)) {
-//            kudosedProofs.add(proof);
-//            talent.setKudosedProofs(kudosedProofs);
-//            talentRepository.save(talent);
-//        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Proof has already been kudosed");
+    public void setKudos(Authentication auth, Long proofId, int amount) {
+        var sponsor = sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.FORBIDDEN, "Only sponsors have access to kudos"));
+        if (amount <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You must bet at least 1 kudos");
+        }
+        if (sponsor.getBalance() < amount) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Not enough balance");
+        }
+
+        var proof = getProofEntity(proofId);
+        if (!proof.getStatus().equals(Status.PUBLISHED.name())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only put kudos in published proofs");
+        }
+
+        List<Kudos> sponsorKudos = sponsor.getKudos();
+        if (!kudosRepository.existsByProofId(proofId)) {
+            sponsorKudos.add(Kudos.builder()
+                    .amount(amount)
+                    .sponsorId(sponsor.getId())
+                    .proofId(proofId)
+                    .build());
+        } else {
+            sponsorKudos.stream().filter(kudos -> kudos.getProofId().equals(proofId))
+                    .forEach(kudos -> kudos.setAmount(kudos.getAmount() + amount));
+        }
+        sponsor.setKudos(sponsorKudos);
+        sponsor.setBalance(sponsor.getBalance() - amount);
+        sponsorRepository.save(sponsor);
     }
 
 

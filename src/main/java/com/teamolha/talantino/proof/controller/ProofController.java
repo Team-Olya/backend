@@ -87,7 +87,8 @@ public class ProofController {
 
     @PostMapping("/proofs/{proof-id}/kudos")
     public void setKudos(Authentication auth,
-                         @PathVariable("proof-id") Long proofId) {
-        proofService.setKudos(auth, proofId);
+                         @PathVariable("proof-id") Long proofId,
+                         @RequestParam(value = "amount", required = false, defaultValue = "1") int amount) {
+        proofService.setKudos(auth, proofId, amount);
     }
 }
