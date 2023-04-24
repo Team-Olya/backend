@@ -1,12 +1,16 @@
-package com.teamolha.talantino.config;
+package com.teamolha.talantino.general.config;
 
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.teamolha.talantino.sponsor.model.entity.Sponsor;
+import com.teamolha.talantino.sponsor.repository.SponsorRepository;
+import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import com.teamolha.talantino.talent.mapper.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
@@ -23,6 +27,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -30,6 +35,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Optional;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
@@ -44,21 +50,26 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/actuator/health").permitAll() // for DevOps
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/auth/me").permitAll()
+
                         .requestMatchers("/talents/register").permitAll()
-                        .requestMatchers("/talents/login").permitAll()
                         .requestMatchers("/talents").permitAll()
                         .requestMatchers("/talents/**").authenticated()
-                        .requestMatchers("/proofs").permitAll()
                         .requestMatchers(antMatcher("/talents/*")).authenticated()
+
+                        .requestMatchers("/proofs").permitAll()
                         .requestMatchers(antMatcher("/proofs/*")).authenticated()
                         .requestMatchers(antMatcher("/proofs/**/kudos")).permitAll()
-                        .requestMatchers(antMatcher("/api/auth")).authenticated()
-                        .requestMatchers(antMatcher("/h2/**")).permitAll() // for H2 console
-                        .requestMatchers("/error").permitAll()
+
+                        .requestMatchers("/sponsor/register").permitAll()
+
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/api-docs/**").permitAll()
-                        .requestMatchers("/test").authenticated()
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers(antMatcher("/h2/**")).permitAll()
+
                         .anyRequest().authenticated()
                 );
 
@@ -102,12 +113,23 @@ public class WebSecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(
+            SponsorRepository sponsorRepository,
             TalentRepository talentRepository,
             Mappers mapper
     ) {
-        return email -> talentRepository.findByEmailIgnoreCase(email)
-                .map(mapper::toUserDetails)
-                .orElseThrow(() -> new UsernameNotFoundException(email + " not found"));
+        return email -> {
+            Optional<Talent> talent = talentRepository.findByEmailIgnoreCase(email);
+            if (talent.isPresent()) {
+                return mapper.toUserDetails(talent.get());
+            }
+
+            Optional<Sponsor> sponsor = sponsorRepository.findByEmailIgnoreCase(email);
+            if (sponsor.isPresent()) {
+                return mapper.toUserDetails(sponsor.get());
+            }
+
+            throw new UsernameNotFoundException("User not found with email: " + email);
+        };
     }
 
     @Bean

@@ -1,4 +1,4 @@
-package com.teamolha.talantino.validation;
+package com.teamolha.talantino.general.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

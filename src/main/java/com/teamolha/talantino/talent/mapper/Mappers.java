@@ -1,5 +1,7 @@
 package com.teamolha.talantino.talent.mapper;
 
+import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.talent.model.entity.Link;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
@@ -33,6 +35,7 @@ public interface Mappers {
 
     default TalentProfileResponse toTalentProfileResponse(Talent talent, Long prevId, Long nextId) {
         return TalentProfileResponse.builder()
+                .role(Roles.TALENT.name())
                 .id(talent.getId())
                 .name(talent.getName())
                 .surname(talent.getSurname())
@@ -57,6 +60,13 @@ public interface Mappers {
         return User.withUsername(talent.getEmail())
                 .password(talent.getPassword())
                 .authorities(talent.getAuthorities().toArray(String[]::new))
+                .build();
+    }
+
+    default UserDetails toUserDetails(Sponsor sponsor) {
+        return User.withUsername(sponsor.getEmail())
+                .password(sponsor.getPassword())
+                .authorities(sponsor.getAuthorities().toArray(String[]::new))
                 .build();
     }
 }

@@ -5,9 +5,9 @@ import com.teamolha.talantino.proof.model.response.ProofDTO;
 import com.teamolha.talantino.proof.model.response.ProofsPageDTO;
 import com.teamolha.talantino.proof.model.response.TalentProofList;
 import com.teamolha.talantino.proof.service.ProofService;
-import com.teamolha.talantino.validation.ProofSort;
-import com.teamolha.talantino.validation.ProofStatus;
-import com.teamolha.talantino.validation.SortType;
+import com.teamolha.talantino.general.validation.ProofSort;
+import com.teamolha.talantino.general.validation.ProofStatus;
+import com.teamolha.talantino.general.validation.SortType;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class ProofController {
             @RequestParam(required = false, defaultValue = "9") Integer amount,
             @RequestParam(required = false, defaultValue = "0") Integer page
     ) {
-        return proofService.talentProofs(auth.getName(), sort, type, status, amount, page, talentId);
+        return proofService.talentProofs(auth, sort, type, status, amount, page, talentId);
     }
 
     @PostMapping("/talents/{talent-id}/proofs")
@@ -87,7 +87,8 @@ public class ProofController {
 
     @PostMapping("/proofs/{proof-id}/kudos")
     public void setKudos(Authentication auth,
-                         @PathVariable("proof-id") Long proofId) {
-        proofService.setKudos(auth, proofId);
+                         @PathVariable("proof-id") Long proofId,
+                         @RequestParam(value = "amount", required = false, defaultValue = "1") int amount) {
+        proofService.setKudos(auth, proofId, amount);
     }
 }

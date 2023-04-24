@@ -1,6 +1,8 @@
 package com.teamolha.talantino.talent.service.impl;
 
+import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.proof.repository.ProofRepository;
+import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.mapper.Mappers;
 import com.teamolha.talantino.talent.model.entity.Kind;
 import com.teamolha.talantino.talent.model.entity.Link;
@@ -19,11 +21,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -41,6 +45,36 @@ public class TalentServiceImpl implements TalentService {
     KindRepository kindRepository;
 
     ProofRepository proofRepository;
+
+    SponsorRepository sponsorRepository;
+
+    PasswordEncoder passwordEncoder;
+
+    @Override
+    public void register(String email, String password, String name, String surname, String kind) {
+        if (talentRepository.existsByEmailIgnoreCase(email) || sponsorRepository.existsByEmailIgnoreCase(email)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    email + " is already occupied!"
+            );
+        }
+        if (!kindRepository.existsByKindIgnoreCase(kind)) {
+            kindRepository.save(
+                    Kind.builder()
+                            .kind(kind)
+                            .build()
+            );
+        }
+        talentRepository.save(
+                Talent.builder()
+                        .email(email)
+                        .password(passwordEncoder.encode(password))
+                        .name(name)
+                        .surname(surname)
+                        .kind(kindRepository.findByKindIgnoreCase(kind))
+                        .authorities(List.of(Roles.TALENT.name()))
+                        .build()
+        );
+    }
 
     @Override
     public TalentProfileResponse talentProfile(String email) {
@@ -115,30 +149,38 @@ public class TalentServiceImpl implements TalentService {
     }
 
     private UpdatedTalentResponse updateTalent(Talent oldTalent, TalentUpdateRequest newTalent) {
-        oldTalent.setName(newTalent.name());
-        oldTalent.setSurname(newTalent.surname());
-        if (!kindRepository.existsByKindIgnoreCase(newTalent.kind())) {
-            kindRepository.save(
-                    Kind.builder()
-                            .kind(newTalent.kind())
-                            .build()
-            );
-        }
-        oldTalent.setKind(kindRepository.findByKindIgnoreCase(newTalent.kind()));
-        oldTalent.setAvatar(newTalent.avatar());
-        oldTalent.setDescription(newTalent.description());
-        oldTalent.setExperience(newTalent.experience());
-        oldTalent.setLocation(newTalent.location());
-        linkRepository.deleteByTalent(oldTalent);
-        List<Link> links = newTalent.links().stream().map(url -> linkRepository.save(
-                Link.builder()
-                        .url(url)
-                        .talent(oldTalent)
-                        .build()
-        )).collect(Collectors.toList());
-        oldTalent.setLinks(links);
+        Optional.ofNullable(newTalent.name()).ifPresent(oldTalent::setName);
+        Optional.ofNullable(newTalent.surname()).ifPresent(oldTalent::setSurname);
+        Optional.ofNullable(newTalent.kind())
+                .ifPresent(kind -> {
+                    if (!kindRepository.existsByKindIgnoreCase(kind)) {
+                        Kind newKind = Kind.builder()
+                                .kind(kind)
+                                .build();
+                        kindRepository.save(newKind);
+                        oldTalent.setKind(newKind);
+                    } else {
+                        oldTalent.setKind(kindRepository.findByKindIgnoreCase(kind));
+                    }
+                });
+        Optional.ofNullable(newTalent.avatar()).ifPresent(oldTalent::setAvatar);
+        Optional.ofNullable(newTalent.description()).ifPresent(oldTalent::setDescription);
+        Optional.ofNullable(newTalent.experience()).ifPresent(oldTalent::setExperience);
+        Optional.ofNullable(newTalent.location()).ifPresent(oldTalent::setLocation);
+        Optional.ofNullable(newTalent.links()).ifPresent(links -> {
+            linkRepository.deleteByTalent(oldTalent);
+            List<Link> newLinks = links.stream()
+                    .map(url -> Link.builder()
+                            .url(url)
+                            .talent(oldTalent)
+                            .build())
+                    .map(linkRepository::save)
+                    .collect(Collectors.toList());
+            oldTalent.setLinks(newLinks);
+        });
         talentRepository.save(oldTalent);
         return mapper.toUpdatedTalent(oldTalent);
     }
+
 }
 
