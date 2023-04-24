@@ -1,5 +1,6 @@
 package com.teamolha.talantino.proof.service.impl;
 
+import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.model.Status;
 import com.teamolha.talantino.proof.model.entity.Kudos;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -65,15 +67,16 @@ public class ProofServiceImpl implements ProofService {
 
     @Transactional(readOnly = true)
     @Override
-    public TalentProofList talentProofs(String name, String sort, String sortType, String status, Integer amount, Integer page, Long talentId) {
+    public TalentProofList talentProofs(Authentication auth, String sort, String sortType, String status, Integer amount, Integer page, Long talentId) {
         if (talentRepository.findById(talentId).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "Talent with id " + talentId + " not found");
         }
 
-        if (talentRepository.findByEmailIgnoreCase(name).orElseThrow().getId() != talentId && !status.equals(Status.PUBLISHED.name())) {
+        if ((isTalent(auth) && talentRepository.findByEmailIgnoreCase(auth.getName()).get().getId() != talentId ||
+                isSponsor(auth)) && !status.equals(Status.PUBLISHED.name())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Other talents can see only PUBLISHED proofs");
+                    "You can see only PUBLISHED proofs");
         }
 
         Pageable pageable = sortType.equals("desc") ?
@@ -84,7 +87,7 @@ public class ProofServiceImpl implements ProofService {
                 proofRepository.findByTalent_Id(talentId).size() :
                 proofRepository.findByStatusAndTalent_Id(status, talentId).size();
 
-        var talent = talentRepository.findByEmailIgnoreCase(name).orElse(null);
+        var talent = talentRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
 
         var proofs = status.equals("ALL") ?
                 proofRepository.findByTalent_Id(talentId, pageable)
@@ -236,5 +239,13 @@ public class ProofServiceImpl implements ProofService {
         return proofRepository.findById(proofId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Proof with ID " + proofId + " not found"));
+    }
+
+    private boolean isTalent(Authentication auth) {
+        return auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList().contains(Roles.TALENT.name());
+    }
+
+    private boolean isSponsor(Authentication auth) {
+        return auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList().contains(Roles.SPONSOR.name());
     }
 }

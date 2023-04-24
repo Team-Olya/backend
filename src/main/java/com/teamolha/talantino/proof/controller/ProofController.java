@@ -33,7 +33,7 @@ public class ProofController {
             @RequestParam(required = false, defaultValue = "9") Integer amount,
             @RequestParam(required = false, defaultValue = "0") Integer page
     ) {
-        return proofService.talentProofs(auth.getName(), sort, type, status, amount, page, talentId);
+        return proofService.talentProofs(auth, sort, type, status, amount, page, talentId);
     }
 
     @PostMapping("/talents/{talent-id}/proofs")
