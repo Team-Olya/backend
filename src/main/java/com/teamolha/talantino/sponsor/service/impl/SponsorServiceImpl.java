@@ -3,6 +3,7 @@ package com.teamolha.talantino.sponsor.service.impl;
 import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
+import com.teamolha.talantino.sponsor.model.request.AddKudosRequest;
 import com.teamolha.talantino.sponsor.model.response.SponsorProfileResponse;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.sponsor.service.SponsorService;
@@ -44,15 +45,15 @@ public class SponsorServiceImpl implements SponsorService {
     }
 
     @Override
-    public SponsorProfileResponse addFunds(Authentication auth, Long amount) {
+    public SponsorProfileResponse addKudos(Authentication auth, AddKudosRequest addKudosRequest) {
         var sponsor = sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.FORBIDDEN, "Only sponsor can add funds"));
-        if (amount > 1000) {
+        if (addKudosRequest.amount() > 1000) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can add a maximum of 1000 per transaction");
-        } else if (amount < 1) {
+        } else if (addKudosRequest.amount() < 1) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "We can't pay to your card, sorry");
         }
-        sponsor.setBalance(sponsor.getBalance() + amount);
+        sponsor.setBalance(sponsor.getBalance() + addKudosRequest.amount());
         return mapper.toSponsorProfileResponse(sponsorRepository.save(sponsor));
     }
 }
