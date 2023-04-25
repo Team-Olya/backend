@@ -4,6 +4,7 @@ import com.teamolha.talantino.proof.model.entity.Kudos;
 import com.teamolha.talantino.proof.model.entity.Proof;
 import com.teamolha.talantino.proof.model.response.ProofDTO;
 import com.teamolha.talantino.proof.model.response.ShortProofDTO;
+import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
@@ -37,11 +38,11 @@ public interface ProofMapper {
                 .build();
     }
 
-    default ShortProofDTO toShortProofDTO(Proof proof, Talent talent) {
+    default ShortProofDTO toShortProofDTO(Proof proof, Sponsor sponsor) {
         boolean isKudosed = false, isAuthor = false;
-        if (talent != null) {
-            isKudosed = false; // TODO:Влад Только для спонсора
-            isAuthor = talent.getProofs().contains(proof);
+        if (sponsor != null) {
+            isKudosed = sponsor.getKudos().stream().anyMatch(kudos -> kudos.getProofId().equals(proof.getId()));
+//            isAuthor = talent.getProofs().contains(proof);
         }
 
         return ShortProofDTO.builder()
