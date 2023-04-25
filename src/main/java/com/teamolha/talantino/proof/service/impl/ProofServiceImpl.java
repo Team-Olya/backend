@@ -53,11 +53,11 @@ public class ProofServiceImpl implements ProofService {
                 PageRequest.of(page, count, Sort.Direction.DESC, sort) :
                 PageRequest.of(page, count, Sort.Direction.ASC, sort);
 
-        var talent = (auth == null) ? null :
-                talentRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
+        var sponsor = (auth == null) ? null :
+                sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
 
         List<ShortProofDTO> proofs = proofRepository.findByStatus(Status.PUBLISHED.name(), pageable)
-                .stream().map(proof -> mapper.toShortProofDTO(proof, talent)).toList();
+                .stream().map(proof -> mapper.toShortProofDTO(proof, sponsor)).toList();
 
         return ProofsPageDTO.builder()
                 .totalAmount(totalAmount)
