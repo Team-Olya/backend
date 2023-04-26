@@ -1,5 +1,6 @@
 package com.teamolha.talantino.proof.service.impl;
 
+import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.model.Status;
 import com.teamolha.talantino.proof.model.entity.Kudos;
@@ -10,8 +11,6 @@ import com.teamolha.talantino.proof.model.response.*;
 import com.teamolha.talantino.proof.repository.KudosRepository;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.proof.service.ProofService;
-import com.teamolha.talantino.sponsor.repository.SponsorRepository;
-import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
 import com.teamolha.talantino.talent.model.entity.Talent;
@@ -30,6 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -185,18 +185,20 @@ public class ProofServiceImpl implements ProofService {
         return mapper.toProofDTO(proof);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public KudosList getKudos(Authentication auth, Long proofId) {
         var proof = getProofEntity(proofId);
         var talent = (auth == null) ? null :
                 talentRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
         List<KudosDTO> kudos = new ArrayList<>();
-        if(proof.getTalent().equals(talent)){
+        if (talent != null && proof.getTalent().getId() == talent.getId()) {
             kudos = getKudos(proofId);
         }
         return KudosList.builder()
-                .totalAmount(proof.getKudos().size())
+                .totalAmount(proof.getKudos()
+                        .stream()
+                        .mapToInt(Kudos::getAmount)
+                        .sum())
                 .kudos(kudos).build();
     }
 

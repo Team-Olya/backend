@@ -6,7 +6,6 @@ import com.teamolha.talantino.proof.model.response.ProofDTO;
 import com.teamolha.talantino.proof.model.response.ShortProofDTO;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.talent.model.entity.Talent;
-import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 
 import static org.mapstruct.ReportingPolicy.IGNORE;
@@ -33,7 +32,11 @@ public interface ProofMapper {
                 .description(proof.getDescription())
                 .authorId(proof.getTalent().getId())
                 .status(proof.getStatus())
-                .totalKudos(proof.getKudos().size())
+                .totalKudos(proof.getKudos()
+                        .stream()
+                        .mapToInt(Kudos::getAmount)
+                        .sum()
+                )
                 .isKudosed(false) // TODO:Влад Только для спонсора
                 .build();
     }
