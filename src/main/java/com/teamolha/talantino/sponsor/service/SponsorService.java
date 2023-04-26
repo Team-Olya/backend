@@ -2,6 +2,7 @@ package com.teamolha.talantino.sponsor.service;
 
 import com.teamolha.talantino.sponsor.model.request.AddKudosRequest;
 import com.teamolha.talantino.sponsor.model.response.SponsorProfileResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 
 import com.teamolha.talantino.sponsor.model.request.SponsorUpdateRequest;
@@ -13,4 +14,8 @@ public interface SponsorService {
     SponsorProfileResponse addKudos(Authentication auth, AddKudosRequest addKudosRequest);
 
     UpdatedSponsorResponse updateSponsorProfile(long sponsorId, String email, SponsorUpdateRequest updateSponsor);
+
+    void deleteSponsor(HttpServletRequest request, Authentication auth, long sponsorId);
+
+    void recoverSponsor(String token);
 }

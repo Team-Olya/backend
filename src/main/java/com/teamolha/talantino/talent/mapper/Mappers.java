@@ -1,6 +1,7 @@
 package com.teamolha.talantino.talent.mapper;
 
 import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.sponsor.model.SponsorStatus;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.talent.model.entity.Link;
 import com.teamolha.talantino.talent.model.entity.Talent;
@@ -67,6 +68,7 @@ public interface Mappers {
         return User.withUsername(sponsor.getEmail())
                 .password(sponsor.getPassword())
                 .authorities(sponsor.getAuthorities().toArray(String[]::new))
+                .disabled(SponsorStatus.INACTIVE.equals(sponsor.getStatus()))
                 .build();
     }
 }
