@@ -1,6 +1,7 @@
 package com.teamolha.talantino.proof.controller;
 
 import com.teamolha.talantino.proof.model.request.ProofRequest;
+import com.teamolha.talantino.proof.model.response.KudosList;
 import com.teamolha.talantino.proof.model.response.ProofDTO;
 import com.teamolha.talantino.proof.model.response.ProofsPageDTO;
 import com.teamolha.talantino.proof.model.response.TalentProofList;
@@ -81,8 +82,9 @@ public class ProofController {
     }
 
     @GetMapping("/proofs/{proof-id}/kudos")
-    public int getNumberOfKudos(@PathVariable("proof-id") Long proofId) {
-        return proofService.getNumberOfKudos(proofId);
+    public KudosList getKudos(Authentication auth,
+                              @PathVariable("proof-id") Long proofId) {
+        return proofService.getKudos(auth, proofId);
     }
 
     @PostMapping("/proofs/{proof-id}/kudos")

@@ -6,7 +6,6 @@ import com.teamolha.talantino.proof.model.response.ProofDTO;
 import com.teamolha.talantino.proof.model.response.ShortProofDTO;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.talent.model.entity.Talent;
-import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 
 import static org.mapstruct.ReportingPolicy.IGNORE;
