@@ -1,7 +1,9 @@
 package com.teamolha.talantino.sponsor.service.impl;
 
 import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.general.email.utils.EmailUtil;
 import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
+import com.teamolha.talantino.sponsor.model.SponsorStatus;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.model.request.SponsorUpdateRequest;
 import com.teamolha.talantino.sponsor.model.response.UpdatedSponsorResponse;
@@ -10,6 +12,7 @@ import com.teamolha.talantino.sponsor.model.response.SponsorProfileResponse;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.sponsor.service.SponsorService;
 import com.teamolha.talantino.talent.repository.TalentRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -17,8 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -27,6 +29,7 @@ public class SponsorServiceImpl implements SponsorService {
     private SponsorMapper mapper;
     private TalentRepository talentRepository;
     private SponsorRepository sponsorRepository;
+    private EmailUtil emailUtil;
 
     @Override
     public void register(String email, String password, String name, String surname) {
@@ -72,6 +75,33 @@ public class SponsorServiceImpl implements SponsorService {
         return updateSponsor(sponsor, updateSponsor);
     }
 
+    @Override
+    public void deleteSponsor(HttpServletRequest request, Authentication auth, long sponsorId) {
+        var sponsor = sponsorRepository.findById(sponsorId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Sponsor with ID " + sponsorId + " not found"));
+
+        if (!auth.getName().equals(sponsor.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        sponsor.setStatus(SponsorStatus.INACTIVE);
+        sponsor.setDeletionToken(UUID.randomUUID().toString());
+        sponsor.setDeletionDate(calculateDeletionDate(2));
+        sponsorRepository.save(sponsor);
+        emailUtil.deactivateAccount(request, sponsor.getEmail(), sponsor.getDeletionToken());
+    }
+
+    @Override
+    public void recoverSponsor(String token) {
+        var sponsor = sponsorRepository.findByDeletionToken(token).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid token"));
+        sponsor.setStatus(SponsorStatus.ACTIVE);
+        sponsor.setDeletionDate(null);
+        sponsor.setDeletionToken(null);
+        sponsorRepository.save(sponsor);
+    }
+
     private UpdatedSponsorResponse updateSponsor(Sponsor oldSponsor, SponsorUpdateRequest newSponsor) {
         Optional.ofNullable(newSponsor.name()).ifPresent(oldSponsor::setName);
         Optional.ofNullable(newSponsor.surname()).ifPresent(oldSponsor::setSurname);
@@ -79,5 +109,12 @@ public class SponsorServiceImpl implements SponsorService {
         Optional.ofNullable(newSponsor.avatar()).ifPresent(oldSponsor::setAvatar);
         sponsorRepository.save(oldSponsor);
         return mapper.toUpdatedSponsor(oldSponsor);
+    }
+
+    private Date calculateDeletionDate(int deletionDateInDays) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(new Date().getTime());
+        cal.add(Calendar.SECOND, deletionDateInDays);
+        return new Date(cal.getTime().getTime());
     }
 }

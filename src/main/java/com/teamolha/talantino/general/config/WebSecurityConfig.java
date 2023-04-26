@@ -63,6 +63,7 @@ public class WebSecurityConfig {
                         .requestMatchers(antMatcher("/proofs/**/kudos")).permitAll()
 
                         .requestMatchers("/sponsor/register").permitAll()
+                        .requestMatchers("/sponsors/recover").permitAll()
 
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/api-docs/**").permitAll()
