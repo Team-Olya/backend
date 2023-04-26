@@ -13,6 +13,7 @@ public record ShortProofDTO(
         @Size(min = 2, max = 200)
         String description,
         Integer totalKudos,
+        Integer totalKudosFromSponsor,
         Boolean isKudosed,
         Boolean isAuthor
 ) {

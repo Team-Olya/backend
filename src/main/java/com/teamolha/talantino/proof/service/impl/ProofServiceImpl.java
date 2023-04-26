@@ -219,7 +219,7 @@ public class ProofServiceImpl implements ProofService {
         }
 
         List<Kudos> sponsorKudos = sponsor.getKudos();
-        if (!kudosRepository.existsByProofId(proofId)) {
+        if (!kudosRepository.existsBySponsorIdAndProofId(sponsor.getId(), proofId)) {
             sponsorKudos.add(Kudos.builder()
                     .amount(amount)
                     .sponsorId(sponsor.getId())

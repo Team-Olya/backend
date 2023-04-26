@@ -43,8 +43,12 @@ public interface ProofMapper {
 
     default ShortProofDTO toShortProofDTO(Proof proof, Sponsor sponsor) {
         boolean isKudosed = false, isAuthor = false;
+        Integer totalKudosFromSponsor = null;
         if (sponsor != null) {
             isKudosed = sponsor.getKudos().stream().anyMatch(kudos -> kudos.getProofId().equals(proof.getId()));
+            totalKudosFromSponsor = sponsor.getKudos().stream()
+                    .filter(kudos -> kudos.getProofId().equals(proof.getId())).findFirst()
+                    .map(Kudos::getAmount).orElse(null);
 //            isAuthor = talent.getProofs().contains(proof);
         }
 
@@ -60,6 +64,7 @@ public interface ProofMapper {
                         .mapToInt(Kudos::getAmount)
                         .sum()
                 ) // TODO:Влад теперь считает сумму кудосов, а не их количество
+                .totalKudosFromSponsor(totalKudosFromSponsor)
                 .isKudosed(isKudosed)
                 .isAuthor(isAuthor)
                 .build();
