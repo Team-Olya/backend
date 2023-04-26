@@ -1,6 +1,7 @@
 package com.teamolha.talantino.proof.service;
 
 import com.teamolha.talantino.proof.model.request.ProofRequest;
+import com.teamolha.talantino.proof.model.response.KudosList;
 import com.teamolha.talantino.proof.model.response.ProofDTO;
 import com.teamolha.talantino.proof.model.response.ProofsPageDTO;
 import com.teamolha.talantino.proof.model.response.TalentProofList;
@@ -20,7 +21,7 @@ public interface ProofService {
 
     ProofDTO getProof(Long proofId);
 
-    int getNumberOfKudos(Long proofId);
+    KudosList getKudos(Authentication auth, Long proofId);
 
     void setKudos(Authentication auth, Long proofId);
 }

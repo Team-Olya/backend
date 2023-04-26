@@ -3,10 +3,13 @@ package com.teamolha.talantino.proof.service.impl;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.model.Status;
 import com.teamolha.talantino.proof.model.entity.Proof;
+import com.teamolha.talantino.proof.model.response.KudosDTO;
 import com.teamolha.talantino.proof.model.request.ProofRequest;
 import com.teamolha.talantino.proof.model.response.*;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.proof.service.ProofService;
+import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
+import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import lombok.AllArgsConstructor;
@@ -22,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +37,8 @@ public class ProofServiceImpl implements ProofService {
 
     ProofMapper mapper;
     ProofRepository proofRepository;
+    SponsorMapper sponsorMapper;
+    private final SponsorRepository sponsorRepository;
     private final TalentRepository talentRepository;
 
     @Transactional(readOnly = true)
@@ -175,9 +181,17 @@ public class ProofServiceImpl implements ProofService {
 
     @Transactional(readOnly = true)
     @Override
-    public int getNumberOfKudos(Long proofId) {
+    public KudosList getKudos(Authentication auth, Long proofId) {
         var proof = getProofEntity(proofId);
-        return proof.getKudos().size();
+        var talent = (auth == null) ? null :
+                talentRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
+        List<KudosDTO> kudos = new ArrayList<>();
+        if(proof.getTalent().equals(talent)){
+            kudos = getKudos(proofId);
+        }
+        return KudosList.builder()
+                .totalAmount(proof.getKudos().size())
+                .kudos(kudos).build();
     }
 
     @Transactional(readOnly = true)
@@ -202,7 +216,6 @@ public class ProofServiceImpl implements ProofService {
 //        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Proof has already been kudosed");
     }
 
-
     private ProofDTO editProof(Proof proof, ProofRequest newProof) {
         Optional.ofNullable(newProof.title()).ifPresent(proof::setTitle);
         Optional.ofNullable(newProof.description()).ifPresent(proof::setDescription);
@@ -221,5 +234,21 @@ public class ProofServiceImpl implements ProofService {
         return proofRepository.findById(proofId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Proof with ID " + proofId + " not found"));
+    }
+
+    private List<KudosDTO> getKudos(Long proofId){
+        List<KudosDTO> kudos = new ArrayList<>();
+        List<Object[]> list = proofRepository.findSponsorsAndKudosOnProof(proofId);
+        for (Object[] elem : list) {
+            long sponsorId = ((Number) elem[0]).longValue();
+            int amount = ((Number) elem[1]).intValue();
+            sponsorRepository.findById(sponsorId).ifPresent(
+                    sponsor -> kudos.add(KudosDTO.builder()
+                            .sponsor(sponsorMapper.toShortSponsorDTO(sponsor))
+                            .amountOfKudos(amount)
+                            .build())
+            );
+        }
+        return kudos;
     }
 }
