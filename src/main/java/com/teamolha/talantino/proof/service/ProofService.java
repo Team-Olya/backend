@@ -11,7 +11,7 @@ public interface ProofService {
 
     ProofsPageDTO pageProofs(Authentication auth, String sort, String type, int page, int count);
 
-    TalentProofList talentProofs(String name, String sort, String type, String status, Integer amount, Integer page, Long id);
+    TalentProofList talentProofs(Authentication auth, String sort, String type, String status, Integer amount, Integer page, Long id);
 
     void createProof(String email, Long talentId, ProofRequest proof);
 
@@ -23,5 +23,5 @@ public interface ProofService {
 
     KudosList getKudos(Authentication auth, Long proofId);
 
-    void setKudos(Authentication auth, Long proofId);
+    void setKudos(Authentication auth, Long proofId, int amount);
 }
