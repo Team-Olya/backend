@@ -87,7 +87,7 @@ public class SponsorServiceImpl implements SponsorService {
 
         sponsor.setStatus(SponsorStatus.INACTIVE);
         sponsor.setDeletionToken(UUID.randomUUID().toString());
-        sponsor.setDeletionDate(calculateDeletionDate(2));
+        sponsor.setDeletionDate(calculateDeletionDate(7));
         sponsorRepository.save(sponsor);
         emailUtil.deactivateAccount(request, sponsor.getEmail(), sponsor.getDeletionToken());
     }
@@ -114,7 +114,7 @@ public class SponsorServiceImpl implements SponsorService {
     private Date calculateDeletionDate(int deletionDateInDays) {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(new Date().getTime());
-        cal.add(Calendar.SECOND, deletionDateInDays);
+        cal.add(Calendar.DAY_OF_WEEK, deletionDateInDays);
         return new Date(cal.getTime().getTime());
     }
 }

@@ -255,18 +255,16 @@ public class ProofServiceImpl implements ProofService {
                         "Proof with ID " + proofId + " not found"));
     }
 
-    private List<KudosDTO> getKudos(Long proofId){
+    private List<KudosDTO> getKudos(Long proofId) {
         List<KudosDTO> kudos = new ArrayList<>();
         List<Object[]> list = proofRepository.findSponsorsAndKudosOnProof(proofId);
         for (Object[] elem : list) {
             long sponsorId = ((Number) elem[0]).longValue();
             int amount = ((Number) elem[1]).intValue();
-            sponsorRepository.findById(sponsorId).ifPresent(
-                    sponsor -> kudos.add(KudosDTO.builder()
-                            .sponsor(sponsorMapper.toShortSponsorDTO(sponsor))
-                            .amountOfKudos(amount)
-                            .build())
-            );
+            sponsorRepository.findById(sponsorId).ifPresentOrElse(sponsor -> kudos.add(KudosDTO.builder()
+                    .sponsor(sponsorMapper.toShortSponsorDTO(sponsor))
+                    .amountOfKudos(amount)
+                    .build()), () -> kudos.add(KudosDTO.builder().sponsor(null).amountOfKudos(amount).build()));
         }
         return kudos;
     }
