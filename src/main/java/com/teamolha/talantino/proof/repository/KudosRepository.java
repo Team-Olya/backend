@@ -7,5 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface KudosRepository extends JpaRepository<Kudos, Long> {
 
-    boolean existsByProofId(Long proofId);
+    boolean existsBySponsorIdAndProofId(Long sponsorId, Long proofId);
+
+
 }
