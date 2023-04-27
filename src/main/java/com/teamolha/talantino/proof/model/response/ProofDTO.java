@@ -13,6 +13,7 @@ public record ProofDTO(
         Long authorId,
         String status,
         Integer totalKudos,
+        Integer totalKudosFromSponsor,
         Boolean isKudosed
 ) {
 }
