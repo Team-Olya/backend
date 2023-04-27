@@ -8,12 +8,12 @@ import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
 import com.teamolha.talantino.sponsor.model.SponsorStatus;
 import com.teamolha.talantino.sponsor.model.entity.BalanceAdding;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
+import com.teamolha.talantino.sponsor.model.request.AddKudosRequest;
 import com.teamolha.talantino.sponsor.model.request.SponsorUpdateRequest;
 import com.teamolha.talantino.sponsor.model.response.BalanceAddingDTO;
 import com.teamolha.talantino.sponsor.model.response.SponsorKudos;
-import com.teamolha.talantino.sponsor.model.response.UpdatedSponsorResponse;
-import com.teamolha.talantino.sponsor.model.request.AddKudosRequest;
 import com.teamolha.talantino.sponsor.model.response.SponsorProfileResponse;
+import com.teamolha.talantino.sponsor.model.response.UpdatedSponsorResponse;
 import com.teamolha.talantino.sponsor.repository.BalanceAddingRepository;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.sponsor.service.SponsorService;
@@ -26,7 +26,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -150,7 +149,6 @@ public class SponsorServiceImpl implements SponsorService {
     private UpdatedSponsorResponse updateSponsor(Sponsor oldSponsor, SponsorUpdateRequest newSponsor) {
         Optional.ofNullable(newSponsor.name()).ifPresent(oldSponsor::setName);
         Optional.ofNullable(newSponsor.surname()).ifPresent(oldSponsor::setSurname);
-        Optional.ofNullable(newSponsor.balance()).ifPresent(oldSponsor::setBalance);
         Optional.ofNullable(newSponsor.avatar()).ifPresent(oldSponsor::setAvatar);
         sponsorRepository.save(oldSponsor);
         return mapper.toUpdatedSponsor(oldSponsor);
