@@ -30,7 +30,9 @@ public record TalentProfileResponse(
 
         Long prevId,
 
-        Long nextId
+        Long nextId,
+
+        Long totalKudos
 ) {
 }
 

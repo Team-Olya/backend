@@ -210,7 +210,7 @@ public class ProofServiceImpl implements ProofService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You must bet at least 1 kudos");
         }
         if (sponsor.getBalance() < amount) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Not enough balance");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Not enough totalKudos");
         }
 
         var proof = getProofEntity(proofId);
