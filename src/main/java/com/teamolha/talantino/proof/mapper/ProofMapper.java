@@ -37,9 +37,11 @@ public interface ProofMapper {
                         .mapToInt(Kudos::getAmount)
                         .sum()
                 )
-                .isKudosed(sponsor != null &&
-                        sponsor.getKudos().stream()
-                                .anyMatch(kudos -> kudos.getProofId().equals(proof.getId())))
+                .totalKudosFromSponsor(sponsor.getKudos().stream()
+                        .filter(kudos -> kudos.getProofId().equals(proof.getId())).findFirst()
+                        .map(Kudos::getAmount).orElse(null))
+                .isKudosed(sponsor.getKudos().stream()
+                        .anyMatch(kudos -> kudos.getProofId().equals(proof.getId())))
                 .build();
     }
 
