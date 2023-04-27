@@ -8,6 +8,7 @@ import com.teamolha.talantino.sponsor.model.response.SponsorProfileResponse;
 import com.teamolha.talantino.sponsor.model.response.UpdatedSponsorResponse;
 import com.teamolha.talantino.sponsor.service.SponsorService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,7 @@ public class SponsorController {
 
     @PatchMapping("/sponsors/{sponsor-id}")
     public UpdatedSponsorResponse updateSponsorProfile(@PathVariable("sponsor-id") long sponsorId,
-                                                       @RequestBody SponsorUpdateRequest sponsorUpdateRequest,
+                                                       @RequestBody @Valid SponsorUpdateRequest sponsorUpdateRequest,
                                                        Authentication auth) {
         return sponsorService.updateSponsorProfile(sponsorId, auth.getName(), sponsorUpdateRequest);
     }
