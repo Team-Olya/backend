@@ -14,7 +14,6 @@ public record ShortProofDTO(
         String description,
         Integer totalKudos,
         Integer totalKudosFromSponsor,
-        Boolean isKudosed,
-        Boolean isAuthor
+        Boolean isKudosed
 ) {
 }

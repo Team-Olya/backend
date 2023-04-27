@@ -91,16 +91,16 @@ public class ProofServiceImpl implements ProofService {
                 proofRepository.findByTalent_Id(talentId).size() :
                 proofRepository.findByStatusAndTalent_Id(status, talentId).size();
 
-        var talent = talentRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
+        var sponsor = sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
 
         var proofs = status.equals("ALL") ?
                 proofRepository.findByTalent_Id(talentId, pageable)
                         .stream()
-                        .map(proof -> mapper.toProofDTO(proof, talent))
+                        .map(proof -> mapper.toProofDTO(proof, sponsor))
                         .toList() :
                 proofRepository.findByStatusAndTalent_Id(status, talentId, pageable)
                         .stream()
-                        .map(proof -> mapper.toProofDTO(proof, talent))
+                        .map(proof -> mapper.toProofDTO(proof, sponsor))
                         .toList();
 
         return TalentProofList.builder()
