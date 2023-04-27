@@ -52,4 +52,9 @@ public class Sponsor {
     private Date deletionDate;
 
     private String deletionToken;
+
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST,
+            CascadeType.DETACH, CascadeType.REFRESH},
+            mappedBy = "sponsorId")
+    private List<BalanceAdding> balanceAdding;
 }

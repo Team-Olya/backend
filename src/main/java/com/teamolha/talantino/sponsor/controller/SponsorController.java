@@ -2,6 +2,8 @@ package com.teamolha.talantino.sponsor.controller;
 
 import com.teamolha.talantino.sponsor.model.request.AddKudosRequest;
 import com.teamolha.talantino.sponsor.model.request.SponsorUpdateRequest;
+import com.teamolha.talantino.sponsor.model.response.BalanceAddingDTO;
+import com.teamolha.talantino.sponsor.model.response.SponsorKudos;
 import com.teamolha.talantino.sponsor.model.response.SponsorProfileResponse;
 import com.teamolha.talantino.sponsor.model.response.UpdatedSponsorResponse;
 import com.teamolha.talantino.sponsor.service.SponsorService;
@@ -9,6 +11,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -21,6 +25,17 @@ public class SponsorController {
                                            @RequestBody AddKudosRequest addKudosRequest) {
         return sponsorService.addKudos(auth, addKudosRequest);
     }
+
+    @GetMapping("/sponsors/balance/history")
+    public List<BalanceAddingDTO> getBalanceAddingHistory(Authentication auth) {
+        return sponsorService.getBalanceAddingHistory(auth);
+    }
+
+    @GetMapping("/sponsors/kudos")
+    public List<SponsorKudos> getKudosHistory(Authentication auth) {
+        return sponsorService.getKudosHistory(auth);
+    }
+
     @PatchMapping("/sponsors/{sponsor-id}")
     public UpdatedSponsorResponse updateSponsorProfile(@PathVariable("sponsor-id") long sponsorId,
                                                        @RequestBody SponsorUpdateRequest sponsorUpdateRequest,

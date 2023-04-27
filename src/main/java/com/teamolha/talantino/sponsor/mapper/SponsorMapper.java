@@ -4,6 +4,7 @@ import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.proof.model.entity.Kudos;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.model.response.ShortSponsorDTO;
+import com.teamolha.talantino.sponsor.model.response.SponsorKudos;
 import com.teamolha.talantino.sponsor.model.response.SponsorProfileResponse;
 import com.teamolha.talantino.sponsor.model.response.UpdatedSponsorResponse;
 import org.mapstruct.Mapper;
