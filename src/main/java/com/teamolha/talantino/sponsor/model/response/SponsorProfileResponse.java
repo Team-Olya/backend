@@ -9,6 +9,8 @@ public record SponsorProfileResponse(
         String name,
         String surname,
         String avatar,
-        Long balance
+        Long balance,
+        Long totalKudosed,
+        Long totalSpent
 ) {
 }
