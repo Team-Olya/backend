@@ -1,6 +1,7 @@
 package com.teamolha.talantino.talent.mapper;
 
 import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.proof.model.entity.Kudos;
 import com.teamolha.talantino.sponsor.model.SponsorStatus;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.talent.model.entity.Link;
@@ -54,6 +55,10 @@ public interface Mappers {
                 )
                 .prevId(prevId)
                 .nextId(nextId)
+                .totalKudos(talent.getProofs().stream()
+                        .flatMap(proof -> proof.getKudos().stream())
+                        .mapToLong(Kudos::getAmount)
+                        .sum())
                 .build();
     }
 
