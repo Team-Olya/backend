@@ -1,6 +1,7 @@
 package com.teamolha.talantino.sponsor.mapper;
 
 import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.proof.model.entity.Kudos;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.model.response.ShortSponsorDTO;
 import com.teamolha.talantino.sponsor.model.response.SponsorProfileResponse;
@@ -19,6 +20,14 @@ public interface SponsorMapper {
                 .surname(sponsor.getSurname())
                 .avatar(sponsor.getAvatar())
                 .balance(sponsor.getBalance())
+                .totalKudosed((long) sponsor.getKudos()
+                        .size()
+                )
+                .totalSpent((long) sponsor.getKudos()
+                        .stream()
+                        .mapToInt(Kudos::getAmount)
+                        .sum()
+                )
                 .build();
     }
 

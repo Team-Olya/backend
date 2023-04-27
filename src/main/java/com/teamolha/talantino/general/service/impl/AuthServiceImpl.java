@@ -3,7 +3,6 @@ package com.teamolha.talantino.general.service.impl;
 import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.general.service.AuthService;
 import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
-import com.teamolha.talantino.sponsor.model.response.SponsorProfileResponse;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.mapper.Mappers;
 import com.teamolha.talantino.talent.model.response.LoginResponse;
