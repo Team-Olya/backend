@@ -2,13 +2,19 @@ package com.teamolha.talantino.sponsor.service.impl;
 
 import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.general.email.utils.EmailUtil;
+import com.teamolha.talantino.proof.mapper.ProofMapper;
+import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
 import com.teamolha.talantino.sponsor.model.SponsorStatus;
+import com.teamolha.talantino.sponsor.model.entity.BalanceAdding;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.model.request.SponsorUpdateRequest;
+import com.teamolha.talantino.sponsor.model.response.BalanceAddingDTO;
+import com.teamolha.talantino.sponsor.model.response.SponsorKudos;
 import com.teamolha.talantino.sponsor.model.response.UpdatedSponsorResponse;
 import com.teamolha.talantino.sponsor.model.request.AddKudosRequest;
 import com.teamolha.talantino.sponsor.model.response.SponsorProfileResponse;
+import com.teamolha.talantino.sponsor.repository.BalanceAddingRepository;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.sponsor.service.SponsorService;
 import com.teamolha.talantino.talent.repository.TalentRepository;
@@ -20,7 +26,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -30,6 +40,9 @@ public class SponsorServiceImpl implements SponsorService {
     private TalentRepository talentRepository;
     private SponsorRepository sponsorRepository;
     private EmailUtil emailUtil;
+    private BalanceAddingRepository balanceAddingRepository;
+    private ProofMapper proofMapper;
+    private ProofRepository proofRepository;
 
     @Override
     public void register(String email, String password, String name, String surname) {
@@ -60,7 +73,39 @@ public class SponsorServiceImpl implements SponsorService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "We can't pay to your card, sorry");
         }
         sponsor.setBalance(sponsor.getBalance() + addKudosRequest.amount());
+        balanceAddingRepository.save(BalanceAdding.builder()
+                .amount(addKudosRequest.amount())
+                .sponsorId(sponsor.getId())
+                .date(LocalDateTime.now(ZoneOffset.UTC))
+                .build());
         return mapper.toSponsorProfileResponse(sponsorRepository.save(sponsor));
+    }
+
+    @Override
+    public List<BalanceAddingDTO> getBalanceAddingHistory(Authentication auth) {
+        var sponsor = sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow( () ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Sponsor is not found")
+        );
+        return balanceAddingRepository.findAllBySponsorId(sponsor.getId())
+                .stream()
+                .map(balanceAdding -> BalanceAddingDTO.builder()
+                        .amount(balanceAdding.getAmount())
+                        .date(balanceAdding.getDate())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SponsorKudos> getKudosHistory(Authentication auth) {
+        var sponsor = sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow( () ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Sponsor is not found")
+        );
+        return sponsor.getKudos().stream()
+                .map(kudos -> SponsorKudos.builder()
+                        .proofDTO(proofMapper.toProofDTO(proofRepository.findById(kudos.getProofId()).orElseThrow(), sponsor))
+                        .amount(kudos.getAmount())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
