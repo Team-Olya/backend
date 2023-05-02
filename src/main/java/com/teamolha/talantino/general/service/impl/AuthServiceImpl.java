@@ -3,8 +3,10 @@ package com.teamolha.talantino.general.service.impl;
 import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.general.service.AuthService;
 import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
+import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.mapper.Mappers;
+import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.model.response.LoginResponse;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import lombok.AllArgsConstructor;
@@ -63,6 +65,21 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public LoginResponse login(Authentication authentication) {
+        var authorities = authentication.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        var user = authorities.contains(Roles.TALENT.name()) ? talentRepository.findByEmailIgnoreCase(authentication.getName())
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                "Wrong authentication data!")
+                ) : sponsorRepository.findByEmailIgnoreCase(authentication.getName())
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                "Wrong authentication data")
+                );
+
         var now = Instant.now();
         var claims = JwtClaimsSet.builder()
                 .issuer("self")
@@ -70,46 +87,39 @@ public class AuthServiceImpl implements AuthService {
                 .expiresAt(now.plus(30, ChronoUnit.MINUTES))
                 .subject(authentication.getName())
                 .claim("scope", createScope(authentication))
+                .claim("id", user instanceof Talent ? ((Talent) user).getId() : ((Sponsor) user).getId())
                 .build();
-
-        var authorities = authentication.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
 
         log.error("{}", authentication.isAuthenticated());
 
-        if (authorities.contains(Roles.TALENT.name())) {
-            var talent = talentRepository.findByEmailIgnoreCase(authentication.getName())
-                    .orElseThrow(() ->
-                            new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                    "Wrong authentication data!")
-                    );
-            return new LoginResponse(
-                    talent.getId(),
-                    jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue(),
-                    talent.getName(),
-                    talent.getSurname(),
-                    talent.getAvatar()
-            );
-        }
+        return user instanceof Talent ? new LoginResponse(
+                ((Talent) user).getId(),
+                jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue(),
+                ((Talent) user).getName(),
+                ((Talent) user).getSurname(),
+                ((Talent) user).getAvatar()
+        ) : new LoginResponse(
+                ((Sponsor) user).getId(),
+                jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue(),
+                ((Sponsor) user).getName(),
+                ((Sponsor) user).getSurname(),
+                ((Sponsor) user).getAvatar());
 
-        if (authorities.contains(Roles.SPONSOR.name())) {
-            var sponsor = sponsorRepository.findByEmailIgnoreCase(authentication.getName())
-                    .orElseThrow(() ->
-                            new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                    "Wrong authentication data")
-                    );
-            return new LoginResponse(
-                    sponsor.getId(),
-                    jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue(),
-                    sponsor.getName(),
-                    sponsor.getSurname(),
-                    sponsor.getAvatar()
-            );
-        }
+//        if (authorities.contains(Roles.SPONSOR.name())) {
+//            var sponsor = sponsorRepository.findByEmailIgnoreCase(authentication.getName())
+//                    .orElseThrow(() ->
+//                            new ResponseStatusException(HttpStatus.BAD_REQUEST,
+//                                    "Wrong authentication data")
+//                    );
+//            return new LoginResponse(
+//                    sponsor.getId(),
+//                    jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue(),
+//                    sponsor.getName(),
+//                    sponsor.getSurname(),
+//                    sponsor.getAvatar()
+//            );
+//        }
 
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong authentication data");
     }
 
     private String createScope(Authentication authentication) {
