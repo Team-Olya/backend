@@ -5,7 +5,6 @@ import com.teamolha.talantino.sponsor.model.request.CreateSponsor;
 import com.teamolha.talantino.sponsor.service.SponsorService;
 import com.teamolha.talantino.talent.model.request.CreateTalent;
 import com.teamolha.talantino.talent.model.response.LoginResponse;
-import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
 import com.teamolha.talantino.talent.service.TalentService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
