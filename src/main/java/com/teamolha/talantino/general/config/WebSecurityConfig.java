@@ -1,4 +1,4 @@
-package com.teamolha.talantino.config;
+package com.teamolha.talantino.general.config;
 
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;

@@ -1,13 +1,10 @@
-package com.teamolha.talantino.validation;
+package com.teamolha.talantino.general.validation;
 
 import com.teamolha.talantino.proof.model.Status;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ProofStatusValidator implements ConstraintValidator<ProofStatus, String> {
 

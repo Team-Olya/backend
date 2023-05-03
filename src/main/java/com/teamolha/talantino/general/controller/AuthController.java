@@ -1,4 +1,4 @@
-package com.teamolha.talantino.controller;
+package com.teamolha.talantino.general.controller;
 
 import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
 import com.teamolha.talantino.talent.service.TalentService;

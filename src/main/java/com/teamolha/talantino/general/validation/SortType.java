@@ -1,4 +1,4 @@
-package com.teamolha.talantino.validation;
+package com.teamolha.talantino.general.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -12,14 +12,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target({PARAMETER, FIELD})
 @Retention(RUNTIME)
-@Constraint(validatedBy = ProofStatusValidator.class)
+@Constraint(validatedBy = SortTypeValidator.class)
 @Documented
-public @interface ProofStatus {
-
-    String message() default "{Password.invalid}";
+public @interface SortType {
+    String message() default "{SortType.invalid}";
 
     Class<?>[] groups() default { };
 
     Class<? extends Payload>[] payload() default { };
-
 }
