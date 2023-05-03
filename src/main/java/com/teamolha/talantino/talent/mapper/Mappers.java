@@ -6,6 +6,7 @@ import com.teamolha.talantino.sponsor.model.SponsorStatus;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.talent.model.entity.Link;
 import com.teamolha.talantino.talent.model.entity.Talent;
+import com.teamolha.talantino.talent.model.response.TalentFullResponse;
 import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
 import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
 import org.mapstruct.Mapper;
@@ -59,6 +60,29 @@ public interface Mappers {
                         .flatMap(proof -> proof.getKudos().stream())
                         .mapToLong(Kudos::getAmount)
                         .sum())
+                .build();
+    }
+
+    default TalentFullResponse toTalentFullResponse(Talent talent, Long prevId, Long nextId) {
+        return TalentFullResponse.builder()
+                .role(Roles.TALENT.name())
+                .id(talent.getId())
+                .name(talent.getName())
+                .surname(talent.getSurname())
+                .email(talent.getEmail())
+                .kind(talent.getKind().getKind())
+                .description(talent.getDescription())
+                .avatar(talent.getAvatar())
+                .experience(talent.getExperience())
+                .location(talent.getLocation())
+                .links(talent
+                        .getLinks()
+                        .stream()
+                        .map(Link::getUrl)
+                        .toList()
+                )
+                .prevId(prevId)
+                .nextId(nextId)
                 .build();
     }
 

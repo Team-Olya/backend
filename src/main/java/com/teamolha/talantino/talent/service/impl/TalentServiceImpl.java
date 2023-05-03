@@ -8,10 +8,7 @@ import com.teamolha.talantino.talent.model.entity.Kind;
 import com.teamolha.talantino.talent.model.entity.Link;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.model.request.TalentUpdateRequest;
-import com.teamolha.talantino.talent.model.response.TalentGeneralResponse;
-import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
-import com.teamolha.talantino.talent.model.response.TalentsPageResponse;
-import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
+import com.teamolha.talantino.talent.model.response.*;
 import com.teamolha.talantino.talent.repository.KindRepository;
 import com.teamolha.talantino.talent.repository.LinkRepository;
 import com.teamolha.talantino.talent.repository.TalentRepository;
@@ -105,12 +102,12 @@ public class TalentServiceImpl implements TalentService {
 
     @Transactional(readOnly = true)
     @Override
-    public TalentProfileResponse talentProfile(long talentId) {
+    public TalentFullResponse talentProfile(long talentId) {
         var talent = talentRepository.findById(talentId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Talent with ID " + talentId + " not found!"));
 
-        return mapper.toTalentProfileResponse(talent, getPrevTalentId(talentId), getNextTalentId(talentId));
+        return mapper.toTalentFullResponse(talent, getPrevTalentId(talentId), getNextTalentId(talentId));
     }
 
     @Override
