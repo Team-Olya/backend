@@ -55,7 +55,7 @@ public interface Mappers {
                 )
                 .prevId(prevId)
                 .nextId(nextId)
-                .totalKudos(talent.getProofs().stream()
+                .balance(talent.getProofs().stream()
                         .flatMap(proof -> proof.getKudos().stream())
                         .mapToLong(Kudos::getAmount)
                         .sum())

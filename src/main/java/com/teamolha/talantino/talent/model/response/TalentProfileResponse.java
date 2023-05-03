@@ -32,7 +32,7 @@ public record TalentProfileResponse(
 
         Long nextId,
 
-        Long totalKudos
+        Long balance
 ) {
 }
 
