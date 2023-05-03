@@ -5,7 +5,7 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record TalentProfileResponse(
+public record TalentFullResponse (
         String role,
 
         long id,
@@ -30,9 +30,6 @@ public record TalentProfileResponse(
 
         Long prevId,
 
-        Long nextId,
-
-        Long balance
+        Long nextId
 ) {
 }
-
