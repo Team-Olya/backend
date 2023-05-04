@@ -1,15 +1,12 @@
 package com.teamolha.talantino.proof.model.entity;
 
-import com.teamolha.talantino.proof.model.Status;
 import com.teamolha.talantino.talent.model.entity.Talent;
-import com.teamolha.talantino.validation.ProofStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Getter

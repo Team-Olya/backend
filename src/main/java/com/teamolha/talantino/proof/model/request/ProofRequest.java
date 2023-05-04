@@ -1,6 +1,6 @@
 package com.teamolha.talantino.proof.model.request;
 
-import com.teamolha.talantino.validation.ProofStatus;
+import com.teamolha.talantino.general.validation.ProofStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
