@@ -113,3 +113,28 @@ values (CURRENT_TIMESTAMP, 'Counter Strike profile', '<steam link>', 9, 'DRAFT')
 
 insert into proof (publication_date, title, description, talent_id, status)
 values (CURRENT_TIMESTAMP, 'Java Hibernate project', '<git hub link>', 10, 'HIDDEN');
+
+insert into skill (name) values ('Public speaking');
+insert into skill (name) values ('Time management');
+insert into skill (name) values ('Leadership');
+insert into skill (name) values ('Teamwork');
+insert into skill (name) values ('Problem solving');
+insert into skill (name) values ('Networking');
+insert into skill (name) values ('Digital literacy');
+insert into skill (name) values ('Adaptability');
+insert into skill (name) values ('Critical thinking');
+insert into skill (name) values ('Creativity');
+
+insert into proof_skills (proof_id, skill_id) values (1, 1);
+insert into proof_skills (proof_id, skill_id) values (1, 2);
+insert into proof_skills (proof_id, skill_id) values (2, 3);
+insert into proof_skills (proof_id, skill_id) values (3, 4);
+insert into proof_skills (proof_id, skill_id) values (3, 5);
+insert into proof_skills (proof_id, skill_id) values (5, 6);
+insert into proof_skills (proof_id, skill_id) values (6, 7);
+insert into proof_skills (proof_id, skill_id) values (7, 8);
+insert into proof_skills (proof_id, skill_id) values (8, 9);
+insert into proof_skills (proof_id, skill_id) values (8, 10);
+insert into proof_skills (proof_id, skill_id) values (9, 1);
+insert into proof_skills (proof_id, skill_id) values (9, 10);
+insert into proof_skills (proof_id, skill_id) values (9, 6);
