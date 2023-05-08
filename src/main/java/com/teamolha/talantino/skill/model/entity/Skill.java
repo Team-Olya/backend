@@ -22,7 +22,10 @@ public class Skill {
 
     @NotNull
     @Size(min = 2, max = 40)
-    private String name;
+    private String label;
+
+    @Column(columnDefinition = "TEXT")
+    private String icon;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.REFRESH, CascadeType.DETACH})

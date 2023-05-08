@@ -10,10 +10,10 @@ public class ProofSortValidator implements ConstraintValidator<ProofSort, String
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        boolean valid = value.equals("date") || value.equals("title");
+        boolean valid = value.equals("date") || value.equals("label");
         if (!valid) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "It can be sorted only by date or title");
+                    "It can be sorted only by date or label");
         }
         return true;
     }

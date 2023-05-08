@@ -1,9 +1,10 @@
 package com.teamolha.talantino.proof.model.response;
 
+import com.teamolha.talantino.skill.model.request.SkillDTO;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.List;
 
 @Builder
 public record ProofDTO(
@@ -12,6 +13,7 @@ public record ProofDTO(
         String title,
         String description,
         Long authorId,
-        String status
+        String status,
+        List<SkillDTO> skills
 ) {
 }
