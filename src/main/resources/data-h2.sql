@@ -113,3 +113,28 @@ values (CURRENT_TIMESTAMP, 'Counter Strike profile', '<steam link>', 9, 'DRAFT')
 
 insert into proof (publication_date, title, description, talent_id, status)
 values (CURRENT_TIMESTAMP, 'Java Hibernate project', '<git hub link>', 10, 'HIDDEN');
+
+insert into skill (label, icon) values ('Public speaking', 'https://www.svgrepo.com/show/296083/crying.svg');
+insert into skill (label, icon) values ('Time management', 'https://www.svgrepo.com/show/296083/crying.svg');
+insert into skill (label, icon) values ('Leadership', 'https://www.svgrepo.com/show/296083/crying.svg');
+insert into skill (label, icon) values ('Teamwork', 'https://www.svgrepo.com/show/296083/crying.svg');
+insert into skill (label, icon) values ('Problem solving', 'https://www.svgrepo.com/show/296083/crying.svg');
+insert into skill (label, icon) values ('Networking', 'https://www.svgrepo.com/show/296083/crying.svg');
+insert into skill (label, icon) values ('Digital literacy', 'https://www.svgrepo.com/show/296083/crying.svg');
+insert into skill (label, icon) values ('Adaptability', 'https://www.svgrepo.com/show/296083/crying.svg');
+insert into skill (label, icon) values ('Critical thinking', 'https://www.svgrepo.com/show/296083/crying.svg');
+insert into skill (label, icon) values ('Creativity', 'https://www.svgrepo.com/show/296083/crying.svg');
+
+insert into proof_skills (proof_id, skill_id) values (1, 1);
+insert into proof_skills (proof_id, skill_id) values (1, 2);
+insert into proof_skills (proof_id, skill_id) values (2, 3);
+insert into proof_skills (proof_id, skill_id) values (3, 4);
+insert into proof_skills (proof_id, skill_id) values (3, 5);
+insert into proof_skills (proof_id, skill_id) values (5, 6);
+insert into proof_skills (proof_id, skill_id) values (6, 7);
+insert into proof_skills (proof_id, skill_id) values (7, 8);
+insert into proof_skills (proof_id, skill_id) values (8, 9);
+insert into proof_skills (proof_id, skill_id) values (8, 10);
+insert into proof_skills (proof_id, skill_id) values (9, 1);
+insert into proof_skills (proof_id, skill_id) values (9, 10);
+insert into proof_skills (proof_id, skill_id) values (9, 6);
