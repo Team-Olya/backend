@@ -4,9 +4,14 @@ import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.model.Status;
 import com.teamolha.talantino.proof.model.entity.Proof;
 import com.teamolha.talantino.proof.model.request.ProofRequest;
-import com.teamolha.talantino.proof.model.response.*;
+import com.teamolha.talantino.proof.model.response.ProofDTO;
+import com.teamolha.talantino.proof.model.response.ProofsPageDTO;
+import com.teamolha.talantino.proof.model.response.ShortProofDTO;
+import com.teamolha.talantino.proof.model.response.TalentProofList;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.proof.service.ProofService;
+import com.teamolha.talantino.skill.model.entity.Skill;
+import com.teamolha.talantino.skill.repository.SkillRepository;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -28,6 +34,7 @@ public class ProofServiceImpl implements ProofService {
 
     ProofMapper mapper;
     ProofRepository proofRepository;
+    SkillRepository skillRepository;
     private final TalentRepository talentRepository;
 
     @Override
@@ -97,6 +104,11 @@ public class ProofServiceImpl implements ProofService {
 
         LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC);
 
+        List<Skill> allSkills = skillRepository.findAll();
+        List<Skill> skills = allSkills.stream()
+                .filter(skill -> proof.skills().contains(skill.getLabel()))
+                .toList();
+
         proofRepository.save(
                 Proof.builder()
                         .title(proof.title())
@@ -104,6 +116,7 @@ public class ProofServiceImpl implements ProofService {
                         .description(proof.description())
                         .talent(talent)
                         .status(proof.status())
+                        .skills(skills)
                         .build()
         );
     }
@@ -170,9 +183,17 @@ public class ProofServiceImpl implements ProofService {
     }
 
     private ProofDTO editProof(Proof proof, ProofRequest newProof) {
-        proof.setTitle(newProof.title());
-        proof.setDescription(newProof.description());
-        proof.setStatus(newProof.status());
+        Optional.ofNullable(newProof.title()).ifPresent(proof::setTitle);
+        Optional.ofNullable(newProof.description()).ifPresent(proof::setDescription);
+        Optional.ofNullable(newProof.status()).ifPresent(proof::setStatus);
+
+        List<Skill> allSkills = skillRepository.findAll();
+        List<Skill> skills = allSkills.stream()
+                .filter(skill -> newProof.skills().contains(skill.getLabel()))
+                .toList();
+
+        Optional.of(skills).ifPresent(proof::setSkills);
+
         proofRepository.save(proof);
         return mapper.toProofDTO(proof);
     }
