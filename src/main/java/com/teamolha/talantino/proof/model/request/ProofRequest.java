@@ -8,14 +8,10 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 
 public record ProofRequest(
-        @NotNull
         @Size(min = 2, max = 80)
         String title,
-        @NotNull
         @Size(min = 2, max = 2000)
         String description,
-        @NotNull
-        @ProofStatus
         String status,
         @Skills
         List<String> skills

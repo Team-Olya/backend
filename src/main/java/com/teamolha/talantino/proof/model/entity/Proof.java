@@ -1,5 +1,6 @@
 package com.teamolha.talantino.proof.model.entity;
 
+import com.teamolha.talantino.general.validation.ProofStatus;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import jakarta.persistence.*;
@@ -41,6 +42,7 @@ public class Proof {
     private Talent talent;
 
     @NotBlank
+    @ProofStatus
     private String status;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
