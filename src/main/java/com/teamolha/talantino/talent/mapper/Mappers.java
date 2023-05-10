@@ -1,5 +1,7 @@
 package com.teamolha.talantino.talent.mapper;
 
+import com.teamolha.talantino.skill.model.entity.Skill;
+import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.talent.model.entity.Link;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
@@ -50,6 +52,7 @@ public interface Mappers {
                 )
                 .prevId(prevId)
                 .nextId(nextId)
+                .skills(talent.getSkills().stream().map(SkillDTO::new).toList())
                 .build();
     }
 
