@@ -19,9 +19,10 @@ public class TalentController {
     @GetMapping("/talents")
     public TalentsPageResponse listTalents (
             @RequestParam(required = false ,defaultValue = "9") Integer amount,
-            @RequestParam(required = false, defaultValue = "0") Integer page
+            @RequestParam(required = false, defaultValue = "0") Integer page,
+            @RequestParam(required = false) String skills
     ) {
-        return talentService.pageTalents(page,amount);
+        return talentService.pageTalents(page, amount, skills);
     }
 
     @GetMapping("/talents/{talent-id}")

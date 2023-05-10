@@ -1,6 +1,8 @@
 package com.teamolha.talantino.talent.service.impl;
 
 import com.teamolha.talantino.proof.repository.ProofRepository;
+import com.teamolha.talantino.skill.model.entity.Skill;
+import com.teamolha.talantino.skill.repository.SkillRepository;
 import com.teamolha.talantino.talent.mapper.Mappers;
 import com.teamolha.talantino.talent.model.entity.Kind;
 import com.teamolha.talantino.talent.model.entity.Link;
@@ -23,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,6 +46,8 @@ public class TalentServiceImpl implements TalentService {
 
     ProofRepository proofRepository;
 
+    SkillRepository skillRepository;
+
     @Override
     public TalentProfileResponse talentProfile(String email) {
         var talent = talentRepository.findByEmailIgnoreCase(email).get();
@@ -53,19 +59,27 @@ public class TalentServiceImpl implements TalentService {
 
     @Transactional(readOnly = true)
     @Override
-    public TalentsPageResponse pageTalents(int page, int size) {
+    public TalentsPageResponse pageTalents(int page, int size, String skills) {
         if (size <= 0) {
             return TalentsPageResponse.builder()
                     .totalAmount(talentRepository.findAll().size())
                     .build();
         }
         Pageable pageable = PageRequest.of(page, size);
-        List<TalentGeneralResponse> talents = talentRepository.findAllByOrderByIdDesc(pageable).stream()
-                .map(TalentGeneralResponse::new)
-                .toList();
+
+        List<Talent> talents;
+        if (skills == null) {
+            talents = talentRepository.findAllByOrderByIdDesc(pageable);
+        } else {
+            var skillList = getSkillList(skills);
+            talents = talentRepository.findAllBySkills(skillList, (long) skillList.size(), pageable);
+        }
+
         return TalentsPageResponse.builder()
                 .totalAmount(talentRepository.findAll().size())
-                .talents(talents)
+                .talents(talents.stream()
+                        .map(TalentGeneralResponse::new)
+                        .toList())
                 .build();
     }
 
@@ -139,6 +153,16 @@ public class TalentServiceImpl implements TalentService {
         oldTalent.setLinks(links);
         talentRepository.save(oldTalent);
         return mapper.toUpdatedTalent(oldTalent);
+    }
+
+    private List<Skill> getSkillList(String skillsString) {
+        List<String> labels = List.of(skillsString.split(","));
+        List<Skill> skillList = new ArrayList<>();
+        labels.forEach(label ->
+                skillRepository.findByLabelIgnoreCase(label)
+                        .ifPresent(skillList::add)
+        );
+        return skillList;
     }
 }
 

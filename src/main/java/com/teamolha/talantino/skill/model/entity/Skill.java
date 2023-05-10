@@ -13,6 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class Skill {
@@ -33,6 +34,7 @@ public class Skill {
     @JoinTable(name = "proof_skills",
             joinColumns = @JoinColumn(name = "skill_id"),
             inverseJoinColumns = @JoinColumn(name = "proof_id"))
+    @ToString.Exclude
     private List<Proof> proofs;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
@@ -40,5 +42,6 @@ public class Skill {
     @JoinTable(name = "talent_skills",
             joinColumns = @JoinColumn(name = "skill_id"),
             inverseJoinColumns = @JoinColumn(name = "talent_id"))
+    @ToString.Exclude
     private List<Talent> talents;
 }
