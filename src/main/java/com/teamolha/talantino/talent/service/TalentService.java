@@ -6,7 +6,7 @@ import com.teamolha.talantino.talent.model.response.TalentsPageResponse;
 import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
 
 public interface TalentService {
-    TalentsPageResponse pageTalents(int page, int size);
+    TalentsPageResponse pageTalents(int page, int size, String skills);
 
     TalentProfileResponse talentProfile(long talentId);
 
