@@ -76,7 +76,7 @@ public class TalentServiceImpl implements TalentService {
         } else {
             var skillList = getSkillList(skills);
             talents = talentRepository.findAllBySkills(skillList, (long) skillList.size(), pageable);
-            amount = talentRepository.findCountAllBySkills(skillList, (long) skillList.size()).size();
+            amount = talentRepository.findAllBySkills(skillList, (long) skillList.size()).size();
         }
 
         return TalentsPageResponse.builder()
