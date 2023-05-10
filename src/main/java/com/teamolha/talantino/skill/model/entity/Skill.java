@@ -1,6 +1,7 @@
 package com.teamolha.talantino.skill.model.entity;
 
 import com.teamolha.talantino.proof.model.entity.Proof;
+import com.teamolha.talantino.talent.model.entity.Talent;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -33,4 +34,11 @@ public class Skill {
             joinColumns = @JoinColumn(name = "skill_id"),
             inverseJoinColumns = @JoinColumn(name = "proof_id"))
     private List<Proof> proofs;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REFRESH, CascadeType.DETACH})
+    @JoinTable(name = "talent_skills",
+            joinColumns = @JoinColumn(name = "skill_id"),
+            inverseJoinColumns = @JoinColumn(name = "talent_id"))
+    private List<Talent> talents;
 }
