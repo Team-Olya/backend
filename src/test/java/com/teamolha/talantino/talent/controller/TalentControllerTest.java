@@ -1,6 +1,7 @@
 package com.teamolha.talantino.talent.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.talent.model.request.TalentUpdateRequest;
 import com.teamolha.talantino.talent.model.response.TalentGeneralResponse;
 import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -38,11 +40,16 @@ public class TalentControllerTest {
         expectedResponse.setTotalAmount(11);
 
         List<TalentGeneralResponse> talents = new ArrayList<>();
-        talents.add(new TalentGeneralResponse(6L, "Bohdan", "Rohozianskyi", "JS Developer", null));
-        talents.add(new TalentGeneralResponse(5L, "Max", "Koropets", "QA", null));
-        talents.add(new TalentGeneralResponse(4L, "Anastasiia", "Mashchenko", "QA", null));
-        talents.add(new TalentGeneralResponse(3L, "Ekaterina", "Nikitenko", "QA", null));
-        talents.add(new TalentGeneralResponse(2L, "Alexey", "Pedun", "QA", null));
+        talents.add(new TalentGeneralResponse(6L, "Bohdan", "Rohozianskyi", "JS Developer", null,
+                Collections.singletonList(new SkillDTO("Skill 1", "iconurl"))));
+        talents.add(new TalentGeneralResponse(5L, "Max", "Koropets", "QA", null,
+                Collections.singletonList(new SkillDTO("Skill 1", "iconurl"))));
+        talents.add(new TalentGeneralResponse(4L, "Anastasiia", "Mashchenko", "QA", null,
+                Collections.singletonList(new SkillDTO("Skill 1", "iconurl"))));
+        talents.add(new TalentGeneralResponse(3L, "Ekaterina", "Nikitenko", "QA", null,
+                Collections.singletonList(new SkillDTO("Skill 1", "iconurl"))));
+        talents.add(new TalentGeneralResponse(2L, "Alexey", "Pedun", "QA", null,
+                Collections.singletonList(new SkillDTO("Skill 1", "iconurl"))));
 
         expectedResponse.setTalents(talents);
 
