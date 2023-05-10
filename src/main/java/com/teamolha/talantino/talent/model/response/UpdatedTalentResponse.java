@@ -1,5 +1,6 @@
 package com.teamolha.talantino.talent.model.response;
 
+import com.teamolha.talantino.skill.model.request.SkillDTO;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
@@ -23,6 +24,7 @@ public record UpdatedTalentResponse (
         @NotNull
         String location,
         @NotNull
-        List<String> links
+        List<String> links,
+        List<SkillDTO> skills
 ) {
 }

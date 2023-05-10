@@ -28,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -129,28 +130,45 @@ public class TalentServiceImpl implements TalentService {
     }
 
     private UpdatedTalentResponse updateTalent(Talent oldTalent, TalentUpdateRequest newTalent) {
-        oldTalent.setName(newTalent.name());
-        oldTalent.setSurname(newTalent.surname());
-        if (!kindRepository.existsByKindIgnoreCase(newTalent.kind())) {
-            kindRepository.save(
-                    Kind.builder()
-                            .kind(newTalent.kind())
-                            .build()
-            );
+        Optional.ofNullable(newTalent.name()).ifPresent(oldTalent::setName);
+        Optional.ofNullable(newTalent.surname()).ifPresent(oldTalent::setSurname);
+        Optional.ofNullable(newTalent.kind())
+                .ifPresent(kind -> {
+                    if (!kindRepository.existsByKindIgnoreCase(kind)) {
+                        Kind newKind = Kind.builder()
+                                .kind(kind)
+                                .build();
+                        kindRepository.save(newKind);
+                        oldTalent.setKind(newKind);
+                    } else {
+                        oldTalent.setKind(kindRepository.findByKindIgnoreCase(kind));
+                    }
+                });
+        Optional.ofNullable(newTalent.avatar()).ifPresent(oldTalent::setAvatar);
+        Optional.ofNullable(newTalent.description()).ifPresent(oldTalent::setDescription);
+        Optional.ofNullable(newTalent.experience()).ifPresent(oldTalent::setExperience);
+        Optional.ofNullable(newTalent.location()).ifPresent(oldTalent::setLocation);
+        Optional.ofNullable(newTalent.links()).ifPresent(links -> {
+            linkRepository.deleteByTalent(oldTalent);
+            List<Link> newLinks = links.stream()
+                    .map(url -> Link.builder()
+                            .url(url)
+                            .talent(oldTalent)
+                            .build())
+                    .map(linkRepository::save)
+                    .collect(Collectors.toList());
+            oldTalent.setLinks(newLinks);
+        });
+        talentRepository.save(oldTalent);
+
+        if (newTalent.skills() != null) {
+            List<Skill> allSkills = skillRepository.findAll();
+            List<Skill> skills = allSkills.stream()
+                    .filter(skill -> newTalent.skills().contains(skill.getLabel()))
+                    .collect(Collectors.toList());
+
+            Optional.of(skills).ifPresent(oldTalent::setSkills);
         }
-        oldTalent.setKind(kindRepository.findByKindIgnoreCase(newTalent.kind()));
-        oldTalent.setAvatar(newTalent.avatar());
-        oldTalent.setDescription(newTalent.description());
-        oldTalent.setExperience(newTalent.experience());
-        oldTalent.setLocation(newTalent.location());
-        linkRepository.deleteByTalent(oldTalent);
-        List<Link> links = newTalent.links().stream().map(url -> linkRepository.save(
-                Link.builder()
-                        .url(url)
-                        .talent(oldTalent)
-                        .build()
-        )).collect(Collectors.toList());
-        oldTalent.setLinks(links);
         talentRepository.save(oldTalent);
         return mapper.toUpdatedTalent(oldTalent);
     }

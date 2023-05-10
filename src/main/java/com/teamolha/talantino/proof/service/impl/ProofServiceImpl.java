@@ -108,10 +108,13 @@ public class ProofServiceImpl implements ProofService {
 
         LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC);
 
-        List<Skill> allSkills = skillRepository.findAll();
-        List<Skill> skills = allSkills.stream()
-                .filter(skill -> proof.skills().contains(skill.getLabel()))
-                .toList();
+        List<Skill> skills = null;
+        if (proof.skills() != null) {
+            List<Skill> allSkills = skillRepository.findAll();
+            skills = allSkills.stream()
+                    .filter(skill -> proof.skills().contains(skill.getLabel()))
+                    .toList();
+        }
 
         proofRepository.save(
                 Proof.builder()
@@ -191,12 +194,14 @@ public class ProofServiceImpl implements ProofService {
         Optional.ofNullable(newProof.description()).ifPresent(proof::setDescription);
         Optional.ofNullable(newProof.status()).ifPresent(proof::setStatus);
 
-        List<Skill> allSkills = skillRepository.findAll();
-        List<Skill> skills = allSkills.stream()
-                .filter(skill -> newProof.skills().contains(skill.getLabel()))
-                .collect(Collectors.toList());
+        if (newProof.skills() != null) {
+            List<Skill> allSkills = skillRepository.findAll();
+            List<Skill> skills = allSkills.stream()
+                    .filter(skill -> newProof.skills().contains(skill.getLabel()))
+                    .collect(Collectors.toList());
 
-        Optional.of(skills).ifPresent(proof::setSkills);
+            Optional.of(skills).ifPresent(proof::setSkills);
+        }
 
         proofRepository.save(proof);
         return mapper.toProofDTO(proof);
