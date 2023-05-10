@@ -5,12 +5,15 @@ import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
 import com.teamolha.talantino.talent.model.response.TalentsPageResponse;
 import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
 import com.teamolha.talantino.talent.service.TalentService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
+@Validated
 @RestController
 @AllArgsConstructor
 public class TalentController {
@@ -32,7 +35,7 @@ public class TalentController {
 
     @PatchMapping("/talents/{talent-id}")
     public UpdatedTalentResponse updateTalentProfile(@PathVariable("talent-id") long talentId,
-                                                     @RequestBody TalentUpdateRequest talentUpdateRequest,
+                                                     @RequestBody @Valid TalentUpdateRequest talentUpdateRequest,
                                                      Authentication auth) {
         return talentService.updateTalentProfile(talentId, auth.getName(), talentUpdateRequest);
     }

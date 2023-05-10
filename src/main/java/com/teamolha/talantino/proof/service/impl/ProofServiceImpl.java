@@ -20,15 +20,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@Transactional
 @AllArgsConstructor
 public class ProofServiceImpl implements ProofService {
 
@@ -104,10 +108,13 @@ public class ProofServiceImpl implements ProofService {
 
         LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC);
 
-        List<Skill> allSkills = skillRepository.findAll();
-        List<Skill> skills = allSkills.stream()
-                .filter(skill -> proof.skills().contains(skill.getLabel()))
-                .toList();
+        List<Skill> skills = null;
+        if (proof.skills() != null) {
+            List<Skill> allSkills = skillRepository.findAll();
+            skills = allSkills.stream()
+                    .filter(skill -> proof.skills().contains(skill.getLabel()))
+                    .toList();
+        }
 
         proofRepository.save(
                 Proof.builder()
@@ -187,12 +194,14 @@ public class ProofServiceImpl implements ProofService {
         Optional.ofNullable(newProof.description()).ifPresent(proof::setDescription);
         Optional.ofNullable(newProof.status()).ifPresent(proof::setStatus);
 
-        List<Skill> allSkills = skillRepository.findAll();
-        List<Skill> skills = allSkills.stream()
-                .filter(skill -> newProof.skills().contains(skill.getLabel()))
-                .toList();
+        if (newProof.skills() != null) {
+            List<Skill> allSkills = skillRepository.findAll();
+            List<Skill> skills = allSkills.stream()
+                    .filter(skill -> newProof.skills().contains(skill.getLabel()))
+                    .collect(Collectors.toList());
 
-        Optional.of(skills).ifPresent(proof::setSkills);
+            Optional.of(skills).ifPresent(proof::setSkills);
+        }
 
         proofRepository.save(proof);
         return mapper.toProofDTO(proof);

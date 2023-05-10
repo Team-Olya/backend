@@ -17,6 +17,8 @@ public class SkillsValidator implements ConstraintValidator<Skills, List<String>
 
     @Override
     public boolean isValid(List<String> skills, ConstraintValidatorContext constraintValidatorContext) {
+        if (skills == null) return true;
+
         List<String> invalidSkills = new ArrayList<>();
 
         for (String skill : skills) {

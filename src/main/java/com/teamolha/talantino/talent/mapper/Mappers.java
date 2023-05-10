@@ -10,6 +10,8 @@ import org.mapstruct.Mapper;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.stream.Collectors;
+
 import static org.mapstruct.ReportingPolicy.IGNORE;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = IGNORE)
@@ -30,6 +32,7 @@ public interface Mappers {
                         .stream()
                         .map(Link::getUrl)
                         .toList())
+                .skills(talent.getSkills().stream().map(SkillDTO::new).toList())
                 .build();
     }
 
