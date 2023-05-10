@@ -69,15 +69,18 @@ public class TalentServiceImpl implements TalentService {
         Pageable pageable = PageRequest.of(page, size);
 
         List<Talent> talents;
+        long amount;
         if (skills == null) {
             talents = talentRepository.findAllByOrderByIdDesc(pageable);
+            amount = talentRepository.findAll().size();
         } else {
             var skillList = getSkillList(skills);
             talents = talentRepository.findAllBySkills(skillList, (long) skillList.size(), pageable);
+            amount = talentRepository.findCountAllBySkills(skillList, (long) skillList.size()).size();
         }
 
         return TalentsPageResponse.builder()
-                .totalAmount(talentRepository.findAll().size())
+                .totalAmount(amount)
                 .talents(talents.stream()
                         .map(TalentGeneralResponse::new)
                         .toList())

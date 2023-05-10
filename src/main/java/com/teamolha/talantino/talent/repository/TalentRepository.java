@@ -33,5 +33,6 @@ public interface TalentRepository extends JpaRepository<Talent, Long> {
     @Query("SELECT DISTINCT t FROM Talent t JOIN t.skills s WHERE s IN :skillList GROUP BY t.id HAVING COUNT(DISTINCT s) = :skillCount")
     List<Talent> findAllBySkills(@Param("skillList") List<Skill> skillList, @Param("skillCount") Long skillCount, Pageable pageable);
 
-
+    @Query("SELECT t FROM Talent t JOIN t.skills s WHERE s IN :skillList GROUP BY t.id HAVING COUNT(DISTINCT s) = :skillCount")
+    List<Talent> findCountAllBySkills(@Param("skillList") List<Skill> skillList, @Param("skillCount") Long skillCount);
 }
