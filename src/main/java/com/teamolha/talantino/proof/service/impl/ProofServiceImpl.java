@@ -20,15 +20,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@Transactional
 @AllArgsConstructor
 public class ProofServiceImpl implements ProofService {
 
@@ -190,7 +194,7 @@ public class ProofServiceImpl implements ProofService {
         List<Skill> allSkills = skillRepository.findAll();
         List<Skill> skills = allSkills.stream()
                 .filter(skill -> newProof.skills().contains(skill.getLabel()))
-                .toList();
+                .collect(Collectors.toList());
 
         Optional.of(skills).ifPresent(proof::setSkills);
 
