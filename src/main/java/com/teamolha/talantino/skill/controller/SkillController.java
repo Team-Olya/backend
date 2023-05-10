@@ -16,7 +16,7 @@ public class SkillController {
 
     SkillService skillService;
 
-    @GetMapping("/skill")
+    @GetMapping("/skills")
     SkillListDTO getSkillList(@RequestParam(required = false) String search) {
         return skillService.getSkillList(search);
     }
