@@ -12,6 +12,6 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class TalentsPageResponse {
-    int totalAmount;
+    long totalAmount;
     List<TalentGeneralResponse> talents;
 }
