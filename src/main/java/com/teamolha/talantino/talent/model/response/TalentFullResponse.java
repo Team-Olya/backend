@@ -1,5 +1,6 @@
 package com.teamolha.talantino.talent.model.response;
 
+import com.teamolha.talantino.skill.model.request.SkillDTO;
 import lombok.Builder;
 
 import java.util.List;
@@ -27,6 +28,8 @@ public record TalentFullResponse (
         String location,
 
         List<String> links,
+
+        List<SkillDTO> skills,
 
         Long prevId,
 

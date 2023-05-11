@@ -67,6 +67,7 @@ public interface Mappers {
                         .flatMap(proof -> proof.getKudos().stream())
                         .mapToLong(Kudos::getAmount)
                         .sum())
+                .skills(talent.getSkills().stream().map(SkillDTO::new).toList())
                 .build();
     }
 

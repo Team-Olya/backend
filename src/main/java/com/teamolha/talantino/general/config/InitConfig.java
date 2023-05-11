@@ -17,6 +17,7 @@ import java.util.Calendar;
 public class InitConfig implements CommandLineRunner {
 
     private TalentRepository talentRepository;
+    private SponsorRepository sponsorRepository;
 
     @Override
     public void run(String... args) throws Exception {

@@ -105,21 +105,6 @@ public class AuthServiceImpl implements AuthService {
                 ((Sponsor) user).getSurname(),
                 ((Sponsor) user).getAvatar());
 
-//        if (authorities.contains(Roles.SPONSOR.name())) {
-//            var sponsor = sponsorRepository.findByEmailIgnoreCase(authentication.getName())
-//                    .orElseThrow(() ->
-//                            new ResponseStatusException(HttpStatus.BAD_REQUEST,
-//                                    "Wrong authentication data")
-//                    );
-//            return new LoginResponse(
-//                    sponsor.getId(),
-//                    jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue(),
-//                    sponsor.getName(),
-//                    sponsor.getSurname(),
-//                    sponsor.getAvatar()
-//            );
-//        }
-
     }
 
     private String createScope(Authentication authentication) {

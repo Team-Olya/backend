@@ -194,7 +194,7 @@ public class TalentServiceImpl implements TalentService {
             oldTalent.setLinks(newLinks);
         });
         if (newTalent.skills() != null) {
-            List<Skill> allSkills = skillRepository.findAll();
+            List<Skill> allSkills = skillRepository.findAll(); //TODO: ignore case
             List<Skill> skills = allSkills.stream()
                     .filter(skill -> newTalent.skills().contains(skill.getLabel()))
                     .collect(Collectors.toList());

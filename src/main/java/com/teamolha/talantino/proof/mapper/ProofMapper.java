@@ -52,6 +52,7 @@ public interface ProofMapper {
                         .mapToInt(Kudos::getAmount)
                         .sum()
                 )
+                .skills(proof.getSkills().stream().map(SkillDTO::new).toList())
                 .totalKudosFromSponsor(totalKudosFromSponsor)
                 .isKudosed(isKudosed)
                 .build();
