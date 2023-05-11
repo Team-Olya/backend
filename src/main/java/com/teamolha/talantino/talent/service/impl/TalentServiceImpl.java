@@ -1,5 +1,6 @@
 package com.teamolha.talantino.talent.service.impl;
 
+import com.teamolha.talantino.admin.model.AccountStatus;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.repository.SkillRepository;
@@ -63,7 +64,7 @@ public class TalentServiceImpl implements TalentService {
     public TalentsPageResponse pageTalents(int page, int size, String skills) {
         if (size <= 0) {
             return TalentsPageResponse.builder()
-                    .totalAmount(talentRepository.findAll().size())
+                    .totalAmount(talentRepository.findByAccountStatusOrAccountStatusIsNull(AccountStatus.ACTIVE).size())
                     .build();
         }
         Pageable pageable = PageRequest.of(page, size);
@@ -71,8 +72,8 @@ public class TalentServiceImpl implements TalentService {
         List<Talent> talents;
         long amount;
         if (skills == null) {
-            talents = talentRepository.findAllByOrderByIdDesc(pageable);
-            amount = talentRepository.findAll().size();
+            talents = talentRepository.findByAccountStatusOrAccountStatusIsNullOrderByIdDesc(pageable, AccountStatus.ACTIVE);
+            amount = talentRepository.findByAccountStatusOrAccountStatusIsNull(AccountStatus.ACTIVE).size();
         } else {
             var skillList = getSkillList(skills);
             talents = talentRepository.findAllBySkills(skillList, (long) skillList.size(), pageable);
