@@ -14,6 +14,9 @@ public record ShortProofDTO(
         String title,
         @Size(min = 2, max = 200)
         String description,
+        Integer totalKudos,
+        Integer totalKudosFromSponsor,
+        Boolean isKudosed,
         List<SkillDTO> skills
 ) {
 }

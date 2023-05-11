@@ -1,18 +1,17 @@
 package com.teamolha.talantino.talent.service.impl;
 
 import com.teamolha.talantino.admin.model.AccountStatus;
+import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.repository.SkillRepository;
+import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.mapper.Mappers;
 import com.teamolha.talantino.talent.model.entity.Kind;
 import com.teamolha.talantino.talent.model.entity.Link;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.model.request.TalentUpdateRequest;
-import com.teamolha.talantino.talent.model.response.TalentGeneralResponse;
-import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
-import com.teamolha.talantino.talent.model.response.TalentsPageResponse;
-import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
+import com.teamolha.talantino.talent.model.response.*;
 import com.teamolha.talantino.talent.repository.KindRepository;
 import com.teamolha.talantino.talent.repository.LinkRepository;
 import com.teamolha.talantino.talent.repository.TalentRepository;
@@ -22,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -49,6 +49,36 @@ public class TalentServiceImpl implements TalentService {
     ProofRepository proofRepository;
 
     SkillRepository skillRepository;
+
+    SponsorRepository sponsorRepository;
+
+    PasswordEncoder passwordEncoder;
+
+    @Override
+    public void register(String email, String password, String name, String surname, String kind) {
+        if (talentRepository.existsByEmailIgnoreCase(email) || sponsorRepository.existsByEmailIgnoreCase(email)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    email + " is already occupied!"
+            );
+        }
+        if (!kindRepository.existsByKindIgnoreCase(kind)) {
+            kindRepository.save(
+                    Kind.builder()
+                            .kind(kind)
+                            .build()
+            );
+        }
+        talentRepository.save(
+                Talent.builder()
+                        .email(email)
+                        .password(passwordEncoder.encode(password))
+                        .name(name)
+                        .surname(surname)
+                        .kind(kindRepository.findByKindIgnoreCase(kind))
+                        .authorities(List.of(Roles.TALENT.name()))
+                        .build()
+        );
+    }
 
     @Override
     public TalentProfileResponse talentProfile(String email) {
@@ -90,12 +120,12 @@ public class TalentServiceImpl implements TalentService {
 
     @Transactional(readOnly = true)
     @Override
-    public TalentProfileResponse talentProfile(long talentId) {
+    public TalentFullResponse talentProfile(long talentId) {
         var talent = talentRepository.findById(talentId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Talent with ID " + talentId + " not found!"));
 
-        return mapper.toTalentProfileResponse(talent, getPrevTalentId(talentId), getNextTalentId(talentId));
+        return mapper.toTalentFullResponse(talent, getPrevTalentId(talentId), getNextTalentId(talentId));
     }
 
     @Override
@@ -163,8 +193,6 @@ public class TalentServiceImpl implements TalentService {
                     .collect(Collectors.toList());
             oldTalent.setLinks(newLinks);
         });
-        talentRepository.save(oldTalent);
-
         if (newTalent.skills() != null) {
             List<Skill> allSkills = skillRepository.findAll();
             List<Skill> skills = allSkills.stream()
@@ -186,5 +214,6 @@ public class TalentServiceImpl implements TalentService {
         );
         return skillList;
     }
+
 }
 

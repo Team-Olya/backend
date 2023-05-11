@@ -1,6 +1,7 @@
 package com.teamolha.talantino.proof.controller;
 
 import com.teamolha.talantino.proof.model.request.ProofRequest;
+import com.teamolha.talantino.proof.model.response.KudosList;
 import com.teamolha.talantino.proof.model.response.ProofDTO;
 import com.teamolha.talantino.proof.model.response.ProofsPageDTO;
 import com.teamolha.talantino.proof.model.response.TalentProofList;
@@ -33,7 +34,7 @@ public class ProofController {
             @RequestParam(required = false, defaultValue = "9") Integer amount,
             @RequestParam(required = false, defaultValue = "0") Integer page
     ) {
-        return proofService.talentProofs(auth.getName(), sort, type, status, amount, page, talentId);
+        return proofService.talentProofs(auth, sort, type, status, amount, page, talentId);
     }
 
     @PostMapping("/talents/{talent-id}/proofs")
@@ -47,12 +48,13 @@ public class ProofController {
 
     @GetMapping("/proofs")
     public ProofsPageDTO getAllProofs(
+            Authentication auth,
             @RequestParam(required = false, defaultValue = "date") @Valid @ProofSort String sort,
             @RequestParam(required = false, defaultValue = "desc") @Valid @SortType String type,
             @RequestParam(required = false, defaultValue = "9") Integer amount,
             @RequestParam(required = false, defaultValue = "0") Integer page
     ) {
-        return proofService.pageProofs(sort, type, page, amount);
+        return proofService.pageProofs(auth, sort, type, page, amount);
     }
 
     @PatchMapping("talents/{talent-id}/proofs/{proof-id}")
@@ -77,5 +79,18 @@ public class ProofController {
     @GetMapping("/proofs/{proof-id}")
     public ProofDTO getProof(@PathVariable("proof-id") Long proofId) {
         return proofService.getProof(proofId);
+    }
+
+    @GetMapping("/proofs/{proof-id}/kudos")
+    public KudosList getKudos(Authentication auth,
+                              @PathVariable("proof-id") Long proofId) {
+        return proofService.getKudos(auth, proofId);
+    }
+
+    @PostMapping("/proofs/{proof-id}/kudos")
+    public void setKudos(Authentication auth,
+                         @PathVariable("proof-id") Long proofId,
+                         @RequestParam(value = "amount", required = false, defaultValue = "1") int amount) {
+        proofService.setKudos(auth, proofId, amount);
     }
 }

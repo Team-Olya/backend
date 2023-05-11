@@ -1,7 +1,7 @@
 package com.teamolha.talantino.talent.controller;
 
 import com.teamolha.talantino.talent.model.request.TalentUpdateRequest;
-import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
+import com.teamolha.talantino.talent.model.response.TalentFullResponse;
 import com.teamolha.talantino.talent.model.response.TalentsPageResponse;
 import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
 import com.teamolha.talantino.talent.service.TalentService;
@@ -29,7 +29,7 @@ public class TalentController {
     }
 
     @GetMapping("/talents/{talent-id}")
-    public TalentProfileResponse talentProfile(@PathVariable("talent-id") long talentId) {
+    public TalentFullResponse talentProfile(@PathVariable("talent-id") long talentId) {
         return talentService.talentProfile(talentId);
     }
 

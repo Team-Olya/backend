@@ -4,8 +4,13 @@ import com.teamolha.talantino.admin.model.AccountStatus;
 import com.teamolha.talantino.admin.model.entity.Admin;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.model.request.SkillDTO;
+import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.proof.model.entity.Kudos;
+import com.teamolha.talantino.sponsor.model.SponsorStatus;
+import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.talent.model.entity.Link;
 import com.teamolha.talantino.talent.model.entity.Talent;
+import com.teamolha.talantino.talent.model.response.TalentFullResponse;
 import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
 import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
 import org.mapstruct.Mapper;
@@ -40,6 +45,34 @@ public interface Mappers {
 
     default TalentProfileResponse toTalentProfileResponse(Talent talent, Long prevId, Long nextId) {
         return TalentProfileResponse.builder()
+                .role(Roles.TALENT.name())
+                .id(talent.getId())
+                .name(talent.getName())
+                .surname(talent.getSurname())
+                .email(talent.getEmail())
+                .kind(talent.getKind().getKind())
+                .description(talent.getDescription())
+                .avatar(talent.getAvatar())
+                .experience(talent.getExperience())
+                .location(talent.getLocation())
+                .links(talent
+                        .getLinks()
+                        .stream()
+                        .map(Link::getUrl)
+                        .toList()
+                )
+                .prevId(prevId)
+                .nextId(nextId)
+                .balance(talent.getProofs().stream()
+                        .flatMap(proof -> proof.getKudos().stream())
+                        .mapToLong(Kudos::getAmount)
+                        .sum())
+                .build();
+    }
+
+    default TalentFullResponse toTalentFullResponse(Talent talent, Long prevId, Long nextId) {
+        return TalentFullResponse.builder()
+                .role(Roles.TALENT.name())
                 .id(talent.getId())
                 .name(talent.getName())
                 .surname(talent.getSurname())
@@ -73,6 +106,14 @@ public interface Mappers {
         return User.withUsername(admin.getLogin())
                 .password(admin.getPassword())
                 .authorities(admin.getAuthorities().toArray(String[]::new))
+                .build();
+    }
+
+    default UserDetails toUserDetails(Sponsor sponsor) {
+        return User.withUsername(sponsor.getEmail())
+                .password(sponsor.getPassword())
+                .authorities(sponsor.getAuthorities().toArray(String[]::new))
+                .disabled(SponsorStatus.INACTIVE.equals(sponsor.getStatus()))
                 .build();
     }
 }

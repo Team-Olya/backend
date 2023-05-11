@@ -1,5 +1,6 @@
 package com.teamolha.talantino.general.config;
 
+import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -20,5 +21,6 @@ public class InitConfig implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         talentRepository.deleteAllByVerificationExpireDate(Calendar.getInstance().getTime());
+        sponsorRepository.deleteAllByDeletionDateLessThanEqual(Calendar.getInstance().getTime());
     }
 }

@@ -1,12 +1,11 @@
 package com.teamolha.talantino.talent.model.response;
 
-import com.teamolha.talantino.skill.model.request.SkillDTO;
 import lombok.Builder;
 
 import java.util.List;
 
 @Builder
-public record TalentProfileResponse(
+public record TalentFullResponse (
         String role,
 
         long id,
@@ -31,11 +30,6 @@ public record TalentProfileResponse(
 
         Long prevId,
 
-        Long nextId,
-
-        List<SkillDTO> skills,
-
-        Long balance
+        Long nextId
 ) {
 }
-

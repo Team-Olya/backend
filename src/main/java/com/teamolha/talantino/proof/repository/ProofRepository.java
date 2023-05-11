@@ -2,7 +2,6 @@ package com.teamolha.talantino.proof.repository;
 
 import com.teamolha.talantino.proof.model.entity.Proof;
 import com.teamolha.talantino.talent.model.entity.Talent;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -33,4 +32,8 @@ public interface ProofRepository extends JpaRepository<Proof, Long> {
     List<Proof> findByTalent_Id(long talentId);
 
     long deleteByTalent(Talent talent);
+
+    @Query(value = "SELECT sponsor_id, SUM(amount) FROM kudos WHERE proof_id=:proofId GROUP BY sponsor_id",
+            nativeQuery = true)
+    List<Object[]> findSponsorsAndKudosOnProof(long proofId);
 }
