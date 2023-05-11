@@ -64,6 +64,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/skills").permitAll()
                         .requestMatchers("/test").authenticated()
                         .requestMatchers("/admin/create").permitAll()
+                        .requestMatchers("/email-confirm").permitAll()
                         .anyRequest().authenticated()
                 );
 
