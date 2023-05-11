@@ -18,6 +18,8 @@ public interface TalentRepository extends JpaRepository<Talent, Long> {
 
     boolean existsByEmailIgnoreCase(String email);
 
+    void deleteTalentByEmailIgnoreCase(String email);
+
     List<Talent> findAllByOrderByIdDesc(Pageable pageable);
 
     @Query(value = "SELECT prev_value FROM (SELECT *, LAG(id) OVER " +

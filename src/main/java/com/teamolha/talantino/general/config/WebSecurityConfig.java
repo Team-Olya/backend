@@ -3,6 +3,9 @@ package com.teamolha.talantino.general.config;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.teamolha.talantino.admin.model.entity.Admin;
+import com.teamolha.talantino.admin.repository.AdminRepository;
+import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import com.teamolha.talantino.talent.mapper.Mappers;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +33,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Optional;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
@@ -59,6 +63,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api-docs/**").permitAll()
                         .requestMatchers("/skills").permitAll()
                         .requestMatchers("/test").authenticated()
+                        .requestMatchers("/admin/create").permitAll()
                         .anyRequest().authenticated()
                 );
 
@@ -102,12 +107,21 @@ public class WebSecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(
+            AdminRepository adminRepository,
             TalentRepository talentRepository,
             Mappers mapper
     ) {
-        return email -> talentRepository.findByEmailIgnoreCase(email)
-                .map(mapper::toUserDetails)
-                .orElseThrow(() -> new UsernameNotFoundException(email + " not found"));
+        return email -> {
+            Optional<Talent> talent = talentRepository.findByEmailIgnoreCase(email);
+            if (talent.isPresent()) {
+                return mapper.toUserDetails(talent.get());
+            }
+            Optional<Admin> admin = adminRepository.findByLoginIgnoreCase(email);
+            if (admin.isPresent()) {
+                return mapper.toUserDetails(admin.get());
+            }
+            throw new UsernameNotFoundException("User not found with email: " + email);
+        };
     }
 
     @Bean

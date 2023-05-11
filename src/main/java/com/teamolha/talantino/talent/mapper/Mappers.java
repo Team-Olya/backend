@@ -1,5 +1,6 @@
 package com.teamolha.talantino.talent.mapper;
 
+import com.teamolha.talantino.admin.model.entity.Admin;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.talent.model.entity.Link;
@@ -63,6 +64,13 @@ public interface Mappers {
         return User.withUsername(talent.getEmail())
                 .password(talent.getPassword())
                 .authorities(talent.getAuthorities().toArray(String[]::new))
+                .build();
+    }
+
+    default UserDetails toUserDetails(Admin admin) {
+        return User.withUsername(admin.getLogin())
+                .password(admin.getPassword())
+                .authorities(admin.getAuthorities().toArray(String[]::new))
                 .build();
     }
 }

@@ -14,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class Talent {
@@ -54,11 +55,13 @@ public class Talent {
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST,
             CascadeType.DETACH, CascadeType.REFRESH},
             mappedBy = "talent")
+    @ToString.Exclude
     private List<Link> links;
 
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST,
             CascadeType.DETACH, CascadeType.REFRESH},
             mappedBy = "talent")
+    @ToString.Exclude
     private List<Proof> proofs;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE,
@@ -66,6 +69,7 @@ public class Talent {
     @JoinTable(name = "talent_skills",
             joinColumns = @JoinColumn(name = "talent_id"),
             inverseJoinColumns = @JoinColumn(name = "skill_id"))
+    @ToString.Exclude
     private List<Skill> skills;
 
     @ElementCollection(fetch = FetchType.EAGER)
