@@ -1,5 +1,6 @@
 package com.teamolha.talantino.talent.mapper;
 
+import com.teamolha.talantino.admin.model.AccountStatus;
 import com.teamolha.talantino.admin.model.entity.Admin;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.model.request.SkillDTO;
@@ -64,6 +65,7 @@ public interface Mappers {
         return User.withUsername(talent.getEmail())
                 .password(talent.getPassword())
                 .authorities(talent.getAuthorities().toArray(String[]::new))
+                .disabled(AccountStatus.INACTIVE.equals(talent.getAccountStatus()))
                 .build();
     }
 

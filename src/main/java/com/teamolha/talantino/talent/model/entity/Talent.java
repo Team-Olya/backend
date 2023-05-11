@@ -1,5 +1,6 @@
 package com.teamolha.talantino.talent.model.entity;
 
+import com.teamolha.talantino.admin.model.AccountStatus;
 import com.teamolha.talantino.proof.model.entity.Proof;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import jakarta.persistence.*;
@@ -7,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -74,4 +76,11 @@ public class Talent {
 
     @ElementCollection(fetch = FetchType.EAGER)
     private Collection<String> authorities;
+
+    @Enumerated(EnumType.STRING)
+    private AccountStatus accountStatus;
+
+    private Date verificationExpireDate;
+
+    private String verificationToken;
 }

@@ -3,15 +3,13 @@ package com.teamolha.talantino.talent.controller;
 import com.teamolha.talantino.talent.model.request.CreateTalent;
 import com.teamolha.talantino.talent.model.response.LoginResponse;
 import com.teamolha.talantino.talent.service.TalentAuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Validated
@@ -26,13 +24,19 @@ public class TalentAuthController {
 
     @PostMapping("/talents/register")
     @ResponseStatus(HttpStatus.CREATED)
-    void register (@RequestBody @Valid CreateTalent talent) {
+    void register (@RequestBody @Valid CreateTalent talent, HttpServletRequest request) {
         talentAuthService.register(
                 talent.email(),
                 talent.password(),
                 talent.name(),
                 talent.surname(),
-                talent.kind()
+                talent.kind(),
+                request
         );
+    }
+
+    @PostMapping("/email-confirm")
+    LoginResponse emailConfirm(@RequestParam String token) {
+        return talentAuthService.login(token);
     }
 }

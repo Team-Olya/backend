@@ -16,6 +16,8 @@ import java.util.Optional;
 public interface TalentRepository extends JpaRepository<Talent, Long> {
     Optional<Talent> findByEmailIgnoreCase(String email);
 
+    Optional<Talent> findByVerificationToken(String verificationToken);
+
     boolean existsByEmailIgnoreCase(String email);
 
     void deleteTalentByEmailIgnoreCase(String email);
