@@ -1,19 +1,14 @@
 package com.teamolha.talantino.talent.mapper;
 
-import com.teamolha.talantino.account.model.entity.Account;
-import com.teamolha.talantino.admin.model.AccountStatus;
-import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.proof.model.entity.Kudos;
+import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.talent.model.entity.Link;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.model.response.TalentFullResponse;
 import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
 import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
 import org.mapstruct.Mapper;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import static org.mapstruct.ReportingPolicy.IGNORE;
 
@@ -122,15 +117,4 @@ public interface TalentMapper {
 //                .disabled(SponsorStatus.INACTIVE.equals(sponsor.getStatus()))
 //                .build();
 //    }
-
-    default UserDetails toUserDetails(Account account) {
-        return User.withUsername(account.getEmail())
-                .password(account.getPassword())
-                .authorities(account.getAuthorities().stream()
-                        .map(SimpleGrantedAuthority::new)
-                        .toList()
-                )
-                .disabled(AccountStatus.INACTIVE.equals(account.getAccountStatus()))
-                .build();
-    }
 }

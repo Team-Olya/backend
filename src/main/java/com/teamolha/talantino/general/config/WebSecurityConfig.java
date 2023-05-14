@@ -3,13 +3,9 @@ package com.teamolha.talantino.general.config;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
-import com.teamolha.talantino.admin.model.entity.Admin;
-import com.teamolha.talantino.admin.repository.AdminRepository;
-import com.teamolha.talantino.talent.mapper.TalentMapper;
-import com.teamolha.talantino.talent.model.entity.Talent;
-import com.teamolha.talantino.sponsor.model.entity.Sponsor;
-import com.teamolha.talantino.sponsor.repository.SponsorRepository;
-import com.teamolha.talantino.talent.repository.TalentRepository;
+import com.teamolha.talantino.account.mapper.AccountMapper;
+import com.teamolha.talantino.account.model.entity.Account;
+import com.teamolha.talantino.account.repository.AccountRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -39,7 +35,6 @@ import java.util.Optional;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
-
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
@@ -120,23 +115,13 @@ public class WebSecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(
-            AdminRepository adminRepository,
-            SponsorRepository sponsorRepository,
-            TalentRepository talentRepository,
-            TalentMapper mapper
+            AccountRepository accountRepository,
+            AccountMapper mapper
     ) {
         return email -> {
-            Optional<Talent> talent = talentRepository.findByEmailIgnoreCase(email);
-            if (talent.isPresent()) {
-                return mapper.toUserDetails(talent.get());
-            }
-            Optional<Admin> admin = adminRepository.findByEmailIgnoreCase(email);
-            if (admin.isPresent()) {
-                return mapper.toUserDetails(admin.get());
-            }
-            Optional<Sponsor> sponsor = sponsorRepository.findByEmailIgnoreCase(email);
-            if (sponsor.isPresent()) {
-                return mapper.toUserDetails(sponsor.get());
+            Optional<Account> account = accountRepository.findByEmailIgnoreCase(email);
+            if (account.isPresent()) {
+                return mapper.toUserDetails(account.get());
             }
             throw new UsernameNotFoundException("User not found with email: " + email);
         };
