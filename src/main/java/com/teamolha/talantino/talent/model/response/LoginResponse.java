@@ -1,7 +1,10 @@
 package com.teamolha.talantino.talent.model.response;
 
+import lombok.Builder;
+
+@Builder
 public record LoginResponse(
-        long id,
+        Long id,
         String token,
         String name,
         String surname,

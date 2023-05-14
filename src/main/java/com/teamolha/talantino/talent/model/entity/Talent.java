@@ -20,6 +20,9 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 public class Talent extends Account {
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long talentId;
+
     @NotNull
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST,
             CascadeType.DETACH, CascadeType.REFRESH},

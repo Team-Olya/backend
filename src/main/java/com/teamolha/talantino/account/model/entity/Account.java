@@ -12,6 +12,7 @@ import java.util.Collection;
 @Inheritance(strategy =  InheritanceType.JOINED)
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @SuperBuilder
 public abstract class Account {
@@ -36,4 +37,7 @@ public abstract class Account {
 
     @Enumerated(EnumType.STRING)
     private AccountStatus accountStatus;
+
+    abstract public String getAvatar();
+
 }

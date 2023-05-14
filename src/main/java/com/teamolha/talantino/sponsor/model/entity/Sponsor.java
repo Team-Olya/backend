@@ -14,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @SuperBuilder
+@ToString
 @NoArgsConstructor
 public class Sponsor extends Account {
     @NotNull
@@ -25,6 +26,7 @@ public class Sponsor extends Account {
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST,
             CascadeType.DETACH, CascadeType.REFRESH},
             mappedBy = "sponsorId")
+    @ToString.Exclude
     private List<Kudos> kudos;
 
     private Date deletionDate;
@@ -34,5 +36,6 @@ public class Sponsor extends Account {
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST,
             CascadeType.DETACH, CascadeType.REFRESH},
             mappedBy = "sponsorId")
+    @ToString.Exclude
     private List<BalanceAdding> balanceAdding;
 }
