@@ -139,7 +139,7 @@ public class AdminServiceImpl implements AdminService{
     public void createAdmin(CreateAdmin createAdmin) {
         if (adminRepository.count() == 0) {
             adminRepository.save(Admin.builder()
-                    .login(createAdmin.login())
+                    .email(createAdmin.email())
                     .password(passwordEncoder.encode(createAdmin.password()))
                     .authorities(List.of(Roles.ADMIN.name()))
                     .build()
@@ -158,7 +158,7 @@ public class AdminServiceImpl implements AdminService{
                 .subject(authentication.getName())
                 .claim("scope", createScope(authentication))
                 .build();
-        var user = adminRepository.findByLoginIgnoreCase(authentication.getName()).orElseThrow(
+        var user = adminRepository.findByEmailIgnoreCase(authentication.getName()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong authentication data!"));
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }

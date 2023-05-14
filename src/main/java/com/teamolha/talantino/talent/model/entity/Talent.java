@@ -57,9 +57,6 @@ public class Talent extends Account {
     @ToString.Exclude
     private List<Skill> skills;
 
-    @Enumerated(EnumType.STRING)
-    private AccountStatus accountStatus;
-
     private Date verificationExpireDate;
 
     private String verificationToken;

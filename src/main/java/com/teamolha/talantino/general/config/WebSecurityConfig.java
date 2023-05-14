@@ -50,7 +50,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/email").permitAll()
                         .requestMatchers("/auth/me").permitAll()
 
                         .requestMatchers("/talents/register").permitAll()
@@ -130,7 +130,7 @@ public class WebSecurityConfig {
             if (talent.isPresent()) {
                 return mapper.toUserDetails(talent.get());
             }
-            Optional<Admin> admin = adminRepository.findByLoginIgnoreCase(email);
+            Optional<Admin> admin = adminRepository.findByEmailIgnoreCase(email);
             if (admin.isPresent()) {
                 return mapper.toUserDetails(admin.get());
             }

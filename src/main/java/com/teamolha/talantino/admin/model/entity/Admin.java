@@ -1,25 +1,17 @@
 package com.teamolha.talantino.admin.model.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
-
-import java.util.Collection;
+import com.teamolha.talantino.account.model.entity.Account;
+import jakarta.persistence.Entity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
-public class Admin {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long adminId;
-
-    private String login;
-
-    private String password;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    private Collection<String> authorities;
+public class Admin extends Account {
+    
 }

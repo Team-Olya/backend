@@ -1,11 +1,11 @@
 package com.teamolha.talantino.sponsor.service.impl;
 
+import com.teamolha.talantino.admin.model.AccountStatus;
 import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.general.email.utils.EmailUtil;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
-import com.teamolha.talantino.sponsor.model.SponsorStatus;
 import com.teamolha.talantino.sponsor.model.entity.BalanceAdding;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.model.request.AddKudosRequest;
@@ -129,7 +129,7 @@ public class SponsorServiceImpl implements SponsorService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        sponsor.setStatus(SponsorStatus.INACTIVE);
+        sponsor.setAccountStatus(AccountStatus.INACTIVE);
         sponsor.setDeletionToken(UUID.randomUUID().toString());
         sponsor.setDeletionDate(calculateDeletionDate(7));
         sponsorRepository.save(sponsor);
@@ -140,7 +140,7 @@ public class SponsorServiceImpl implements SponsorService {
     public void recoverSponsor(String token) {
         var sponsor = sponsorRepository.findByDeletionToken(token).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid token"));
-        sponsor.setStatus(SponsorStatus.ACTIVE);
+        sponsor.setAccountStatus(AccountStatus.ACTIVE);
         sponsor.setDeletionDate(null);
         sponsor.setDeletionToken(null);
         sponsorRepository.save(sponsor);

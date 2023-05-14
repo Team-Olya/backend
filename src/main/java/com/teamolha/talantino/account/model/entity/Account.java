@@ -1,5 +1,6 @@
 package com.teamolha.talantino.account.model.entity;
 
+import com.teamolha.talantino.admin.model.AccountStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -32,4 +33,7 @@ public abstract class Account {
 
     @ElementCollection(fetch = FetchType.EAGER)
     private Collection<String> authorities;
+
+    @Enumerated(EnumType.STRING)
+    private AccountStatus accountStatus;
 }
