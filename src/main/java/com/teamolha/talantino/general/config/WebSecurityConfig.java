@@ -5,15 +5,13 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.teamolha.talantino.admin.model.entity.Admin;
 import com.teamolha.talantino.admin.repository.AdminRepository;
+import com.teamolha.talantino.talent.mapper.TalentMapper;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
-import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.repository.TalentRepository;
-import com.teamolha.talantino.talent.mapper.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
@@ -30,7 +28,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -75,8 +72,10 @@ public class WebSecurityConfig {
                         .requestMatchers(antMatcher("/h2/**")).permitAll()
 
                         .requestMatchers("/skills").permitAll()
-                        .requestMatchers("/test").authenticated()
+
                         .requestMatchers("/admin/create").permitAll()
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+
                         .requestMatchers("/email-confirm").permitAll()
                         .anyRequest().authenticated()
                 );
@@ -124,7 +123,7 @@ public class WebSecurityConfig {
             AdminRepository adminRepository,
             SponsorRepository sponsorRepository,
             TalentRepository talentRepository,
-            Mappers mapper
+            TalentMapper mapper
     ) {
         return email -> {
             Optional<Talent> talent = talentRepository.findByEmailIgnoreCase(email);

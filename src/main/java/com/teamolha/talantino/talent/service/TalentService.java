@@ -1,10 +1,9 @@
 package com.teamolha.talantino.talent.service;
 
 import com.teamolha.talantino.talent.model.request.TalentUpdateRequest;
-import com.teamolha.talantino.talent.model.response.TalentFullResponse;
-import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
-import com.teamolha.talantino.talent.model.response.TalentsPageResponse;
-import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
+import com.teamolha.talantino.talent.model.response.*;
+
+import java.util.List;
 
 public interface TalentService {
 
@@ -19,4 +18,6 @@ public interface TalentService {
     UpdatedTalentResponse updateTalentProfile(long talentId, String email, TalentUpdateRequest updateTalent);
 
     void deleteTalent(long talentId, String email);
+
+    List<KindDTO> getTalentKinds();
 }

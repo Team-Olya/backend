@@ -3,13 +3,17 @@ package com.teamolha.talantino.admin.controller;
 import com.teamolha.talantino.admin.model.CreateAdmin;
 import com.teamolha.talantino.admin.model.DeleteTalent;
 import com.teamolha.talantino.admin.service.AdminService;
+import com.teamolha.talantino.proof.model.request.ProofRequest;
+import com.teamolha.talantino.proof.model.response.ProofDTO;
+import com.teamolha.talantino.skill.model.request.SkillDTO;
+import com.teamolha.talantino.talent.model.request.TalentUpdateRequest;
+import com.teamolha.talantino.talent.model.response.KindDTO;
+import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
 @RestController
@@ -29,16 +33,46 @@ public class AdminController {
         return adminService.login(authentication);
     }
 
-    @DeleteMapping("/admin/delete/talents")
-    public void deleteTalent(@RequestBody DeleteTalent deleteTalent, Authentication auth) {
-        var authorities = auth.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
-        if (authorities.contains("ADMIN")) {
-            adminService.deleteTalent(deleteTalent.email());
-        } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not admin");
-        }
+    @DeleteMapping("/admin/talent")
+    public void deleteTalent(@RequestBody DeleteTalent deleteTalent) {
+        adminService.deleteTalent(deleteTalent.email());
+    }
+
+    @DeleteMapping("/admin/talents/{talent-id}")
+    public void deleteTalent(@PathVariable("talent-id") Long talentId) {
+        adminService.deleteTalent(talentId);
+    }
+
+    @DeleteMapping("/admin/proofs/{proof-id}")
+    public void deleteProof(@PathVariable("proof-id") Long proofId) {
+        adminService.deleteProof(proofId);
+    }
+
+    @PatchMapping("/admin/talents/{talent-id}")
+    public UpdatedTalentResponse editTalent(@PathVariable("talent-id") Long talentId,
+                                            @RequestBody TalentUpdateRequest newTalent) {
+        return adminService.editTalent(newTalent, talentId);
+    }
+
+    @PatchMapping("/admin/proofs/{proof-id}")
+    public ProofDTO editProof(@PathVariable("proof-id") Long proofId,
+                                @RequestBody ProofRequest newProof) {
+        return adminService.editProof(newProof, proofId);
+    }
+
+    @PatchMapping("/admin/kind-of-talent/{kind-id}")
+    public KindDTO editKind(@PathVariable("kind-id") Long id,
+                              @RequestBody String newKind) {
+        return adminService.editKind(id, newKind);
+    }
+
+    @PostMapping("/admin/skills")
+    public void addSkill(@RequestBody SkillDTO skillDTO) {
+        adminService.addSkill(skillDTO);
+    }
+
+    @DeleteMapping("/admin/skills/{skill-id}")
+    public void deleteSkill(@PathVariable("skill-id") Long skillId) {
+        adminService.deleteSkill(skillId);
     }
 }

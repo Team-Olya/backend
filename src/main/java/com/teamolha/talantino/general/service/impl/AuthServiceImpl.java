@@ -5,7 +5,7 @@ import com.teamolha.talantino.general.service.AuthService;
 import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
-import com.teamolha.talantino.talent.mapper.Mappers;
+import com.teamolha.talantino.talent.mapper.TalentMapper;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.model.response.LoginResponse;
 import com.teamolha.talantino.talent.repository.TalentRepository;
@@ -33,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
     private TalentRepository talentRepository;
     private JwtEncoder jwtEncoder;
     private final SponsorRepository sponsorRepository;
-    private Mappers talentMapper;
+    private TalentMapper talentMapper;
     private SponsorMapper sponsorMapper;
 
     @Override
