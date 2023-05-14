@@ -13,7 +13,7 @@ public record TalentUpdateRequest(
         String kind,
         String avatar,
         String description,
-        int experience,
+        Integer experience,
         String location,
         List<String> links,
         @Skills

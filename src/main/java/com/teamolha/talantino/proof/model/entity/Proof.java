@@ -3,6 +3,7 @@ package com.teamolha.talantino.proof.model.entity;
 import com.teamolha.talantino.general.validation.ProofStatus;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.talent.model.entity.Talent;
+import com.teamolha.talantino.general.validation.ProofStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -40,6 +41,11 @@ public class Proof {
     @JoinColumn(name = "talent_id")
     @NotNull
     private Talent talent;
+
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST,
+            CascadeType.DETACH, CascadeType.REFRESH},
+            mappedBy = "proofId")
+    private List<Kudos> kudos;
 
     @NotBlank
     @ProofStatus
