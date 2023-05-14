@@ -25,13 +25,4 @@ public interface AccountMapper {
                 .disabled(AccountStatus.INACTIVE.equals(account.getAccountStatus()))
                 .build();
     }
-
-    @Mapping(target = "authorities", ignore = true)
-    Talent accountToTalent(Account account);
-
-    @Mapping(target = "authorities", ignore = true)
-    Sponsor accountToSponsor(Account account);
-
-    @Mapping(target = "authorities", ignore = true)
-    Sponsor accountToAdmin(Account account);
 }

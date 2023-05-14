@@ -14,7 +14,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 public class Admin extends Account {
-
     @Override
     public String getAvatar() {
         return null;

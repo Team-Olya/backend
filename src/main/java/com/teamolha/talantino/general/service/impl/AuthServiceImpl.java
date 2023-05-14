@@ -44,48 +44,25 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Object myProfile(Authentication authentication) {
-        var authorities = authentication.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
+        var account = accountRepository.findByEmailIgnoreCase(authentication.getName()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-//        if (authorities.contains(Roles.TALENT.name())) {
-//            var talent = talentRepository.findByEmailIgnoreCase(authentication.getName())
-//                    .orElseThrow(() ->
-//                            new ResponseStatusException(HttpStatus.NOT_FOUND)
-//                    );
-//            return talentMapper.toTalentProfileResponse(
-//                    talent, talentRepository.findPrevTalent(talent.getId()), talentRepository.findNextTalent(talent.getId())
-//            );
-//        }
-
-        var account = accountRepository.findByEmailIgnoreCase(authentication.getName()).get();
-
-//        if (authorities.contains(Roles.SPONSOR.name())) {
-//            var sponsor = sponsorRepository.findByEmailIgnoreCase(authentication.getName())
-//                    .orElseThrow(() ->
-//                            new ResponseStatusException(HttpStatus.NOT_FOUND)
-//                    );
-//            return sponsorMapper.toSponsorProfileResponse(sponsor);
-//        }
-        Object user;
-        switch (Roles.valueOf(authorities.get(0))) {
-            case SPONSOR ->
-                user = sponsorMapper.toSponsorProfileResponse(sponsorRepository.findByEmailIgnoreCase(account.getEmail()).get());
+        Roles role = Roles.valueOf(account.getAuthorities().stream().findFirst().get());
+        switch (role) {
             case TALENT -> {
-                var talent = talentRepository.findByEmailIgnoreCase(account.getEmail()).get();
-                user = talentMapper.toTalentProfileResponse(talent,
-                        talentRepository.findPrevTalent(talent.getTalentId()),
-                        talentRepository.findNextTalent(talent.getTalentId())
-                );
+                var talent = talentRepository.findByEmailIgnoreCase(account.getEmail()).orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND));
+                return talentMapper.toTalentProfileResponse(
+                        talent, talentRepository.findPrevTalent(talent.getId()),
+                        talentRepository.findNextTalent(talent.getId()));
             }
-            case ADMIN ->
-                user = adminRepository.findByEmailIgnoreCase(account.getEmail()).get();
-            default -> throw new ResponseStatusException(HttpStatus.I_AM_A_TEAPOT,
-                    "Account hasn't any role");
+            case SPONSOR -> {
+                return sponsorMapper.toSponsorProfileResponse(
+                        sponsorRepository.findByEmailIgnoreCase(account.getEmail()).orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND)));
+            }
         }
-        log.error(user.toString());
-        return user;
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
     public LoginResponse login(Authentication authentication) {
