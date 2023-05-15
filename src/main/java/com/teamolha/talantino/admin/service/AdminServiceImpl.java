@@ -1,6 +1,6 @@
 package com.teamolha.talantino.admin.service;
 
-import com.teamolha.talantino.admin.model.CreateAdmin;
+import com.teamolha.talantino.admin.model.request.CreateAdmin;
 import com.teamolha.talantino.admin.model.entity.Admin;
 import com.teamolha.talantino.admin.repository.AdminRepository;
 import com.teamolha.talantino.general.config.Roles;
@@ -141,6 +141,8 @@ public class AdminServiceImpl implements AdminService{
             adminRepository.save(Admin.builder()
                     .email(createAdmin.email())
                     .password(passwordEncoder.encode(createAdmin.password()))
+                    .name(createAdmin.name())
+                    .surname(createAdmin.surname())
                     .authorities(List.of(Roles.ADMIN.name()))
                     .build()
             );

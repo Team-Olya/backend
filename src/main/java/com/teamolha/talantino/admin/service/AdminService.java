@@ -1,6 +1,6 @@
 package com.teamolha.talantino.admin.service;
 
-import com.teamolha.talantino.admin.model.CreateAdmin;
+import com.teamolha.talantino.admin.model.request.CreateAdmin;
 import com.teamolha.talantino.proof.model.request.ProofRequest;
 import com.teamolha.talantino.proof.model.response.ProofDTO;
 import com.teamolha.talantino.skill.model.request.SkillDTO;

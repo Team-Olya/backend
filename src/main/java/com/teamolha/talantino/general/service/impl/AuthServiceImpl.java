@@ -2,6 +2,7 @@ package com.teamolha.talantino.general.service.impl;
 
 import com.teamolha.talantino.account.mapper.AccountMapper;
 import com.teamolha.talantino.account.repository.AccountRepository;
+import com.teamolha.talantino.admin.mapper.AdminMapper;
 import com.teamolha.talantino.admin.repository.AdminRepository;
 import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.general.service.AuthService;
@@ -41,6 +42,7 @@ public class AuthServiceImpl implements AuthService {
     private SponsorMapper sponsorMapper;
     private AccountRepository accountRepository;
     private AccountMapper accountMapper;
+    private AdminMapper adminMapper;
 
     @Override
     public Object myProfile(Authentication authentication) {
@@ -60,6 +62,12 @@ public class AuthServiceImpl implements AuthService {
                 return sponsorMapper.toSponsorProfileResponse(
                         sponsorRepository.findByEmailIgnoreCase(account.getEmail()).orElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND)));
+            }
+            case ADMIN -> {
+                return adminMapper.toAdminProfile(
+                        adminRepository.findByEmailIgnoreCase(account.getEmail()).orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND))
+                );
             }
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);

@@ -1,7 +1,6 @@
 package com.teamolha.talantino.talent.model.entity;
 
 import com.teamolha.talantino.account.model.entity.Account;
-import com.teamolha.talantino.admin.model.AccountStatus;
 import com.teamolha.talantino.proof.model.entity.Proof;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import jakarta.persistence.*;
@@ -9,7 +8,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package com.teamolha.talantino.sponsor.service.impl;
 
-import com.teamolha.talantino.admin.model.AccountStatus;
+import com.teamolha.talantino.account.model.entity.AccountStatus;
 import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.general.email.utils.EmailUtil;
 import com.teamolha.talantino.proof.mapper.ProofMapper;

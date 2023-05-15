@@ -1,4 +1,4 @@
-package com.teamolha.talantino.admin.model;
+package com.teamolha.talantino.admin.model.request;
 
 import java.util.List;
 

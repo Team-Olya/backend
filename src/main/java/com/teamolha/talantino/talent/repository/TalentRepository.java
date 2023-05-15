@@ -1,9 +1,8 @@
 package com.teamolha.talantino.talent.repository;
 
-import com.teamolha.talantino.admin.model.AccountStatus;
+import com.teamolha.talantino.account.model.entity.AccountStatus;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.talent.model.entity.Talent;
-import jakarta.persistence.TypedQuery;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
