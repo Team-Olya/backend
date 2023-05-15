@@ -282,7 +282,10 @@ public class ProofServiceImpl implements ProofService {
         reportRepository.save(Report.builder().proof(proof).account(account).build());
 
         ReportedProofDTO reportedProof = mapper.toReportDTO(proof, account);
-        sendReportMessage(reportedProof, request.getScheme() + "://" + request.getHeader("host"));
+
+        // todo for localhost use this:
+        // sendReportMessage(reportedProof, request.getScheme() + "://" + request.getHeader("host"));
+        sendReportMessage(reportedProof, request.getHeader("Referer"));
         return reportedProof;
     }
 
