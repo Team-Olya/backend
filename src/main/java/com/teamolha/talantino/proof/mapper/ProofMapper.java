@@ -1,11 +1,14 @@
 package com.teamolha.talantino.proof.mapper;
 
+import com.teamolha.talantino.account.model.entity.Account;
 import com.teamolha.talantino.proof.model.entity.Kudos;
 import com.teamolha.talantino.proof.model.entity.Proof;
 import com.teamolha.talantino.proof.model.response.ProofDTO;
+import com.teamolha.talantino.proof.model.response.ReportedProofDTO;
 import com.teamolha.talantino.proof.model.response.ShortProofDTO;
 import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
+import com.teamolha.talantino.talent.model.entity.Talent;
 import org.mapstruct.Mapper;
 
 import java.util.stream.Collectors;
@@ -82,6 +85,21 @@ public interface ProofMapper {
                 )
                 .totalKudosFromSponsor(totalKudosFromSponsor)
                 .isKudosed(isKudosed)
+                .build();
+    }
+
+    default ReportedProofDTO toReportDTO(Proof proof, Account account) {
+        Talent talent = proof.getTalent();
+
+        return ReportedProofDTO.builder()
+                .id(proof.getId())
+                .title(proof.getTitle())
+                .date(proof.getDate())
+                .description(proof.getDescription())
+                .proofAuthorId(talent.getId())
+                .proofAuthor(talent.getName() + " " + talent.getSurname())
+                .proofAuthorAvatar(talent.getAvatar())
+                .reportedBy(account.getName() + " " + account.getSurname())
                 .build();
     }
 }

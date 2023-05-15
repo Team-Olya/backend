@@ -1,10 +1,13 @@
 package com.teamolha.talantino.proof.service.impl;
 
+import com.teamolha.talantino.account.repository.AccountRepository;
 import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.general.discord.event.MessageSendEvent;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.model.Status;
 import com.teamolha.talantino.proof.model.entity.Kudos;
 import com.teamolha.talantino.proof.model.entity.Proof;
+import com.teamolha.talantino.proof.model.entity.Report;
 import com.teamolha.talantino.proof.model.response.KudosDTO;
 import com.teamolha.talantino.proof.model.request.ProofRequest;
 import com.teamolha.talantino.proof.model.response.ProofDTO;
@@ -14,6 +17,7 @@ import com.teamolha.talantino.proof.model.response.TalentProofList;
 import com.teamolha.talantino.proof.model.response.*;
 import com.teamolha.talantino.proof.repository.KudosRepository;
 import com.teamolha.talantino.proof.repository.ProofRepository;
+import com.teamolha.talantino.proof.repository.ReportRepository;
 import com.teamolha.talantino.proof.service.ProofService;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.repository.SkillRepository;
@@ -21,6 +25,8 @@ import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.repository.TalentRepository;
+import discord4j.rest.http.client.ClientException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -35,12 +41,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -48,13 +52,25 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ProofServiceImpl implements ProofService {
 
-    ProofMapper mapper;
-    ProofRepository proofRepository;
-    SkillRepository skillRepository;
-    SponsorMapper sponsorMapper;
-    TalentRepository talentRepository;
-    SponsorRepository sponsorRepository;
-    KudosRepository kudosRepository;
+    private final ProofMapper mapper;
+
+    private final AccountRepository accountRepository;
+
+    private final ProofRepository proofRepository;
+
+    private final SkillRepository skillRepository;
+
+    private final SponsorMapper sponsorMapper;
+
+    private final TalentRepository talentRepository;
+
+    private final SponsorRepository sponsorRepository;
+
+    private final KudosRepository kudosRepository;
+
+    private final ReportRepository reportRepository;
+
+    private final MessageSendEvent messageSendEvent;
 
     @Transactional(readOnly = true)
     @Override
@@ -253,6 +269,43 @@ public class ProofServiceImpl implements ProofService {
         sponsorRepository.save(sponsor);
     }
 
+    @Override
+    public ReportedProofDTO reportProof(Authentication auth, Long proofId, HttpServletRequest request) {
+        var account = accountRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
+        var proof = getProofEntity(proofId);
+
+        if (reportRepository.existsByProofAndAccount(proof, account)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Your complaint is already under consideration by the moderators!");
+        }
+        reportRepository.save(Report.builder().proof(proof).account(account).build());
+
+        ReportedProofDTO reportedProof = mapper.toReportDTO(proof, account);
+        sendReportMessage(reportedProof, request.getScheme() + "://" + request.getHeader("host"));
+        return reportedProof;
+    }
+
+    @Override
+    public void rejectReport(Long reportId) {
+        reportRepository.deleteById(reportId);
+    }
+
+    @Override
+    public void approveReport(Long reportId) {
+        var report = reportRepository.findById(reportId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
+        reportRepository.deleteById(reportId);
+        proofRepository.deleteById(report.getProof().getId());
+    }
+
+    private void sendReportMessage(ReportedProofDTO reportedProof, String referer) {
+        try {
+            messageSendEvent.sendMessage(reportedProof, referer);
+        } catch (ClientException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Moderator Bot exception");
+        }
+    }
 
     private ProofDTO editProof(Proof proof, ProofRequest newProof) {
         Optional.ofNullable(newProof.title()).ifPresent(proof::setTitle);

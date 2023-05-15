@@ -1,14 +1,12 @@
 package com.teamolha.talantino.proof.controller;
 
 import com.teamolha.talantino.proof.model.request.ProofRequest;
-import com.teamolha.talantino.proof.model.response.KudosList;
-import com.teamolha.talantino.proof.model.response.ProofDTO;
-import com.teamolha.talantino.proof.model.response.ProofsPageDTO;
-import com.teamolha.talantino.proof.model.response.TalentProofList;
+import com.teamolha.talantino.proof.model.response.*;
 import com.teamolha.talantino.proof.service.ProofService;
 import com.teamolha.talantino.general.validation.ProofSort;
 import com.teamolha.talantino.general.validation.ProofStatus;
 import com.teamolha.talantino.general.validation.SortType;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -92,5 +90,11 @@ public class ProofController {
                          @PathVariable("proof-id") Long proofId,
                          @RequestParam(value = "amount", required = false, defaultValue = "1") int amount) {
         proofService.setKudos(auth, proofId, amount);
+    }
+
+    @PostMapping("/proofs/{proof-id}/report")
+    public ReportedProofDTO reportProof(Authentication auth, @PathVariable("proof-id") Long proofId,
+                                        HttpServletRequest request) {
+        return proofService.reportProof(auth, proofId, request);
     }
 }
