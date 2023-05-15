@@ -37,7 +37,7 @@ public class MessageSendEvent {
         return EmbedCreateSpec.builder()
                 .color(Color.VIVID_VIOLET)
                 .title(reportedProof.title())
-                .url(createProofUrl(refererUrl, reportedProof.id()))
+                .url(createTalentUrl(refererUrl, reportedProof.proofAuthorId()))
                 .author(reportedProof.proofAuthor(), createTalentUrl(refererUrl, reportedProof.proofAuthorId()),
                         reportedProof.proofAuthorAvatar())
                 .description(reportedProof.description())
@@ -45,10 +45,6 @@ public class MessageSendEvent {
                 .timestamp(Instant.now())
                 .footer("Reported by " + reportedProof.reportedBy(), null)
                 .build();
-    }
-
-    private String createProofUrl(String refererUrl, Long proofId) {
-        return refererUrl + "/proofs/" + proofId;
     }
 
     private String createTalentUrl(String refererUrl, Long talentId) {

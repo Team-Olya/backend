@@ -88,11 +88,11 @@ public interface ProofMapper {
                 .build();
     }
 
-    default ReportedProofDTO toReportDTO(Proof proof, Account account) {
+    default ReportedProofDTO toReportDTO(Long reportId, Proof proof, Account account) {
         Talent talent = proof.getTalent();
 
         return ReportedProofDTO.builder()
-                .id(proof.getId())
+                .id(reportId)
                 .title(proof.getTitle())
                 .date(proof.getDate())
                 .description(proof.getDescription())

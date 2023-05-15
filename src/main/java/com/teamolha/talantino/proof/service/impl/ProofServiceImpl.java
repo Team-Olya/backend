@@ -275,17 +275,28 @@ public class ProofServiceImpl implements ProofService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND));
         var proof = getProofEntity(proofId);
 
+        if (!proof.getStatus().equals(Status.PUBLISHED.name())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You can't report not PUBLISHED proof");
+        }
         if (reportRepository.existsByProofAndAccount(proof, account)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Your complaint is already under consideration by the moderators!");
         }
-        reportRepository.save(Report.builder().proof(proof).account(account).build());
+        if (account.getId().equals(proof.getTalent().getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You can't report your own proof");
+        }
+        Report report = reportRepository.save(Report.builder().proof(proof).account(account).build());
 
-        ReportedProofDTO reportedProof = mapper.toReportDTO(proof, account);
+        ReportedProofDTO reportedProof = mapper.toReportDTO(report.getId(), proof, account);
 
         // todo for localhost use this:
-        // sendReportMessage(reportedProof, request.getScheme() + "://" + request.getHeader("host"));
-        sendReportMessage(reportedProof, request.getHeader("Referer"));
+        String referer = request.getHeader("Referer");
+        if (referer == null) {
+            referer = request.getScheme() + "://" + request.getHeader("host");
+        }
+        sendReportMessage(reportedProof, referer);
         return reportedProof;
     }
 
@@ -299,7 +310,10 @@ public class ProofServiceImpl implements ProofService {
         var report = reportRepository.findById(reportId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND));
         reportRepository.deleteById(reportId);
-        proofRepository.deleteById(report.getProof().getId());
+        Long proofId = report.getProof().getId();
+        if (proofRepository.existsById(proofId)) {
+            proofRepository.deleteById(proofId);
+        }
     }
 
     private void sendReportMessage(ReportedProofDTO reportedProof, String referer) {
