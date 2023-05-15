@@ -1,6 +1,7 @@
 package com.teamolha.talantino.talent.controller;
 
 import com.teamolha.talantino.talent.model.request.TalentUpdateRequest;
+import com.teamolha.talantino.talent.model.response.KindDTO;
 import com.teamolha.talantino.talent.model.response.TalentFullResponse;
 import com.teamolha.talantino.talent.model.response.TalentsPageResponse;
 import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
@@ -11,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @Validated
@@ -43,5 +46,10 @@ public class TalentController {
     @DeleteMapping("/talents/{talent-id}")
     public void deleteTalent(@PathVariable("talent-id") long talentId, Authentication auth) {
         talentService.deleteTalent(talentId, auth.getName());
+    }
+
+    @GetMapping("/talents/kinds")
+    public List<KindDTO> getTalentKinds() {
+        return talentService.getTalentKinds();
     }
 }

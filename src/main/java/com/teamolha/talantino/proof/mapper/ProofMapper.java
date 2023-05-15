@@ -67,7 +67,6 @@ public interface ProofMapper {
                     .filter(kudos -> kudos.getProofId().equals(proof.getId())).findFirst()
                     .map(Kudos::getAmount).orElse(null);
         }
-
         return ShortProofDTO.builder()
                 .id(proof.getId())
                 .date(proof.getDate())

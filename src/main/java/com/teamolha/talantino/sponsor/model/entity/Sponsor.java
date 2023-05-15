@@ -1,37 +1,22 @@
 package com.teamolha.talantino.sponsor.model.entity;
 
+import com.teamolha.talantino.account.model.entity.Account;
 import com.teamolha.talantino.proof.model.entity.Kudos;
-import com.teamolha.talantino.sponsor.model.SponsorStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
-@Builder
+@SuperBuilder
+@ToString
 @NoArgsConstructor
-@AllArgsConstructor
-public class Sponsor {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-
-    @NotNull
-    private String name;
-
-    @NotNull
-    private String surname;
-
-    @NotNull
-    private String email;
-
-    @NotNull
-    private String password;
-
+public class Sponsor extends Account {
     @NotNull
     private Long balance;
 
@@ -41,13 +26,8 @@ public class Sponsor {
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST,
             CascadeType.DETACH, CascadeType.REFRESH},
             mappedBy = "sponsorId")
+    @ToString.Exclude
     private List<Kudos> kudos;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    private Collection<String> authorities;
-
-    @Enumerated(EnumType.STRING)
-    private SponsorStatus status;
 
     private Date deletionDate;
 
@@ -56,5 +36,6 @@ public class Sponsor {
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST,
             CascadeType.DETACH, CascadeType.REFRESH},
             mappedBy = "sponsorId")
+    @ToString.Exclude
     private List<BalanceAdding> balanceAdding;
 }

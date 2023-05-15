@@ -1,9 +1,8 @@
 package com.teamolha.talantino.talent.repository;
 
-import com.teamolha.talantino.admin.model.AccountStatus;
+import com.teamolha.talantino.account.model.entity.AccountStatus;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.talent.model.entity.Talent;
-import jakarta.persistence.TypedQuery;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -31,15 +30,15 @@ public interface TalentRepository extends JpaRepository<Talent, Long> {
 
     List<Talent> findByAccountStatusOrAccountStatusIsNull(AccountStatus accountStatus);
 
-    @Query(value = "SELECT prev_value FROM (SELECT *, LAG(id) OVER " +
-            "(ORDER BY id) AS prev_value FROM talent " +
-            "WHERE account_status = 'ACTIVE' OR account_status IS NULL) subquery WHERE id=:id",
+    @Query(value = "SELECT prev_value FROM (SELECT *, LAG(id) OVER (ORDER BY id) AS prev_value FROM account " +
+            "INNER JOIN ACCOUNT_AUTHORITIES auth ON account.id = auth.account_id WHERE auth.AUTHORITIES = 'TALENT')" +
+            " subquery WHERE id=:id",
             nativeQuery = true)
     Long findPrevTalent(long id);
 
-    @Query(value = "SELECT next_value FROM (SELECT *, LEAD(id) OVER " +
-            "(ORDER BY id) AS next_value FROM talent " +
-            "WHERE account_status = 'ACTIVE' OR account_status IS NULL) subquery WHERE id=:id",
+    @Query(value = "SELECT next_value FROM (SELECT *, LEAD(id) OVER (ORDER BY id) AS next_value FROM account " +
+            "INNER JOIN ACCOUNT_AUTHORITIES auth ON account.id = auth.account_id WHERE auth.AUTHORITIES = 'TALENT')" +
+            " subquery WHERE id=:id",
             nativeQuery = true)
     Long findNextTalent(long id);
 

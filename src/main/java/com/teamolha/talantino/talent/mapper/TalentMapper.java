@@ -1,28 +1,19 @@
 package com.teamolha.talantino.talent.mapper;
 
-import com.teamolha.talantino.admin.model.AccountStatus;
-import com.teamolha.talantino.admin.model.entity.Admin;
-import com.teamolha.talantino.skill.model.entity.Skill;
-import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.proof.model.entity.Kudos;
-import com.teamolha.talantino.sponsor.model.SponsorStatus;
-import com.teamolha.talantino.sponsor.model.entity.Sponsor;
+import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.talent.model.entity.Link;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.model.response.TalentFullResponse;
 import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
 import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
 import org.mapstruct.Mapper;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.stream.Collectors;
 
 import static org.mapstruct.ReportingPolicy.IGNORE;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = IGNORE)
-public interface Mappers {
+public interface TalentMapper {
 
     default UpdatedTalentResponse toUpdatedTalent(Talent talent) {
         return UpdatedTalentResponse.builder()
@@ -95,26 +86,35 @@ public interface Mappers {
                 .build();
     }
 
-    default UserDetails toUserDetails(Talent talent) {
-        return User.withUsername(talent.getEmail())
-                .password(talent.getPassword())
-                .authorities(talent.getAuthorities().toArray(String[]::new))
-                .disabled(AccountStatus.INACTIVE.equals(talent.getAccountStatus()))
-                .build();
-    }
-
-    default UserDetails toUserDetails(Admin admin) {
-        return User.withUsername(admin.getLogin())
-                .password(admin.getPassword())
-                .authorities(admin.getAuthorities().toArray(String[]::new))
-                .build();
-    }
-
-    default UserDetails toUserDetails(Sponsor sponsor) {
-        return User.withUsername(sponsor.getEmail())
-                .password(sponsor.getPassword())
-                .authorities(sponsor.getAuthorities().toArray(String[]::new))
-                .disabled(SponsorStatus.INACTIVE.equals(sponsor.getStatus()))
-                .build();
-    }
+//    default UserDetails toUserDetails(Talent talent) {
+//        return User.withUsername(talent.getEmail())
+//                .password(talent.getPassword())
+//                .authorities(talent.getAuthorities().stream()
+//                        .map(SimpleGrantedAuthority::new)
+//                        .toList()
+//                )
+//                .disabled(AccountStatus.INACTIVE.equals(talent.getAccountStatus()))
+//                .build();
+//    }
+//
+//    default UserDetails toUserDetails(Admin admin) {
+//        return User.withUsername(admin.getLogin())
+//                .password(admin.getPassword())
+//                .authorities(admin.getAuthorities().stream()
+//                        .map(SimpleGrantedAuthority::new)
+//                        .toList()
+//                )
+//                .build();
+//    }
+//
+//    default UserDetails toUserDetails(Sponsor sponsor) {
+//        return User.withUsername(sponsor.getEmail())
+//                .password(sponsor.getPassword())
+//                .authorities(sponsor.getAuthorities().stream()
+//                        .map(SimpleGrantedAuthority::new)
+//                        .toList()
+//                )
+//                .disabled(SponsorStatus.INACTIVE.equals(sponsor.getStatus()))
+//                .build();
+//    }
 }

@@ -1,11 +1,15 @@
 package com.teamolha.talantino.general.service.impl;
 
+import com.teamolha.talantino.account.mapper.AccountMapper;
+import com.teamolha.talantino.account.repository.AccountRepository;
+import com.teamolha.talantino.admin.mapper.AdminMapper;
+import com.teamolha.talantino.admin.repository.AdminRepository;
 import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.general.service.AuthService;
 import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
-import com.teamolha.talantino.talent.mapper.Mappers;
+import com.teamolha.talantino.talent.mapper.TalentMapper;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.model.response.LoginResponse;
 import com.teamolha.talantino.talent.repository.TalentRepository;
@@ -30,56 +34,47 @@ import java.util.stream.Collectors;
 @Transactional
 @AllArgsConstructor
 public class AuthServiceImpl implements AuthService {
+    private final AdminRepository adminRepository;
     private TalentRepository talentRepository;
     private JwtEncoder jwtEncoder;
     private final SponsorRepository sponsorRepository;
-    private Mappers talentMapper;
+    private TalentMapper talentMapper;
     private SponsorMapper sponsorMapper;
+    private AccountRepository accountRepository;
+    private AccountMapper accountMapper;
+    private AdminMapper adminMapper;
 
     @Override
     public Object myProfile(Authentication authentication) {
-        var authorities = authentication.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
+        var account = accountRepository.findByEmailIgnoreCase(authentication.getName()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        if (authorities.contains(Roles.TALENT.name())) {
-            var talent = talentRepository.findByEmailIgnoreCase(authentication.getName())
-                    .orElseThrow(() ->
-                            new ResponseStatusException(HttpStatus.NOT_FOUND)
-                    );
-            return talentMapper.toTalentProfileResponse(
-                    talent, talentRepository.findPrevTalent(talent.getId()), talentRepository.findNextTalent(talent.getId())
-            );
+        Roles role = Roles.valueOf(account.getAuthorities().stream().findFirst().get());
+        switch (role) {
+            case TALENT -> {
+                var talent = talentRepository.findByEmailIgnoreCase(account.getEmail()).orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND));
+                return talentMapper.toTalentProfileResponse(
+                        talent, talentRepository.findPrevTalent(talent.getId()),
+                        talentRepository.findNextTalent(talent.getId()));
+            }
+            case SPONSOR -> {
+                return sponsorMapper.toSponsorProfileResponse(
+                        sponsorRepository.findByEmailIgnoreCase(account.getEmail()).orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND)));
+            }
+            case ADMIN -> {
+                return adminMapper.toAdminProfile(
+                        adminRepository.findByEmailIgnoreCase(account.getEmail()).orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND))
+                );
+            }
         }
-
-        if (authorities.contains(Roles.SPONSOR.name())) {
-            var sponsor = sponsorRepository.findByEmailIgnoreCase(authentication.getName())
-                    .orElseThrow(() ->
-                            new ResponseStatusException(HttpStatus.NOT_FOUND)
-                    );
-            return sponsorMapper.toSponsorProfileResponse(sponsor);
-        }
-
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
     public LoginResponse login(Authentication authentication) {
-        var authorities = authentication.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
-
-        var user = authorities.contains(Roles.TALENT.name()) ? talentRepository.findByEmailIgnoreCase(authentication.getName())
-                .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                "Wrong authentication data!")
-                ) : sponsorRepository.findByEmailIgnoreCase(authentication.getName())
-                .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                "Wrong authentication data")
-                );
-
+        var user = accountRepository.findByEmailIgnoreCase(authentication.getName()).get();
         var now = Instant.now();
         var claims = JwtClaimsSet.builder()
                 .issuer("self")
@@ -87,23 +82,18 @@ public class AuthServiceImpl implements AuthService {
                 .expiresAt(now.plus(30, ChronoUnit.MINUTES))
                 .subject(authentication.getName())
                 .claim("scope", createScope(authentication))
-                .claim("id", user instanceof Talent ? ((Talent) user).getId() : ((Sponsor) user).getId())
+                .claim("id", user.getId())
                 .build();
 
         log.error("{}", authentication.isAuthenticated());
 
-        return user instanceof Talent ? new LoginResponse(
-                ((Talent) user).getId(),
-                jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue(),
-                ((Talent) user).getName(),
-                ((Talent) user).getSurname(),
-                ((Talent) user).getAvatar()
-        ) : new LoginResponse(
-                ((Sponsor) user).getId(),
-                jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue(),
-                ((Sponsor) user).getName(),
-                ((Sponsor) user).getSurname(),
-                ((Sponsor) user).getAvatar());
+        return LoginResponse.builder()
+                .id(user.getId())
+                .token(jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue())
+                .name(user.getName())
+                .surname(user.getSurname())
+                .avatar(user.getAvatar())
+                .build();
 
     }
 

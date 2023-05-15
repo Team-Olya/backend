@@ -1,12 +1,12 @@
 package com.teamolha.talantino.talent.service.impl;
 
-import com.teamolha.talantino.admin.model.AccountStatus;
+import com.teamolha.talantino.account.model.entity.AccountStatus;
 import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.repository.SkillRepository;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
-import com.teamolha.talantino.talent.mapper.Mappers;
+import com.teamolha.talantino.talent.mapper.TalentMapper;
 import com.teamolha.talantino.talent.model.entity.Kind;
 import com.teamolha.talantino.talent.model.entity.Link;
 import com.teamolha.talantino.talent.model.entity.Talent;
@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,7 +37,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class TalentServiceImpl implements TalentService {
 
-    Mappers mapper;
+    TalentMapper mapper;
 
     LinkRepository linkRepository;
 
@@ -153,6 +152,14 @@ public class TalentServiceImpl implements TalentService {
         linkRepository.deleteByTalent(talent);
         proofRepository.deleteByTalent(talent);
         talentRepository.delete(talent);
+    }
+
+    @Override
+    public List<KindDTO> getTalentKinds() {
+        return kindRepository.findAll()
+                .stream()
+                .map(kind -> new KindDTO(kind.getId(), kind.getKind()))
+                .collect(Collectors.toList());
     }
 
     private Long getPrevTalentId(long talentId) {
