@@ -1,7 +1,9 @@
 package com.teamolha.talantino.sponsor.service.impl;
 
 import com.teamolha.talantino.account.model.entity.AccountStatus;
+import com.teamolha.talantino.general.config.EmailProperties;
 import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.general.email.EmailHelper;
 import com.teamolha.talantino.general.email.EmailSender;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.repository.ProofRepository;
@@ -42,14 +44,16 @@ public class SponsorServiceImpl implements SponsorService {
     private BalanceAddingRepository balanceAddingRepository;
     private ProofMapper proofMapper;
     private ProofRepository proofRepository;
+    private EmailHelper emailHelper;
 
     @Override
-    public void register(String email, String password, String name, String surname) {
+    public void register(String email, String password, String name, String surname, HttpServletRequest request) {
         if (talentRepository.existsByEmailIgnoreCase(email) || sponsorRepository.existsByEmailIgnoreCase(email)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     email + " is already occupied!"
             );
         }
+        String token = emailHelper.generateUUIDToken();
         sponsorRepository.save(
                 Sponsor.builder()
                         .email(email)
@@ -58,8 +62,12 @@ public class SponsorServiceImpl implements SponsorService {
                         .surname(surname)
                         .balance(0L)
                         .authorities(List.of(Roles.SPONSOR.name()))
+                        .accountStatus(AccountStatus.INACTIVE)
+                        .verificationExpireDate(emailHelper.calculateExpireVerificationDate())
+                        .verificationToken(token)
                         .build()
         );
+        emailSender.verificationAccount(request, email, token);
     }
 
     @Override

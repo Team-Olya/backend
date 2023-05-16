@@ -6,6 +6,7 @@ import com.teamolha.talantino.sponsor.service.SponsorService;
 import com.teamolha.talantino.talent.model.request.CreateTalent;
 import com.teamolha.talantino.talent.model.response.LoginResponse;
 import com.teamolha.talantino.talent.service.TalentService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,24 +36,31 @@ public class AuthController {
 
     @PostMapping("/talents/register")
     @ResponseStatus(HttpStatus.CREATED)
-    void talentRegister (@RequestBody @Valid CreateTalent talent) {
+    void talentRegister (@RequestBody @Valid CreateTalent talent, HttpServletRequest request) {
         talentService.register(
                 talent.email(),
                 talent.password(),
                 talent.name(),
                 talent.surname(),
-                talent.kind()
+                talent.kind(),
+                request
         );
     }
 
     @PostMapping("/sponsor/register")
     @ResponseStatus(HttpStatus.CREATED)
-    void sponsorRegister (@RequestBody @Valid CreateSponsor sponsor) {
+    void sponsorRegister (@RequestBody @Valid CreateSponsor sponsor, HttpServletRequest request) {
         sponsorService.register (
                 sponsor.email(),
                 sponsor.password(),
                 sponsor.name(),
-                sponsor.surname()
+                sponsor.surname(),
+                request
         );
+    }
+
+    @PostMapping("/email-confirm")
+    LoginResponse emailConfirm(@RequestParam String token) {
+        return authService.login(token);
     }
 }

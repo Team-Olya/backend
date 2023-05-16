@@ -1,23 +1,20 @@
 package com.teamolha.talantino.general.service.impl;
 
-import com.teamolha.talantino.account.mapper.AccountMapper;
+import com.teamolha.talantino.account.model.entity.AccountStatus;
 import com.teamolha.talantino.account.repository.AccountRepository;
 import com.teamolha.talantino.admin.mapper.AdminMapper;
 import com.teamolha.talantino.admin.repository.AdminRepository;
 import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.general.service.AuthService;
 import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
-import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.mapper.TalentMapper;
-import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.model.response.LoginResponse;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -27,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,7 +39,6 @@ public class AuthServiceImpl implements AuthService {
     private TalentMapper talentMapper;
     private SponsorMapper sponsorMapper;
     private AccountRepository accountRepository;
-    private AccountMapper accountMapper;
     private AdminMapper adminMapper;
 
     @Override
@@ -73,19 +70,34 @@ public class AuthServiceImpl implements AuthService {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
+    @Override
+    public LoginResponse login(String token) {
+        var user = accountRepository.findByVerificationToken(token).orElseThrow(()->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid token"));
+        user.setAccountStatus(AccountStatus.ACTIVE);
+        user.setVerificationExpireDate(null);
+        user.setVerificationToken(null);
+        return getLoginResponse(user.getEmail());
+    }
+
     public LoginResponse login(Authentication authentication) {
-        var user = accountRepository.findByEmailIgnoreCase(authentication.getName()).get();
+        return getLoginResponse(authentication.getName());
+
+    }
+
+    private LoginResponse getLoginResponse(String email) {
+        var user = accountRepository.findByEmailIgnoreCase(email).get();
         var now = Instant.now();
         var claims = JwtClaimsSet.builder()
                 .issuer("self")
                 .issuedAt(now)
                 .expiresAt(now.plus(30, ChronoUnit.MINUTES))
-                .subject(authentication.getName())
-                .claim("scope", createScope(authentication))
+                .subject(email)
+                .claim("scope", createScope(user.getAuthorities()))
                 .claim("id", user.getId())
                 .build();
 
-        log.error("{}", authentication.isAuthenticated());
+        log.error("Logged in = {}", email);
 
         return LoginResponse.builder()
                 .id(user.getId())
@@ -94,12 +106,15 @@ public class AuthServiceImpl implements AuthService {
                 .surname(user.getSurname())
                 .avatar(user.getAvatar())
                 .build();
-
     }
 
-    private String createScope(Authentication authentication) {
-        return authentication.getAuthorities()
-                .stream().map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(" "));
+    private String createScope(Collection<String> authorities) {
+        return authorities.stream().findFirst().stream().collect(Collectors.joining(" "));
     }
+
+//    private String createScope(Authentication authentication) {
+//        return authentication.getAuthorities()
+//                .stream().map(GrantedAuthority::getAuthority)
+//                .collect(Collectors.joining(" "));
+//    }
 }

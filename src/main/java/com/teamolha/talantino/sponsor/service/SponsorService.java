@@ -13,7 +13,7 @@ import com.teamolha.talantino.sponsor.model.response.UpdatedSponsorResponse;
 import java.util.List;
 
 public interface SponsorService {
-    void register(String email, String password, String name, String surname);
+    void register(String email, String password, String name, String surname, HttpServletRequest request);
 
     SponsorProfileResponse addKudos(Authentication auth, AddKudosRequest addKudosRequest);
 

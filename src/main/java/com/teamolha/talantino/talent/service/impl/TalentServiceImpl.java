@@ -1,7 +1,10 @@
 package com.teamolha.talantino.talent.service.impl;
 
 import com.teamolha.talantino.account.model.entity.AccountStatus;
+import com.teamolha.talantino.general.config.EmailProperties;
 import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.general.email.EmailHelper;
+import com.teamolha.talantino.general.email.EmailSender;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.repository.SkillRepository;
@@ -16,6 +19,7 @@ import com.teamolha.talantino.talent.repository.KindRepository;
 import com.teamolha.talantino.talent.repository.LinkRepository;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import com.teamolha.talantino.talent.service.TalentService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -26,9 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,24 +39,29 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class TalentServiceImpl implements TalentService {
 
-    TalentMapper mapper;
+    private TalentMapper mapper;
 
-    LinkRepository linkRepository;
+    private LinkRepository linkRepository;
 
-    TalentRepository talentRepository;
+    private TalentRepository talentRepository;
 
-    KindRepository kindRepository;
+    private KindRepository kindRepository;
 
-    ProofRepository proofRepository;
+    private ProofRepository proofRepository;
 
-    SkillRepository skillRepository;
+    private SkillRepository skillRepository;
 
-    SponsorRepository sponsorRepository;
+    private SponsorRepository sponsorRepository;
 
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
+
+    private EmailHelper emailHelper;
+
+    private EmailSender emailSender;
 
     @Override
-    public void register(String email, String password, String name, String surname, String kind) {
+    public void register(String email, String password, String name, String surname, String kind,
+                         HttpServletRequest request) {
         if (talentRepository.existsByEmailIgnoreCase(email) || sponsorRepository.existsByEmailIgnoreCase(email)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     email + " is already occupied!"
@@ -67,6 +74,7 @@ public class TalentServiceImpl implements TalentService {
                             .build()
             );
         }
+        String token = emailHelper.generateUUIDToken();
         talentRepository.save(
                 Talent.builder()
                         .email(email)
@@ -75,8 +83,12 @@ public class TalentServiceImpl implements TalentService {
                         .surname(surname)
                         .kind(kindRepository.findByKindIgnoreCase(kind))
                         .authorities(List.of(Roles.TALENT.name()))
+                        .accountStatus(AccountStatus.INACTIVE)
+                        .verificationExpireDate(emailHelper.calculateExpireVerificationDate())
+                        .verificationToken(token)
                         .build()
         );
+        emailSender.verificationAccount(request, email, token);
     }
 
     @Override

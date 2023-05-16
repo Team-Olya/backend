@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.Collection;
+import java.util.Date;
 
 @Entity
 @Inheritance(strategy =  InheritanceType.JOINED)
@@ -36,6 +37,10 @@ public abstract class Account {
 
     @Enumerated(EnumType.STRING)
     private AccountStatus accountStatus;
+
+    private Date verificationExpireDate;
+
+    private String verificationToken;
 
     abstract public String getAvatar();
 

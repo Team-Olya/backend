@@ -18,8 +18,6 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 public class Talent extends Account {
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private long talentId;
 
     @NotNull
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST,
@@ -57,8 +55,4 @@ public class Talent extends Account {
             inverseJoinColumns = @JoinColumn(name = "skill_id"))
     @ToString.Exclude
     private List<Skill> skills;
-
-    private Date verificationExpireDate;
-
-    private String verificationToken;
 }
