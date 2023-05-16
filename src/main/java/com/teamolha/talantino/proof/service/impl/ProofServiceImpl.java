@@ -294,7 +294,7 @@ public class ProofServiceImpl implements ProofService {
         // todo for localhost use this:
         String referer = request.getHeader("Referer");
         if (referer == null) {
-            referer = request.getScheme() + "://" + request.getHeader("host");
+            referer = request.getScheme() + "://" + request.getHeader("host") + "/";
         }
         sendReportMessage(reportedProof, referer);
         return reportedProof;
