@@ -87,7 +87,7 @@ public class ProofServiceImpl implements ProofService {
                 sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
 
         List<ShortProofDTO> proofs = proofRepository.findByStatus(Status.PUBLISHED.name(), pageable)
-                .stream().map(proof -> mapper.toShortProofDTO(proof, sponsor)).toList();
+                .stream().map(proof -> mapper.toShortProofDTO(proof, sponsor, auth != null)).toList();
 
         return ProofsPageDTO.builder()
                 .totalAmount(totalAmount)

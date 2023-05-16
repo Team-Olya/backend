@@ -9,6 +9,7 @@ import com.teamolha.talantino.proof.model.response.ShortProofDTO;
 import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.talent.model.entity.Talent;
+import com.teamolha.talantino.talent.model.response.ProofAuthorDTO;
 import org.mapstruct.Mapper;
 
 import java.util.stream.Collectors;
@@ -61,7 +62,7 @@ public interface ProofMapper {
                 .build();
     }
 
-    default ShortProofDTO toShortProofDTO(Proof proof, Sponsor sponsor) {
+    default ShortProofDTO toShortProofDTO(Proof proof, Sponsor sponsor, boolean isAuthenticated) {
         boolean isKudosed = false;
         Integer totalKudosFromSponsor = null;
         if (sponsor != null) {
@@ -70,6 +71,13 @@ public interface ProofMapper {
                     .filter(kudos -> kudos.getProofId().equals(proof.getId())).findFirst()
                     .map(Kudos::getAmount).orElse(null);
         }
+        var talent = proof.getTalent();
+        var author = isAuthenticated ? ProofAuthorDTO.builder()
+                .id(talent.getId())
+                .name(talent.getName())
+                .surname(talent.getSurname())
+                .avatar(talent.getAvatar())
+                .build() : null;
         return ShortProofDTO.builder()
                 .id(proof.getId())
                 .date(proof.getDate())
@@ -77,6 +85,7 @@ public interface ProofMapper {
                 .description(proof.getDescription().length() > 200 ?
                         proof.getDescription().substring(0, 200) :
                         proof.getDescription())
+                .author(author)
                 .skills(proof.getSkills().stream().map(SkillDTO::new).collect(Collectors.toList()))
                 .totalKudos(proof.getKudos()
                         .stream()

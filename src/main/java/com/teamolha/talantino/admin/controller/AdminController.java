@@ -64,7 +64,7 @@ public class AdminController {
         return adminService.editProof(newProof, proofId);
     }
 
-    @PatchMapping("/admin/kind-of-talent/{kind-id}")
+    @PatchMapping("/admin/talents/kinds/{kind-id}")
     public KindDTO editKind(@PathVariable("kind-id") Long id,
                               @RequestBody String newKind) {
         return adminService.editKind(id, newKind);
