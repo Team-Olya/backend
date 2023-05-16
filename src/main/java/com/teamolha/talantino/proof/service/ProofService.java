@@ -1,10 +1,8 @@
 package com.teamolha.talantino.proof.service;
 
 import com.teamolha.talantino.proof.model.request.ProofRequest;
-import com.teamolha.talantino.proof.model.response.KudosList;
-import com.teamolha.talantino.proof.model.response.ProofDTO;
-import com.teamolha.talantino.proof.model.response.ProofsPageDTO;
-import com.teamolha.talantino.proof.model.response.TalentProofList;
+import com.teamolha.talantino.proof.model.response.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 
 public interface ProofService {
@@ -24,4 +22,10 @@ public interface ProofService {
     KudosList getKudos(Authentication auth, Long proofId);
 
     void setKudos(Authentication auth, Long proofId, int amount);
+
+    ReportedProofDTO reportProof(Authentication auth, Long proofId, HttpServletRequest request);
+
+    void rejectReport(Long reportId);
+
+    void approveReport(Long reportId);
 }

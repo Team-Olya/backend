@@ -1,4 +1,4 @@
-package com.teamolha.talantino.general.email.utils;
+package com.teamolha.talantino.general.email;
 
 import com.teamolha.talantino.general.config.EmailProperties;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
-public class EmailUtil {
+public class EmailSender {
 
     private JavaMailSender emailSender;
 

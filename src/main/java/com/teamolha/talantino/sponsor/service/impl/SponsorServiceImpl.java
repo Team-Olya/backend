@@ -2,7 +2,7 @@ package com.teamolha.talantino.sponsor.service.impl;
 
 import com.teamolha.talantino.account.model.entity.AccountStatus;
 import com.teamolha.talantino.general.config.Roles;
-import com.teamolha.talantino.general.email.utils.EmailUtil;
+import com.teamolha.talantino.general.email.EmailSender;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
@@ -38,7 +38,7 @@ public class SponsorServiceImpl implements SponsorService {
     private SponsorMapper mapper;
     private TalentRepository talentRepository;
     private SponsorRepository sponsorRepository;
-    private EmailUtil emailUtil;
+    private EmailSender emailSender;
     private BalanceAddingRepository balanceAddingRepository;
     private ProofMapper proofMapper;
     private ProofRepository proofRepository;
@@ -133,7 +133,7 @@ public class SponsorServiceImpl implements SponsorService {
         sponsor.setDeletionToken(UUID.randomUUID().toString());
         sponsor.setDeletionDate(calculateDeletionDate(7));
         sponsorRepository.save(sponsor);
-        emailUtil.deactivateAccount(request, sponsor.getEmail(), sponsor.getDeletionToken());
+        emailSender.deactivateAccount(request, sponsor.getEmail(), sponsor.getDeletionToken());
     }
 
     @Override
