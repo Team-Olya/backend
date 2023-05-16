@@ -85,36 +85,4 @@ public interface TalentMapper {
                 .skills(talent.getSkills().stream().map(SkillDTO::new).toList())
                 .build();
     }
-
-//    default UserDetails toUserDetails(Talent talent) {
-//        return User.withUsername(talent.getEmail())
-//                .password(talent.getPassword())
-//                .authorities(talent.getAuthorities().stream()
-//                        .map(SimpleGrantedAuthority::new)
-//                        .toList()
-//                )
-//                .disabled(AccountStatus.INACTIVE.equals(talent.getAccountStatus()))
-//                .build();
-//    }
-//
-//    default UserDetails toUserDetails(Admin admin) {
-//        return User.withUsername(admin.getLogin())
-//                .password(admin.getPassword())
-//                .authorities(admin.getAuthorities().stream()
-//                        .map(SimpleGrantedAuthority::new)
-//                        .toList()
-//                )
-//                .build();
-//    }
-//
-//    default UserDetails toUserDetails(Sponsor sponsor) {
-//        return User.withUsername(sponsor.getEmail())
-//                .password(sponsor.getPassword())
-//                .authorities(sponsor.getAuthorities().stream()
-//                        .map(SimpleGrantedAuthority::new)
-//                        .toList()
-//                )
-//                .disabled(SponsorStatus.INACTIVE.equals(sponsor.getStatus()))
-//                .build();
-//    }
 }
