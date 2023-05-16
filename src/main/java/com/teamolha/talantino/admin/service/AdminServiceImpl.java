@@ -10,7 +10,7 @@ import com.teamolha.talantino.proof.model.response.ProofDTO;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.skill.mapper.SkillMapper;
 import com.teamolha.talantino.skill.model.entity.Skill;
-import com.teamolha.talantino.skill.model.request.ProofSkillDTO;
+import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.skill.repository.SkillRepository;
 import com.teamolha.talantino.talent.mapper.TalentMapper;
 import com.teamolha.talantino.talent.model.entity.Kind;
@@ -124,10 +124,10 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
-    public void addSkill(ProofSkillDTO proofSkillDTO) {
+    public void addSkill(SkillDTO skillDTO) {
         skillRepository.save(Skill.builder()
-                .icon(proofSkillDTO.icon())
-                .label(proofSkillDTO.label())
+                .icon(skillDTO.icon())
+                .label(skillDTO.label())
                 .build()
         );
     }
