@@ -3,7 +3,7 @@ package com.teamolha.talantino.admin.service;
 import com.teamolha.talantino.admin.model.request.CreateAdmin;
 import com.teamolha.talantino.proof.model.request.ProofRequest;
 import com.teamolha.talantino.proof.model.response.ProofDTO;
-import com.teamolha.talantino.skill.model.request.SkillDTO;
+import com.teamolha.talantino.skill.model.request.ProofSkillDTO;
 import com.teamolha.talantino.talent.model.request.TalentUpdateRequest;
 import com.teamolha.talantino.talent.model.response.KindDTO;
 import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
@@ -26,7 +26,7 @@ public interface AdminService {
 
     KindDTO editKind(Long id, String newKind);
 
-    void addSkill(SkillDTO skillDTO);
+    void addSkill(ProofSkillDTO proofSkillDTO);
 
     void deleteSkill(Long skillId);
 }

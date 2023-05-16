@@ -1,7 +1,7 @@
 package com.teamolha.talantino.talent.service.impl;
 
-import com.teamolha.talantino.account.model.entity.AccountStatus;
-import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.account.model.AccountStatus;
+import com.teamolha.talantino.account.model.AccountRole;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.repository.SkillRepository;
@@ -74,7 +74,7 @@ public class TalentServiceImpl implements TalentService {
                         .name(name)
                         .surname(surname)
                         .kind(kindRepository.findByKindIgnoreCase(kind))
-                        .authorities(List.of(Roles.TALENT.name()))
+                        .authorities(List.of(AccountRole.TALENT.name()))
                         .build()
         );
     }

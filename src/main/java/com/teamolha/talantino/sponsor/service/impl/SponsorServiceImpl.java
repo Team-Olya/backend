@@ -1,7 +1,7 @@
 package com.teamolha.talantino.sponsor.service.impl;
 
-import com.teamolha.talantino.account.model.entity.AccountStatus;
-import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.account.model.AccountStatus;
+import com.teamolha.talantino.account.model.AccountRole;
 import com.teamolha.talantino.general.email.EmailSender;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.repository.ProofRepository;
@@ -57,7 +57,7 @@ public class SponsorServiceImpl implements SponsorService {
                         .name(name)
                         .surname(surname)
                         .balance(0L)
-                        .authorities(List.of(Roles.SPONSOR.name()))
+                        .authorities(List.of(AccountRole.SPONSOR.name()))
                         .build()
         );
     }
@@ -94,18 +94,18 @@ public class SponsorServiceImpl implements SponsorService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<SponsorKudos> getKudosHistory(Authentication auth) {
-        var sponsor = sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow( () ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Sponsor is not found")
-        );
-        return sponsor.getKudos().stream()
-                .map(kudos -> SponsorKudos.builder()
-                        .proofDTO(proofMapper.toProofDTO(proofRepository.findById(kudos.getProofId()).orElseThrow(), sponsor))
-                        .amount(kudos.getAmount())
-                        .build())
-                .collect(Collectors.toList());
-    }
+//    @Override
+//    public List<SponsorKudos> getKudosHistory(Authentication auth) {
+//        var sponsor = sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow( () ->
+//                new ResponseStatusException(HttpStatus.NOT_FOUND, "Sponsor is not found")
+//        );
+//        return sponsor.getKudos().stream()
+//                .map(kudos -> SponsorKudos.builder()
+//                        .proofDTO(proofMapper.toProofDTO(proofRepository.findById(kudos.getProofId()).orElseThrow(), sponsor))
+//                        .amount(kudos.getAmount())
+//                        .build())
+//                .collect(Collectors.toList());
+//    }
 
     @Override
     public UpdatedSponsorResponse updateSponsorProfile(long sponsorId, String email, SponsorUpdateRequest updateSponsor) {

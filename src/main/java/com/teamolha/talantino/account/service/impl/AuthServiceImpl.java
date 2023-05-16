@@ -1,16 +1,14 @@
-package com.teamolha.talantino.general.service.impl;
+package com.teamolha.talantino.account.service.impl;
 
 import com.teamolha.talantino.account.mapper.AccountMapper;
 import com.teamolha.talantino.account.repository.AccountRepository;
 import com.teamolha.talantino.admin.mapper.AdminMapper;
 import com.teamolha.talantino.admin.repository.AdminRepository;
-import com.teamolha.talantino.general.config.Roles;
-import com.teamolha.talantino.general.service.AuthService;
+import com.teamolha.talantino.account.model.AccountRole;
+import com.teamolha.talantino.account.service.AuthService;
 import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
-import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.mapper.TalentMapper;
-import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.model.response.LoginResponse;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import lombok.AllArgsConstructor;
@@ -49,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
         var account = accountRepository.findByEmailIgnoreCase(authentication.getName()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        Roles role = Roles.valueOf(account.getAuthorities().stream().findFirst().get());
+        AccountRole role = AccountRole.valueOf(account.getAuthorities().stream().findFirst().get());
         switch (role) {
             case TALENT -> {
                 var talent = talentRepository.findByEmailIgnoreCase(account.getEmail()).orElseThrow(() ->

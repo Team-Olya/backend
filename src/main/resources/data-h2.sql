@@ -165,6 +165,7 @@ insert into proof_skills (proof_id, skill_id) values (1, 2);
 insert into proof_skills (proof_id, skill_id) values (2, 3);
 insert into proof_skills (proof_id, skill_id) values (3, 4);
 insert into proof_skills (proof_id, skill_id) values (3, 5);
+insert into proof_skills (proof_id, skill_id) values (4, 5);
 insert into proof_skills (proof_id, skill_id) values (5, 6);
 insert into proof_skills (proof_id, skill_id) values (6, 7);
 insert into proof_skills (proof_id, skill_id) values (7, 8);
@@ -221,6 +222,7 @@ insert into account_authorities (authorities, account_id) values ('SPONSOR', 13)
 insert into account_authorities (authorities, account_id) values ('SPONSOR', 14);
 insert into account_authorities (authorities, account_id) values ('SPONSOR', 15);
 
-insert into kudos (sponsor_id, proof_id, amount) values ('1', '1', '2');
-insert into kudos (sponsor_id, proof_id, amount) values ('2', '1', '3');
-insert into kudos (sponsor_id, proof_id, amount) values ('1', '4', '5');
+insert into kudos (sponsor_id, proof_id, skill_id, amount) values ('12', '1', '1', '2');
+insert into kudos (sponsor_id, proof_id, skill_id, amount) values ('12', '1', '2', '2');
+insert into kudos (sponsor_id, proof_id, skill_id, amount) values ('13', '1', '2', '3');
+insert into kudos (sponsor_id, proof_id, skill_id, amount) values ('12', '4', '5', '5');

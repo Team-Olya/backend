@@ -19,5 +19,8 @@ public class Kudos {
     @Column(name = "proof_id")
     Long proofId;
 
+    @Column(name = "skill_id")
+    Long skillId;
+
     int amount;
 }

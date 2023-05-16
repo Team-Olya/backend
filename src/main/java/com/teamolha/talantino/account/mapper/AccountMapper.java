@@ -1,7 +1,7 @@
 package com.teamolha.talantino.account.mapper;
 
 import com.teamolha.talantino.account.model.entity.Account;
-import com.teamolha.talantino.account.model.entity.AccountStatus;
+import com.teamolha.talantino.account.model.AccountStatus;
 import org.mapstruct.Mapper;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;

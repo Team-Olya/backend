@@ -1,6 +1,6 @@
 package com.teamolha.talantino.sponsor.mapper;
 
-import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.account.model.AccountRole;
 import com.teamolha.talantino.proof.model.entity.Kudos;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.model.response.ShortSponsorDTO;
@@ -14,7 +14,7 @@ import static org.mapstruct.ReportingPolicy.IGNORE;
 public interface SponsorMapper {
     default SponsorProfileResponse toSponsorProfileResponse(Sponsor sponsor) {
         return SponsorProfileResponse.builder()
-                .role(Roles.SPONSOR.name())
+                .role(AccountRole.SPONSOR.name())
                 .id(sponsor.getId())
                 .name(sponsor.getName())
                 .surname(sponsor.getSurname())

@@ -1,6 +1,6 @@
 package com.teamolha.talantino.proof.model.response;
 
-import com.teamolha.talantino.skill.model.request.SkillDTO;
+import com.teamolha.talantino.skill.model.request.ProofSkillDTO;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
@@ -14,9 +14,6 @@ public record ShortProofDTO(
         String title,
         @Size(min = 2, max = 200)
         String description,
-        Integer totalKudos,
-        Integer totalKudosFromSponsor,
-        Boolean isKudosed,
-        List<SkillDTO> skills
+        List<ProofSkillDTO> skills
 ) {
 }

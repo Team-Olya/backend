@@ -1,6 +1,6 @@
 package com.teamolha.talantino.talent.repository;
 
-import com.teamolha.talantino.account.model.entity.AccountStatus;
+import com.teamolha.talantino.account.model.AccountStatus;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import org.springframework.data.domain.Pageable;

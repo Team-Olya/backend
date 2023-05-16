@@ -1,6 +1,6 @@
-package com.teamolha.talantino.general.controller;
+package com.teamolha.talantino.account.controller;
 
-import com.teamolha.talantino.general.service.AuthService;
+import com.teamolha.talantino.account.service.AuthService;
 import com.teamolha.talantino.sponsor.model.request.CreateSponsor;
 import com.teamolha.talantino.sponsor.service.SponsorService;
 import com.teamolha.talantino.talent.model.request.CreateTalent;

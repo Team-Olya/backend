@@ -32,10 +32,10 @@ public class SponsorController {
         return sponsorService.getBalanceAddingHistory(auth);
     }
 
-    @GetMapping("/sponsors/kudos")
-    public List<SponsorKudos> getKudosHistory(Authentication auth) {
-        return sponsorService.getKudosHistory(auth);
-    }
+//    @GetMapping("/sponsors/kudos")
+//    public List<SponsorKudos> getKudosHistory(Authentication auth) {
+//        return sponsorService.getKudosHistory(auth);
+//    }
 
     @PatchMapping("/sponsors/{sponsor-id}")
     public UpdatedSponsorResponse updateSponsorProfile(@PathVariable("sponsor-id") long sponsorId,

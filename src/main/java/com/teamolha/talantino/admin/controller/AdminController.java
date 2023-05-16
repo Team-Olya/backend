@@ -5,7 +5,7 @@ import com.teamolha.talantino.admin.model.request.DeleteTalent;
 import com.teamolha.talantino.admin.service.AdminService;
 import com.teamolha.talantino.proof.model.request.ProofRequest;
 import com.teamolha.talantino.proof.model.response.ProofDTO;
-import com.teamolha.talantino.skill.model.request.SkillDTO;
+import com.teamolha.talantino.skill.model.request.ProofSkillDTO;
 import com.teamolha.talantino.talent.model.request.TalentUpdateRequest;
 import com.teamolha.talantino.talent.model.response.KindDTO;
 import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
@@ -71,8 +71,8 @@ public class AdminController {
     }
 
     @PostMapping("/admin/skills")
-    public void addSkill(@RequestBody SkillDTO skillDTO) {
-        adminService.addSkill(skillDTO);
+    public void addSkill(@RequestBody ProofSkillDTO proofSkillDTO) {
+        adminService.addSkill(proofSkillDTO);
     }
 
     @DeleteMapping("/admin/skills/{skill-id}")
