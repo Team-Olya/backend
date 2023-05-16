@@ -48,6 +48,6 @@ public class MessageSendEvent {
     }
 
     private String createTalentUrl(String refererUrl, Long talentId) {
-        return refererUrl + "/talent/" + talentId;
+        return refererUrl + "talent/" + talentId;
     }
 }
