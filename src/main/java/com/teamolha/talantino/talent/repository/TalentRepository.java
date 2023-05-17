@@ -38,9 +38,13 @@ public interface TalentRepository extends JpaRepository<Talent, Long> {
             nativeQuery = true)
     Long findNextTalent(long id);
 
-    @Query("SELECT DISTINCT t FROM Talent t JOIN t.skills s WHERE s IN :skillList GROUP BY t.id HAVING COUNT(DISTINCT s) = :skillCount")
+    @Query("SELECT DISTINCT t FROM Talent t JOIN t.skills s WHERE s IN :skillList GROUP BY " +
+            "t.id, t.accountStatus, t.email, t.password, t.name, t.surname, t.verificationExpireDate, t.verificationToken" +
+            " HAVING COUNT(DISTINCT s) = :skillCount")
     List<Talent> findAllBySkills(@Param("skillList") List<Skill> skillList, @Param("skillCount") Long skillCount, Pageable pageable);
 
-    @Query("SELECT t FROM Talent t JOIN t.skills s WHERE s IN :skillList GROUP BY t.id HAVING COUNT(DISTINCT s) = :skillCount")
+    @Query("SELECT t FROM Talent t JOIN t.skills s WHERE s IN :skillList GROUP BY " +
+            "t.id, t.accountStatus, t.email, t.password, t.name, t.surname, t.verificationExpireDate, t.verificationToken"  +
+            " HAVING COUNT(DISTINCT s) = :skillCount")
     List<Talent> findAllBySkills(@Param("skillList") List<Skill> skillList, @Param("skillCount") Long skillCount);
 }
