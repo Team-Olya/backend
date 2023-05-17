@@ -31,14 +31,14 @@ public interface TalentRepository extends JpaRepository<Talent, Long> {
     List<Talent> findByAccountStatusOrAccountStatusIsNull(AccountStatus accountStatus);
 
     @Query(value = "SELECT prev_value FROM (SELECT *, LAG(id) OVER (ORDER BY id) AS prev_value FROM account " +
-            "INNER JOIN ACCOUNT_AUTHORITIES auth ON account.id = auth.account_id WHERE auth.AUTHORITIES = 'TALENT')" +
-            " subquery WHERE id=:id",
+            "INNER JOIN ACCOUNT_AUTHORITIES auth ON account.id = auth.account_id WHERE (account_status = 'ACTIVE' " +
+            "OR account_status IS NULL) AND auth.AUTHORITIES = 'TALENT') subquery WHERE id = :id",
             nativeQuery = true)
     Long findPrevTalent(long id);
 
-    @Query(value = "SELECT next_value FROM (SELECT *, LEAD(id) OVER (ORDER BY id) AS next_value FROM account " +
-            "INNER JOIN ACCOUNT_AUTHORITIES auth ON account.id = auth.account_id WHERE auth.AUTHORITIES = 'TALENT')" +
-            " subquery WHERE id=:id",
+    @Query(value = "SELECT prev_value FROM (SELECT *, LEAD(id) OVER (ORDER BY id) AS prev_value FROM account " +
+            "INNER JOIN ACCOUNT_AUTHORITIES auth ON account.id = auth.account_id WHERE (account_status = 'ACTIVE' " +
+            "OR account_status IS NULL) AND auth.AUTHORITIES = 'TALENT') subquery WHERE id = :id",
             nativeQuery = true)
     Long findNextTalent(long id);
 
