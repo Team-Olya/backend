@@ -41,7 +41,7 @@ public interface SkillMapper {
         Integer totalKudosFromSponsor = null;
         var totalKudos = proof.getKudos()
                 .stream()
-                .filter(kudos -> kudos.getSkillId().equals(skill.getId()))
+                .filter(kudos -> kudos.getSkillId() != null && kudos.getSkillId().equals(skill.getId()))
                 .mapToInt(Kudos::getAmount)
                 .sum();
         if (sponsor != null) {
