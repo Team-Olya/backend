@@ -1,6 +1,6 @@
 package com.teamolha.talantino.proof.model.response;
 
-import com.teamolha.talantino.skill.model.request.SkillDTO;
+import com.teamolha.talantino.skill.model.request.ProofSkillDTO;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -14,9 +14,6 @@ public record ProofDTO(
         String description,
         Long authorId,
         String status,
-        List<SkillDTO> skills,
-        Integer totalKudos,
-        Integer totalKudosFromSponsor,
-        Boolean isKudosed
+        List<ProofSkillDTO> skills
 ) {
 }

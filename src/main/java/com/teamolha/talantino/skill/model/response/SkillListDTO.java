@@ -1,5 +1,6 @@
 package com.teamolha.talantino.skill.model.response;
 
+import com.teamolha.talantino.skill.model.request.ProofSkillDTO;
 import com.teamolha.talantino.skill.model.request.SkillDTO;
 import lombok.Builder;
 

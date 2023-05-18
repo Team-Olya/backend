@@ -2,7 +2,7 @@ package com.teamolha.talantino.general.aws;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectResult;
-import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.account.model.AccountRole;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.model.entity.Talent;
@@ -45,7 +45,7 @@ public class S3Service {
         }
 
         var user = auth.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                .toList().contains(Roles.TALENT.name())
+                .toList().contains(AccountRole.TALENT.name())
                 ? talentRepository.findByEmailIgnoreCase(auth.getName()).get()
                 : sponsorRepository.findByEmailIgnoreCase(auth.getName()).get();
 

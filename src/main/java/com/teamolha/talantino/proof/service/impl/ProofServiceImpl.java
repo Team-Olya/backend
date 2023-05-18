@@ -1,7 +1,7 @@
 package com.teamolha.talantino.proof.service.impl;
 
 import com.teamolha.talantino.account.repository.AccountRepository;
-import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.account.model.AccountRole;
 import com.teamolha.talantino.general.discord.event.MessageSendEvent;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.model.Status;
@@ -19,6 +19,7 @@ import com.teamolha.talantino.proof.repository.KudosRepository;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.proof.repository.ReportRepository;
 import com.teamolha.talantino.proof.service.ProofService;
+import com.teamolha.talantino.skill.mapper.SkillMapper;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.repository.SkillRepository;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
@@ -72,6 +73,8 @@ public class ProofServiceImpl implements ProofService {
 
     private final MessageSendEvent messageSendEvent;
 
+    private final SkillMapper skillMapper;
+
     @Transactional(readOnly = true)
     @Override
     public ProofsPageDTO pageProofs(Authentication auth, String sort, String type, int page, int count) {
@@ -86,8 +89,10 @@ public class ProofServiceImpl implements ProofService {
         var sponsor = (auth == null) ? null :
                 sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
 
+        log.error(sponsor.toString());
+
         List<ShortProofDTO> proofs = proofRepository.findByStatus(Status.PUBLISHED.name(), pageable)
-                .stream().map(proof -> mapper.toShortProofDTO(proof, sponsor, auth != null)).toList();
+                .stream().map(proof -> mapper.toShortProofDTO(proof, sponsor, skillMapper, auth != null)).toList();
 
         return ProofsPageDTO.builder()
                 .totalAmount(totalAmount)
@@ -122,11 +127,11 @@ public class ProofServiceImpl implements ProofService {
         var proofs = status.equals("ALL") ?
                 proofRepository.findByTalent_Id(talentId, pageable)
                         .stream()
-                        .map(proof -> mapper.toProofDTO(proof, sponsor))
+                        .map(proof -> mapper.toProofDTO(proof, sponsor, skillMapper))
                         .toList() :
                 proofRepository.findByStatusAndTalent_Id(status, talentId, pageable)
                         .stream()
-                        .map(proof -> mapper.toProofDTO(proof, sponsor))
+                        .map(proof -> mapper.toProofDTO(proof, sponsor, skillMapper))
                         .toList();
 
         return TalentProofList.builder()
@@ -217,7 +222,7 @@ public class ProofServiceImpl implements ProofService {
                     "You can see only PUBLISHED proofs");
         }
 
-        return mapper.toProofDTO(proof);
+        return mapper.toProofDTO(proof, skillMapper);
     }
 
     @Override
@@ -339,7 +344,7 @@ public class ProofServiceImpl implements ProofService {
         }
 
         proofRepository.save(proof);
-        return mapper.toProofDTO(proof);
+        return mapper.toProofDTO(proof, skillMapper);
     }
 
     private Talent getTalent(Long talentId) {
@@ -369,10 +374,10 @@ public class ProofServiceImpl implements ProofService {
     }
 
     private boolean isTalent(Authentication auth) {
-        return auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList().contains(Roles.TALENT.name());
+        return auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList().contains(AccountRole.TALENT.name());
     }
 
     private boolean isSponsor(Authentication auth) {
-        return auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList().contains(Roles.SPONSOR.name());
+        return auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList().contains(AccountRole.SPONSOR.name());
     }
 }

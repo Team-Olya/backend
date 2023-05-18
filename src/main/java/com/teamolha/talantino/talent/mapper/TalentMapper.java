@@ -1,6 +1,6 @@
 package com.teamolha.talantino.talent.mapper;
 
-import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.account.model.AccountRole;
 import com.teamolha.talantino.proof.model.entity.Kudos;
 import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.talent.model.entity.Link;
@@ -36,7 +36,7 @@ public interface TalentMapper {
 
     default TalentProfileResponse toTalentProfileResponse(Talent talent, Long prevId, Long nextId) {
         return TalentProfileResponse.builder()
-                .role(Roles.TALENT.name())
+                .role(AccountRole.TALENT.name())
                 .id(talent.getId())
                 .name(talent.getName())
                 .surname(talent.getSurname())
@@ -64,7 +64,7 @@ public interface TalentMapper {
 
     default TalentFullResponse toTalentFullResponse(Talent talent, Long prevId, Long nextId) {
         return TalentFullResponse.builder()
-                .role(Roles.TALENT.name())
+                .role(AccountRole.TALENT.name())
                 .id(talent.getId())
                 .name(talent.getName())
                 .surname(talent.getSurname())

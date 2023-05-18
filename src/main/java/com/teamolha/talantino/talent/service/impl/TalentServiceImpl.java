@@ -1,8 +1,9 @@
 package com.teamolha.talantino.talent.service.impl;
 
+import com.teamolha.talantino.account.model.AccountStatus;
+import com.teamolha.talantino.account.model.AccountRole;
 import com.teamolha.talantino.account.model.entity.AccountStatus;
 import com.teamolha.talantino.general.config.EmailProperties;
-import com.teamolha.talantino.general.config.Roles;
 import com.teamolha.talantino.general.email.EmailHelper;
 import com.teamolha.talantino.general.email.EmailSender;
 import com.teamolha.talantino.proof.repository.ProofRepository;
@@ -82,7 +83,7 @@ public class TalentServiceImpl implements TalentService {
                         .name(name)
                         .surname(surname)
                         .kind(kindRepository.findByKindIgnoreCase(kind))
-                        .authorities(List.of(Roles.TALENT.name()))
+                        .authorities(List.of(AccountRole.TALENT.name()))
                         .accountStatus(AccountStatus.INACTIVE)
                         .verificationExpireDate(emailHelper.calculateExpireVerificationDate())
                         .verificationToken(token)

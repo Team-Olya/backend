@@ -25,5 +25,5 @@ public interface SponsorService {
 
     List<BalanceAddingDTO> getBalanceAddingHistory(Authentication auth);
 
-    List<SponsorKudos> getKudosHistory(Authentication auth);
+//    List<SponsorKudos> getKudosHistory(Authentication auth);
 }

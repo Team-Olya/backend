@@ -1,4 +1,4 @@
-package com.teamolha.talantino.general.service;
+package com.teamolha.talantino.account.service;
 
 import com.teamolha.talantino.talent.model.response.LoginResponse;
 import org.springframework.security.core.Authentication;

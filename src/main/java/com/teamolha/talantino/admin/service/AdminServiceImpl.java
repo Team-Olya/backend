@@ -3,11 +3,12 @@ package com.teamolha.talantino.admin.service;
 import com.teamolha.talantino.admin.model.request.CreateAdmin;
 import com.teamolha.talantino.admin.model.entity.Admin;
 import com.teamolha.talantino.admin.repository.AdminRepository;
-import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.account.model.AccountRole;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.model.request.ProofRequest;
 import com.teamolha.talantino.proof.model.response.ProofDTO;
 import com.teamolha.talantino.proof.repository.ProofRepository;
+import com.teamolha.talantino.skill.mapper.SkillMapper;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.skill.repository.SkillRepository;
@@ -55,6 +56,7 @@ public class AdminServiceImpl implements AdminService{
     SkillRepository skillRepository;
     TalentMapper talentMapper;
     ProofMapper proofMapper;
+    SkillMapper skillMapper;
 
     @Override
     public void deleteTalent(String email) {
@@ -107,7 +109,7 @@ public class AdminServiceImpl implements AdminService{
             Optional.of(skills).ifPresent(proof::setSkills);
         }
         proofRepository.save(proof);
-        return proofMapper.toProofDTO(proof);
+        return proofMapper.toProofDTO(proof, skillMapper);
     }
 
     @Override
@@ -143,7 +145,7 @@ public class AdminServiceImpl implements AdminService{
                     .password(passwordEncoder.encode(createAdmin.password()))
                     .name(createAdmin.name())
                     .surname(createAdmin.surname())
-                    .authorities(List.of(Roles.ADMIN.name()))
+                    .authorities(List.of(AccountRole.ADMIN.name()))
                     .build()
             );
         } else {
