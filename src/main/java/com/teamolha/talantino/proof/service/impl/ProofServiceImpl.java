@@ -89,8 +89,6 @@ public class ProofServiceImpl implements ProofService {
         var sponsor = (auth == null) ? null :
                 sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
 
-        log.error(sponsor.toString());
-
         List<ShortProofDTO> proofs = proofRepository.findByStatus(Status.PUBLISHED.name(), pageable)
                 .stream().map(proof -> mapper.toShortProofDTO(proof, sponsor, skillMapper, auth != null)).toList();
 

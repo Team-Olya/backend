@@ -1,9 +1,7 @@
 package com.teamolha.talantino.sponsor.service.impl;
 
-import com.teamolha.talantino.account.model.AccountStatus;
 import com.teamolha.talantino.account.model.AccountRole;
-import com.teamolha.talantino.account.model.entity.AccountStatus;
-import com.teamolha.talantino.general.config.EmailProperties;
+import com.teamolha.talantino.account.model.AccountStatus;
 import com.teamolha.talantino.general.email.EmailHelper;
 import com.teamolha.talantino.general.email.EmailSender;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
@@ -14,7 +12,6 @@ import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.model.request.AddKudosRequest;
 import com.teamolha.talantino.sponsor.model.request.SponsorUpdateRequest;
 import com.teamolha.talantino.sponsor.model.response.BalanceAddingDTO;
-import com.teamolha.talantino.sponsor.model.response.SponsorKudos;
 import com.teamolha.talantino.sponsor.model.response.SponsorProfileResponse;
 import com.teamolha.talantino.sponsor.model.response.UpdatedSponsorResponse;
 import com.teamolha.talantino.sponsor.repository.BalanceAddingRepository;
@@ -43,8 +40,6 @@ public class SponsorServiceImpl implements SponsorService {
     private SponsorRepository sponsorRepository;
     private EmailSender emailSender;
     private BalanceAddingRepository balanceAddingRepository;
-    private ProofMapper proofMapper;
-    private ProofRepository proofRepository;
     private EmailHelper emailHelper;
 
     @Override

@@ -1,6 +1,6 @@
 package com.teamolha.talantino.account.service.impl;
 
-import com.teamolha.talantino.account.model.entity.AccountStatus;
+import com.teamolha.talantino.account.model.AccountStatus;
 import com.teamolha.talantino.account.repository.AccountRepository;
 import com.teamolha.talantino.admin.mapper.AdminMapper;
 import com.teamolha.talantino.admin.repository.AdminRepository;
