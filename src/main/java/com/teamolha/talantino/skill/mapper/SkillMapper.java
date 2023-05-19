@@ -52,7 +52,7 @@ public interface SkillMapper {
                     );
             totalKudosFromSponsor = sponsor.getKudos().stream()
                     .filter(kudos -> kudos.getProofId().equals(proof.getId()) &&
-                            kudos.getSkillId().equals(skill.getId())).findFirst()
+                            (kudos.getSkillId() != null && kudos.getSkillId().equals(skill.getId()))).findFirst()
                     .map(Kudos::getAmount).orElse(null);
         }
         return ProofSkillDTO.builder()
