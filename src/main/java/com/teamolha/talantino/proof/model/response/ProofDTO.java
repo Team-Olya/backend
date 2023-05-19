@@ -14,6 +14,9 @@ public record ProofDTO(
         String description,
         Long authorId,
         String status,
+        Integer totalKudos,
+        Integer totalKudosFromSponsor,
+        Boolean isKudosed,
         List<ProofSkillDTO> skills
 ) {
 }

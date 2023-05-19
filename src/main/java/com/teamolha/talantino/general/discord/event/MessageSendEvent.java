@@ -22,8 +22,8 @@ public class MessageSendEvent {
     private final Snowflake channelId = Snowflake.of(System.getenv("DISCORD_CHANNEL"));
 
     public void sendMessage(ReportedProofDTO reportedProof, String refererUrl) {
-        Button approve = Button.success("approve", "Approve");
-        Button reject = Button.danger("reject", "Reject");
+        Button approve = Button.success("approve", "Delete proof");
+        Button reject = Button.danger("reject", "Reject report");
 
         discordClient.getChannelById(channelId)
                 .ofType(TextChannel.class)

@@ -22,6 +22,7 @@ import com.teamolha.talantino.proof.service.ProofService;
 import com.teamolha.talantino.skill.mapper.SkillMapper;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.repository.SkillRepository;
+import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
 import com.teamolha.talantino.talent.model.entity.Talent;
@@ -256,17 +257,14 @@ public class ProofServiceImpl implements ProofService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only put kudos in published proofs");
         }
 
-        List<Kudos> sponsorKudos = sponsor.getKudos();
-        if (!kudosRepository.existsBySponsorIdAndProofId(sponsor.getId(), proofId)) {
-            sponsorKudos.add(Kudos.builder()
-                    .amount(amount)
-                    .sponsorId(sponsor.getId())
-                    .proofId(proofId)
-                    .build());
-        } else {
-            sponsorKudos.stream().filter(kudos -> kudos.getProofId().equals(proofId))
-                    .forEach(kudos -> kudos.setAmount(kudos.getAmount() + amount));
+        List<Skill> skills = proof.getSkills();
+        if (!skills.isEmpty() && amount % skills.size() != 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The number of kudos should be a multiple of the number of skills");
         }
+
+        List<Kudos> sponsorKudos = sponsor.getKudos();
+        setKudosOnProof(proofId, amount, sponsor, skills, sponsorKudos);
+
         sponsor.setKudos(sponsorKudos);
         sponsor.setBalance(sponsor.getBalance() - amount);
         sponsorRepository.save(sponsor);
@@ -369,6 +367,37 @@ public class ProofServiceImpl implements ProofService {
                     .build()), () -> kudos.add(KudosDTO.builder().sponsor(null).amountOfKudos(amount).build()));
         }
         return kudos;
+    }
+
+    private void setKudosOnProof(Long proofId, int amount, Sponsor sponsor, List<Skill> skills, List<Kudos> sponsorKudos) {
+        if (!skills.isEmpty()) {
+            int amountForEachSkill = amount / skills.size();
+            skills.forEach(skill -> {
+                if (!kudosRepository.existsBySponsorIdAndProofIdAndSkillId(sponsor.getId(), proofId, skill.getId())) {
+                    sponsorKudos.add(Kudos.builder()
+                            .amount(amountForEachSkill)
+                            .sponsorId(sponsor.getId())
+                            .proofId(proofId)
+                            .skillId(skill.getId())
+                            .build());
+                } else {
+                    sponsorKudos.stream().filter(kudos ->
+                                    kudos.getProofId().equals(proofId) && kudos.getSkillId().equals(skill.getId()))
+                            .forEach(kudos -> kudos.setAmount(kudos.getAmount() + amountForEachSkill));
+                }
+            });
+        } else {
+            if (!kudosRepository.existsBySponsorIdAndProofId(sponsor.getId(), proofId)) {
+                sponsorKudos.add(Kudos.builder()
+                        .amount(amount)
+                        .sponsorId(sponsor.getId())
+                        .proofId(proofId)
+                        .build());
+            } else {
+                sponsorKudos.stream().filter(kudos -> kudos.getProofId().equals(proofId))
+                        .forEach(kudos -> kudos.setAmount(kudos.getAmount() + amount));
+            }
+        }
     }
 
     private boolean isTalent(Authentication auth) {
