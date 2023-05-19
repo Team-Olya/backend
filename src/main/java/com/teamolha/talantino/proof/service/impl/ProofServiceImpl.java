@@ -256,17 +256,30 @@ public class ProofServiceImpl implements ProofService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only put kudos in published proofs");
         }
 
-        List<Kudos> sponsorKudos = sponsor.getKudos();
-        if (!kudosRepository.existsBySponsorIdAndProofId(sponsor.getId(), proofId)) {
-            sponsorKudos.add(Kudos.builder()
-                    .amount(amount)
-                    .sponsorId(sponsor.getId())
-                    .proofId(proofId)
-                    .build());
-        } else {
-            sponsorKudos.stream().filter(kudos -> kudos.getProofId().equals(proofId))
-                    .forEach(kudos -> kudos.setAmount(kudos.getAmount() + amount));
+        List<Skill> skills = proof.getSkills();
+        if (amount % skills.size() != 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The number of kudos should be a multiple of the number of skills");
         }
+
+        List<Kudos> sponsorKudos = sponsor.getKudos();
+        int amountForEachSkill = amount / skills.size();
+        log.error(String.valueOf(amountForEachSkill));
+        skills.forEach(skill -> {
+            if (!kudosRepository.existsBySponsorIdAndProofIdAndSkillId(sponsor.getId(), proofId, skill.getId())) {
+                sponsorKudos.add(Kudos.builder()
+                        .amount(amountForEachSkill)
+                        .sponsorId(sponsor.getId())
+                        .proofId(proofId)
+                        .skillId(skill.getId())
+                        .build());
+            } else {
+//                sponsorKudos.stream().filter(kudos -> kudos.getProofId().equals(proofId))
+//                        .forEach(kudos -> kudos.setAmount(kudos.getAmount() + amountForEachSkill));
+                sponsorKudos.stream().filter(kudos ->
+                        kudos.getProofId().equals(proofId) && kudos.getSkillId().equals(skill.getId()))
+                        .forEach(kudos -> kudos.setAmount(kudos.getAmount() + amountForEachSkill));
+            }
+        });
         sponsor.setKudos(sponsorKudos);
         sponsor.setBalance(sponsor.getBalance() - amount);
         sponsorRepository.save(sponsor);

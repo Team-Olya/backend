@@ -25,7 +25,7 @@ public interface SkillMapper {
     default ProofSkillDTO toProofSkillDTO(Skill skill, Proof proof) {
         var totalKudos = proof.getKudos()
                 .stream()
-                .filter(kudos -> kudos.getSkillId().equals(skill.getId()))
+                .filter(kudos -> kudos.getSkillId() != null && kudos.getSkillId().equals(skill.getId()))
                 .mapToInt(Kudos::getAmount)
                 .sum();
         return ProofSkillDTO.builder()
