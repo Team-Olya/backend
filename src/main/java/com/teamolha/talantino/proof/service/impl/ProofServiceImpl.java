@@ -382,7 +382,8 @@ public class ProofServiceImpl implements ProofService {
                             .build());
                 } else {
                     sponsorKudos.stream().filter(kudos ->
-                                    kudos.getProofId().equals(proofId) && kudos.getSkillId().equals(skill.getId()))
+                                    kudos.getProofId().equals(proofId) &&
+                                            (kudos.getSkillId() != null && kudos.getSkillId().equals(skill.getId())))
                             .forEach(kudos -> kudos.setAmount(kudos.getAmount() + amountForEachSkill));
                 }
             });
