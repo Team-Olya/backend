@@ -48,7 +48,7 @@ public interface SkillMapper {
             isKudosed = sponsor.getKudos()
                     .stream()
                     .anyMatch(kudos -> kudos.getProofId().equals(proof.getId()) &&
-                            kudos.getSkillId().equals(skill.getId())
+                            (kudos.getSkillId() != null && kudos.getSkillId().equals(skill.getId()))
                     );
             totalKudosFromSponsor = sponsor.getKudos().stream()
                     .filter(kudos -> kudos.getProofId().equals(proof.getId()) &&
