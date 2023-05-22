@@ -101,7 +101,7 @@ public class SponsorServiceImpl implements SponsorService {
                 .map(balanceChanging -> BalanceChangingDTO.builder()
                         .amount(balanceChanging.getAmount())
                         .date(balanceChanging.getDate())
-                        .proofId(balanceChanging.getProofId())
+                        .talentId(balanceChanging.getTalent().getId())
                         .build())
                 .collect(Collectors.toList());
         return BalanceHistoryDTO.builder()

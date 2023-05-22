@@ -1,5 +1,6 @@
 package com.teamolha.talantino.sponsor.model.entity;
 
+import com.teamolha.talantino.talent.model.entity.Talent;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,9 +22,9 @@ public class BalanceChanging {
 
     int amount;
 
-    Long proofId;
-
-    Long skillId;
+    @ManyToOne
+    @JoinColumn(name = "talent_id")
+    Talent talent;
 
     LocalDateTime date;
 }

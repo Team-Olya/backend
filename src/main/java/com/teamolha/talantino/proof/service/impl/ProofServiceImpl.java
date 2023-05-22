@@ -275,7 +275,7 @@ public class ProofServiceImpl implements ProofService {
         balanceChangingRepository.save(BalanceChanging.builder()
                 .sponsorId(sponsor.getId())
                 .amount(-amount)
-                .proofId(proofId)
+                .talent(proof.getTalent())
                 .date(LocalDateTime.now(ZoneOffset.UTC))
                 .build());
     }
