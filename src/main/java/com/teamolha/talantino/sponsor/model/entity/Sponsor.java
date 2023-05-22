@@ -37,5 +37,5 @@ public class Sponsor extends Account {
             CascadeType.DETACH, CascadeType.REFRESH},
             mappedBy = "sponsorId")
     @ToString.Exclude
-    private List<BalanceAdding> balanceAdding;
+    private List<BalanceChanging> balanceChangings;
 }

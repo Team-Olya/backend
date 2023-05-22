@@ -2,8 +2,8 @@ package com.teamolha.talantino.sponsor.controller;
 
 import com.teamolha.talantino.sponsor.model.request.AddKudosRequest;
 import com.teamolha.talantino.sponsor.model.request.SponsorUpdateRequest;
-import com.teamolha.talantino.sponsor.model.response.BalanceAddingDTO;
-import com.teamolha.talantino.sponsor.model.response.SponsorKudos;
+import com.teamolha.talantino.sponsor.model.response.BalanceChangingDTO;
+import com.teamolha.talantino.sponsor.model.response.BalanceHistoryDTO;
 import com.teamolha.talantino.sponsor.model.response.SponsorProfileResponse;
 import com.teamolha.talantino.sponsor.model.response.UpdatedSponsorResponse;
 import com.teamolha.talantino.sponsor.service.SponsorService;
@@ -28,14 +28,11 @@ public class SponsorController {
     }
 
     @GetMapping("/sponsors/balance/history")
-    public List<BalanceAddingDTO> getBalanceAddingHistory(Authentication auth) {
-        return sponsorService.getBalanceAddingHistory(auth);
+    public BalanceHistoryDTO getBalanceHistory(Authentication auth,
+                                               @RequestParam(defaultValue = "0") int page,
+                                               @RequestParam(defaultValue = "10") int size) {
+        return sponsorService.getBalanceHistory(auth, page, size);
     }
-
-//    @GetMapping("/sponsors/kudos")
-//    public List<SponsorKudos> getKudosHistory(Authentication auth) {
-//        return sponsorService.getKudosHistory(auth);
-//    }
 
     @PatchMapping("/sponsors/{sponsor-id}")
     public UpdatedSponsorResponse updateSponsorProfile(@PathVariable("sponsor-id") long sponsorId,

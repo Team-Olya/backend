@@ -4,22 +4,23 @@ import com.teamolha.talantino.account.model.AccountRole;
 import com.teamolha.talantino.account.model.AccountStatus;
 import com.teamolha.talantino.general.email.EmailHelper;
 import com.teamolha.talantino.general.email.EmailSender;
-import com.teamolha.talantino.proof.mapper.ProofMapper;
-import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
-import com.teamolha.talantino.sponsor.model.entity.BalanceAdding;
+import com.teamolha.talantino.sponsor.model.entity.BalanceChanging;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.model.request.AddKudosRequest;
 import com.teamolha.talantino.sponsor.model.request.SponsorUpdateRequest;
-import com.teamolha.talantino.sponsor.model.response.BalanceAddingDTO;
+import com.teamolha.talantino.sponsor.model.response.BalanceChangingDTO;
+import com.teamolha.talantino.sponsor.model.response.BalanceHistoryDTO;
 import com.teamolha.talantino.sponsor.model.response.SponsorProfileResponse;
 import com.teamolha.talantino.sponsor.model.response.UpdatedSponsorResponse;
-import com.teamolha.talantino.sponsor.repository.BalanceAddingRepository;
+import com.teamolha.talantino.sponsor.repository.BalanceChangingRepository;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.sponsor.service.SponsorService;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,7 +40,7 @@ public class SponsorServiceImpl implements SponsorService {
     private TalentRepository talentRepository;
     private SponsorRepository sponsorRepository;
     private EmailSender emailSender;
-    private BalanceAddingRepository balanceAddingRepository;
+    private BalanceChangingRepository balanceChangingRepository;
     private EmailHelper emailHelper;
 
     @Override
@@ -76,7 +77,7 @@ public class SponsorServiceImpl implements SponsorService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "We can't pay to your card, sorry");
         }
         sponsor.setBalance(sponsor.getBalance() + addKudosRequest.amount());
-        balanceAddingRepository.save(BalanceAdding.builder()
+        balanceChangingRepository.save(BalanceChanging.builder()
                 .amount(addKudosRequest.amount())
                 .sponsorId(sponsor.getId())
                 .date(LocalDateTime.now(ZoneOffset.UTC))
@@ -85,31 +86,29 @@ public class SponsorServiceImpl implements SponsorService {
     }
 
     @Override
-    public List<BalanceAddingDTO> getBalanceAddingHistory(Authentication auth) {
+    public BalanceHistoryDTO getBalanceHistory(Authentication auth, int page, int size) {
         var sponsor = sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow( () ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Sponsor is not found")
         );
-        return balanceAddingRepository.findAllBySponsorId(sponsor.getId())
+        if (size <= 0 || page < 0) {
+            return BalanceHistoryDTO.builder()
+                    .totalAmount(balanceChangingRepository.countBySponsorId(sponsor.getId()))
+                    .build();
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        var balanceChangings = balanceChangingRepository.findDistinctBySponsorId(sponsor.getId(), pageable)
                 .stream()
-                .map(balanceAdding -> BalanceAddingDTO.builder()
-                        .amount(balanceAdding.getAmount())
-                        .date(balanceAdding.getDate())
+                .map(balanceChanging -> BalanceChangingDTO.builder()
+                        .amount(balanceChanging.getAmount())
+                        .date(balanceChanging.getDate())
+                        .proofId(balanceChanging.getProofId())
                         .build())
                 .collect(Collectors.toList());
+        return BalanceHistoryDTO.builder()
+                .totalAmount(balanceChangingRepository.countBySponsorId(sponsor.getId()))
+                .balanceChangings(balanceChangings)
+                .build();
     }
-
-//    @Override
-//    public List<SponsorKudos> getKudosHistory(Authentication auth) {
-//        var sponsor = sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow( () ->
-//                new ResponseStatusException(HttpStatus.NOT_FOUND, "Sponsor is not found")
-//        );
-//        return sponsor.getKudos().stream()
-//                .map(kudos -> SponsorKudos.builder()
-//                        .proofDTO(proofMapper.toProofDTO(proofRepository.findById(kudos.getProofId()).orElseThrow(), sponsor))
-//                        .amount(kudos.getAmount())
-//                        .build())
-//                .collect(Collectors.toList());
-//    }
 
     @Override
     public UpdatedSponsorResponse updateSponsorProfile(long sponsorId, String email, SponsorUpdateRequest updateSponsor) {
