@@ -229,13 +229,13 @@ public class ProofServiceImpl implements ProofService {
     }
 
     @Override
-    public KudosList getKudos(Authentication auth, Long proofId) {
+    public KudosList getKudos(Authentication auth, Long proofId, int page, int size) {
         var proof = getProofEntity(proofId);
         var talent = (auth == null) ? null :
                 talentRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
         List<KudosDTO> kudos = new ArrayList<>();
         if (talent != null && proof.getTalent().getId() == talent.getId()) {
-            kudos = getKudos(proofId);
+            kudos = getKudos(proofId, page, size);
         }
         return KudosList.builder()
                 .totalAmount(proof.getKudos()
@@ -365,9 +365,10 @@ public class ProofServiceImpl implements ProofService {
                         "Proof with ID " + proofId + " not found"));
     }
 
-    private List<KudosDTO> getKudos(Long proofId) {
+    private List<KudosDTO> getKudos(Long proofId, int page, int size) {
         List<KudosDTO> kudos = new ArrayList<>();
-        List<Object[]> list = proofRepository.findSponsorsAndKudosOnProof(proofId);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        List<Object[]> list = proofRepository.findSponsorsAndKudosOnProof(pageable, proofId);
         for (Object[] elem : list) {
             long sponsorId = ((Number) elem[0]).longValue();
             int amount = ((Number) elem[1]).intValue();

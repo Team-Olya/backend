@@ -5,6 +5,7 @@ import com.teamolha.talantino.talent.model.entity.Talent;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -33,7 +34,8 @@ public interface ProofRepository extends JpaRepository<Proof, Long> {
 
     long deleteByTalent(Talent talent);
 
-    @Query(value = "SELECT sponsor_id, SUM(amount) FROM kudos WHERE proof_id=:proofId GROUP BY sponsor_id",
+    @Query(value = "SELECT sponsor_id, SUM(amount) FROM kudos WHERE proof_id=:proofId GROUP BY id ORDER BY id DESC",
+            countQuery = "SELECT COUNT(DISTINCT sponsor_id) FROM kudos WHERE proof_id=:proofId",
             nativeQuery = true)
-    List<Object[]> findSponsorsAndKudosOnProof(long proofId);
+    List<Object[]> findSponsorsAndKudosOnProof(Pageable pageable, @Param("proofId") long proofId);
 }

@@ -19,7 +19,7 @@ public interface ProofService {
 
     ProofDTO getProof(Long proofId);
 
-    KudosList getKudos(Authentication auth, Long proofId);
+    KudosList getKudos(Authentication auth, Long proofId, int page, int size);
 
     void setKudos(Authentication auth, Long proofId, int amount);
 
