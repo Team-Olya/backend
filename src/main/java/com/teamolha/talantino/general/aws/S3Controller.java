@@ -3,12 +3,11 @@ package com.teamolha.talantino.general.aws;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
+@RequestMapping("/s3")
 @AllArgsConstructor
 public class S3Controller {
 
@@ -21,4 +20,8 @@ public class S3Controller {
         return s3Service.saveFile(auth, file);
     }
 
+    @DeleteMapping("/delete")
+    public void delete(Authentication auth) {
+        s3Service.deleteFile(auth);
+    }
 }
