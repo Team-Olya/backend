@@ -5,8 +5,9 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Builder
-public record BalanceAddingDTO(
-        int amount,
-        LocalDateTime date
+public record BalanceChangingDTO(
+        long amount,
+        LocalDateTime date,
+        Long proofId
 ) {
 }

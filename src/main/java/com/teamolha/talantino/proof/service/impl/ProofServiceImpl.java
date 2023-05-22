@@ -22,7 +22,9 @@ import com.teamolha.talantino.proof.service.ProofService;
 import com.teamolha.talantino.skill.mapper.SkillMapper;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.repository.SkillRepository;
+import com.teamolha.talantino.sponsor.model.entity.BalanceChanging;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
+import com.teamolha.talantino.sponsor.repository.BalanceChangingRepository;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
 import com.teamolha.talantino.talent.model.entity.Talent;
@@ -75,6 +77,8 @@ public class ProofServiceImpl implements ProofService {
     private final MessageSendEvent messageSendEvent;
 
     private final SkillMapper skillMapper;
+
+    private final BalanceChangingRepository balanceChangingRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -268,6 +272,12 @@ public class ProofServiceImpl implements ProofService {
         sponsor.setKudos(sponsorKudos);
         sponsor.setBalance(sponsor.getBalance() - amount);
         sponsorRepository.save(sponsor);
+        balanceChangingRepository.save(BalanceChanging.builder()
+                .sponsorId(sponsor.getId())
+                .amount(-amount)
+                .proofId(proofId)
+                .date(LocalDateTime.now(ZoneOffset.UTC))
+                .build());
     }
 
     @Override

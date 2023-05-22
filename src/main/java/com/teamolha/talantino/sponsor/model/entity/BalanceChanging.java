@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Getter
@@ -12,7 +11,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BalanceAdding {
+public class BalanceChanging {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
@@ -21,6 +20,10 @@ public class BalanceAdding {
     Long sponsorId;
 
     int amount;
+
+    Long proofId;
+
+    Long skillId;
 
     LocalDateTime date;
 }

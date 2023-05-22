@@ -44,5 +44,4 @@ public abstract class Account {
     private String verificationToken;
 
     abstract public String getAvatar();
-
 }
