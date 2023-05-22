@@ -96,7 +96,10 @@ public class S3Service {
 
     public void deleteFile(Authentication auth) {
         var user = getUser(auth);
-        s3.deleteObject(bucketName, getFileName(user.getAvatar()));
+        String filename = getFileName(user.getAvatar());
+        if (filename != null) {
+            s3.deleteObject(bucketName, filename);
+        }
         if (user instanceof Talent) {
             ((Talent) user).setAvatar(null);
             talentRepository.save((Talent) user);
@@ -107,8 +110,12 @@ public class S3Service {
     }
 
     private String getFileName(String avatarUrl) {
-        String[] parts = avatarUrl.split(String.format("https://%s.s3.amazonaws.com/", bucketName));
-        return parts[1];
+        String splitBy = String.format("https://%s.s3.amazonaws.com/", bucketName);
+        if (avatarUrl.contains(splitBy)) {
+            String[] parts = avatarUrl.split(splitBy);
+            return parts[1];
+        }
+        return null;
     }
 
     private Account getUser(Authentication auth) {
