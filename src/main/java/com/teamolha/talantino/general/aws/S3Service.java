@@ -51,7 +51,9 @@ public class S3Service {
         try {
             File file1 = convertMultiPartToFile(file);
             String fileName = generateFileName(user, file);
-            deleteFile(auth);
+            if (user.getAvatar() != null) {
+                deleteFile(auth);
+            }
             PutObjectResult objectResult = s3.putObject(bucketName, fileName, file1);
             if (user instanceof Talent) {
                 ((Talent) user).setAvatar(generateUrl(fileName));
