@@ -33,7 +33,11 @@ public interface ProofRepository extends JpaRepository<Proof, Long> {
 
     long deleteByTalent(Talent talent);
 
-    @Query(value = "SELECT sponsor_id, SUM(amount) FROM kudos WHERE proof_id=:proofId GROUP BY sponsor_id",
+    @Query(value = "SELECT T1.sponsor_id, SUM(T1.amount) " +
+            "FROM kudos T1 " +
+            "JOIN proof_skills T2 ON T1.proof_id = T2.proof_id " +
+            "WHERE T1.proof_id = :proofId AND T2.skill_id = :skillId " +
+            "GROUP BY T1.sponsor_id",
             nativeQuery = true)
-    List<Object[]> findSponsorsAndKudosOnProof(long proofId);
+    List<Object[]> findSponsorsAndKudosOnProof(long proofId, long skillId);
 }

@@ -7,6 +7,6 @@ import java.util.List;
 @Builder
 public record KudosList(
     long totalAmount,
-    List<KudosDTO> kudos
+    List<SkillKudosDTO> kudoses
 ) {
 }
