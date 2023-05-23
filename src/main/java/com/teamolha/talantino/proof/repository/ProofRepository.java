@@ -38,6 +38,7 @@ public interface ProofRepository extends JpaRepository<Proof, Long> {
             "JOIN proof_skills T2 ON T1.proof_id = T2.proof_id " +
             "WHERE T1.proof_id = :proofId AND T2.skill_id = :skillId " +
             "GROUP BY T1.sponsor_id",
+            countQuery = "SELECT COUNT(DISTINCT sponsor_id) FROM kudos WHERE proof_id=:proofId",
             nativeQuery = true)
-    List<Object[]> findSponsorsAndKudosOnProof(long proofId, long skillId);
+    List<Object[]> findSponsorsAndKudosOnProof(Pageable pageable, long proofId, long skillId);
 }

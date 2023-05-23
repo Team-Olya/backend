@@ -1,19 +1,14 @@
 package com.teamolha.talantino.proof.service.impl;
 
-import com.teamolha.talantino.account.repository.AccountRepository;
 import com.teamolha.talantino.account.model.AccountRole;
+import com.teamolha.talantino.account.repository.AccountRepository;
 import com.teamolha.talantino.general.discord.event.MessageSendEvent;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.model.Status;
 import com.teamolha.talantino.proof.model.entity.Kudos;
 import com.teamolha.talantino.proof.model.entity.Proof;
 import com.teamolha.talantino.proof.model.entity.Report;
-import com.teamolha.talantino.proof.model.response.KudosDTO;
 import com.teamolha.talantino.proof.model.request.ProofRequest;
-import com.teamolha.talantino.proof.model.response.ProofDTO;
-import com.teamolha.talantino.proof.model.response.ProofsPageDTO;
-import com.teamolha.talantino.proof.model.response.ShortProofDTO;
-import com.teamolha.talantino.proof.model.response.TalentProofList;
 import com.teamolha.talantino.proof.model.response.*;
 import com.teamolha.talantino.proof.repository.KudosRepository;
 import com.teamolha.talantino.proof.repository.ProofRepository;
@@ -23,11 +18,11 @@ import com.teamolha.talantino.skill.mapper.SkillMapper;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.skill.repository.SkillRepository;
+import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
 import com.teamolha.talantino.sponsor.model.entity.BalanceChanging;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.repository.BalanceChangingRepository;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
-import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import discord4j.rest.http.client.ClientException;
@@ -230,13 +225,13 @@ public class ProofServiceImpl implements ProofService {
     }
 
     @Override
-    public KudosList getKudos(Authentication auth, Long proofId) {
+    public KudosList getKudos(Authentication auth, Long proofId, int page, int size) {
         var proof = getProofEntity(proofId);
         var talent = (auth == null) ? null :
                 talentRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
         List<SkillKudosDTO> kudoses = new ArrayList<>();
         if (talent != null && proof.getTalent().getId() == talent.getId()) {
-            kudoses = getKudos(proofId);
+            kudoses = getKudos(proofId, page, size);
         }
         return KudosList.builder()
                 .totalAmount(proof.getKudos()
@@ -366,20 +361,21 @@ public class ProofServiceImpl implements ProofService {
                         "Proof with ID " + proofId + " not found"));
     }
 
-    private List<SkillKudosDTO> getKudos(Long proofId) {
+    private List<SkillKudosDTO> getKudos(Long proofId, int page, int size) {
         List<SkillKudosDTO> kudoses = new ArrayList<>();
         List<Skill> skills = skillRepository.findByProofs_Id(proofId);
         for (Skill skill : skills) {
             List<KudosDTO> kudos = new ArrayList<>();
-            List<Object[]> list = proofRepository.findSponsorsAndKudosOnProof(proofId, skill.getId());
+            Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+            List<Object[]> list = proofRepository.findSponsorsAndKudosOnProof(pageable, skill.getId(), proofId);
             for (Object[] elem : list) {
                 long sponsorId = ((Number) elem[0]).longValue();
                 int amount = ((Number) elem[1]).intValue();
                 sponsorRepository.findById(sponsorId).ifPresentOrElse(sponsor ->
-                        kudos.add(KudosDTO.builder()
-                                .sponsor(sponsorMapper.toShortSponsorDTO(sponsor))
-                                .amountOfKudos(amount)
-                                .build()),
+                                kudos.add(KudosDTO.builder()
+                                        .sponsor(sponsorMapper.toShortSponsorDTO(sponsor))
+                                        .amountOfKudos(amount)
+                                        .build()),
                         () -> kudos.add(KudosDTO.builder().sponsor(null).amountOfKudos(amount).build()));
             }
             kudoses.add(SkillKudosDTO.builder()
