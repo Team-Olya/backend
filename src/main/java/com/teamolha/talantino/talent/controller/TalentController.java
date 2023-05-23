@@ -1,10 +1,7 @@
 package com.teamolha.talantino.talent.controller;
 
 import com.teamolha.talantino.talent.model.request.TalentUpdateRequest;
-import com.teamolha.talantino.talent.model.response.KindDTO;
-import com.teamolha.talantino.talent.model.response.TalentFullResponse;
-import com.teamolha.talantino.talent.model.response.TalentsPageResponse;
-import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
+import com.teamolha.talantino.talent.model.response.*;
 import com.teamolha.talantino.talent.service.TalentService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -51,5 +48,10 @@ public class TalentController {
     @GetMapping("/talents/kinds")
     public List<KindDTO> getTalentKinds() {
         return talentService.getTalentKinds();
+    }
+
+    @GetMapping("/talents/{talent-id}/statistic")
+    public TalentStatistic getTalentStatistic(@PathVariable("talent-id") long talentId, Authentication auth) {
+        return talentService.getStatistic(talentId, auth.getName());
     }
 }

@@ -21,6 +21,7 @@ import com.teamolha.talantino.proof.repository.ReportRepository;
 import com.teamolha.talantino.proof.service.ProofService;
 import com.teamolha.talantino.skill.mapper.SkillMapper;
 import com.teamolha.talantino.skill.model.entity.Skill;
+import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.skill.repository.SkillRepository;
 import com.teamolha.talantino.sponsor.model.entity.BalanceChanging;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
@@ -229,20 +230,20 @@ public class ProofServiceImpl implements ProofService {
     }
 
     @Override
-    public KudosList getKudos(Authentication auth, Long proofId, int page, int size) {
+    public KudosList getKudos(Authentication auth, Long proofId) {
         var proof = getProofEntity(proofId);
         var talent = (auth == null) ? null :
                 talentRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
-        List<KudosDTO> kudos = new ArrayList<>();
+        List<SkillKudosDTO> kudoses = new ArrayList<>();
         if (talent != null && proof.getTalent().getId() == talent.getId()) {
-            kudos = getKudos(proofId, page, size);
+            kudoses = getKudos(proofId);
         }
         return KudosList.builder()
                 .totalAmount(proof.getKudos()
                         .stream()
                         .mapToInt(Kudos::getAmount)
                         .sum())
-                .kudos(kudos).build();
+                .kudoses(kudoses).build();
     }
 
     @Override
@@ -275,7 +276,7 @@ public class ProofServiceImpl implements ProofService {
         balanceChangingRepository.save(BalanceChanging.builder()
                 .sponsorId(sponsor.getId())
                 .amount(-amount)
-                .talent(proof.getTalent())
+                .proofId(proofId)
                 .date(LocalDateTime.now(ZoneOffset.UTC))
                 .build());
     }
@@ -365,19 +366,28 @@ public class ProofServiceImpl implements ProofService {
                         "Proof with ID " + proofId + " not found"));
     }
 
-    private List<KudosDTO> getKudos(Long proofId, int page, int size) {
-        List<KudosDTO> kudos = new ArrayList<>();
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        List<Object[]> list = proofRepository.findSponsorsAndKudosOnProof(pageable, proofId);
-        for (Object[] elem : list) {
-            long sponsorId = ((Number) elem[0]).longValue();
-            int amount = ((Number) elem[1]).intValue();
-            sponsorRepository.findById(sponsorId).ifPresentOrElse(sponsor -> kudos.add(KudosDTO.builder()
-                    .sponsor(sponsorMapper.toShortSponsorDTO(sponsor))
-                    .amountOfKudos(amount)
-                    .build()), () -> kudos.add(KudosDTO.builder().sponsor(null).amountOfKudos(amount).build()));
+    private List<SkillKudosDTO> getKudos(Long proofId) {
+        List<SkillKudosDTO> kudoses = new ArrayList<>();
+        List<Skill> skills = skillRepository.findByProofs_Id(proofId);
+        for (Skill skill : skills) {
+            List<KudosDTO> kudos = new ArrayList<>();
+            List<Object[]> list = proofRepository.findSponsorsAndKudosOnProof(proofId, skill.getId());
+            for (Object[] elem : list) {
+                long sponsorId = ((Number) elem[0]).longValue();
+                int amount = ((Number) elem[1]).intValue();
+                sponsorRepository.findById(sponsorId).ifPresentOrElse(sponsor ->
+                        kudos.add(KudosDTO.builder()
+                                .sponsor(sponsorMapper.toShortSponsorDTO(sponsor))
+                                .amountOfKudos(amount)
+                                .build()),
+                        () -> kudos.add(KudosDTO.builder().sponsor(null).amountOfKudos(amount).build()));
+            }
+            kudoses.add(SkillKudosDTO.builder()
+                    .skill(new SkillDTO(skill))
+                    .kudos(kudos)
+                    .build());
         }
-        return kudos;
+        return kudoses;
     }
 
     private void setKudosOnProof(Long proofId, int amount, Sponsor sponsor, List<Skill> skills, List<Kudos> sponsorKudos) {

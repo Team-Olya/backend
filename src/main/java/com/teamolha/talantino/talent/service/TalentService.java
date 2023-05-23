@@ -21,4 +21,6 @@ public interface TalentService {
     void deleteTalent(long talentId, String email);
 
     List<KindDTO> getTalentKinds();
+
+    TalentStatistic getStatistic(long talentId, String email);
 }
