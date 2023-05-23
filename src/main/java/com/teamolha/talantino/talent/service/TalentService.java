@@ -18,7 +18,7 @@ public interface TalentService {
 
     UpdatedTalentResponse updateTalentProfile(long talentId, String email, TalentUpdateRequest updateTalent);
 
-    void deleteTalent(long talentId, String email);
+    void deleteTalent(HttpServletRequest request, long talentId, String email);
 
     List<KindDTO> getTalentKinds();
 

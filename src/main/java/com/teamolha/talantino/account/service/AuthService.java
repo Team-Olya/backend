@@ -9,4 +9,6 @@ public interface AuthService {
     Object myProfile(Authentication email);
 
     LoginResponse login(String token);
+
+    void recoverAccount(String token);
 }

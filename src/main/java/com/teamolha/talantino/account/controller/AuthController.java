@@ -63,4 +63,9 @@ public class AuthController {
     LoginResponse emailConfirm(@RequestParam String token) {
         return authService.login(token);
     }
+
+    @PostMapping("/account-recover")
+    public void recoverAccount(@RequestParam String token) {
+        authService.recoverAccount(token);
+    }
 }
