@@ -44,7 +44,17 @@ public interface TalentRepository extends JpaRepository<Talent, Long> {
     List<Talent> findAllBySkills(@Param("skillList") List<Skill> skillList, @Param("skillCount") Long skillCount, Pageable pageable);
 
     @Query("SELECT t FROM Talent t JOIN t.skills s WHERE s IN :skillList GROUP BY " +
-            "t.id, t.accountStatus, t.email, t.password, t.name, t.surname, t.verificationExpireDate, t.verificationToken"  +
+            "t.id, t.accountStatus, t.email, t.password, t.name, t.surname, t.verificationExpireDate, t.verificationToken" +
             " HAVING COUNT(DISTINCT s) = :skillCount")
     List<Talent> findAllBySkills(@Param("skillList") List<Skill> skillList, @Param("skillCount") Long skillCount);
+
+    @Query("SELECT kudos.skillId FROM Talent talent JOIN talent.proofs proofs " +
+            "JOIN proofs.kudos kudos WHERE talent.id = :talentId  GROUP BY kudos.skillId " +
+            "ORDER BY COUNT(kudos.skillId) DESC LIMIT 1")
+    Long findMostKudosedSkill(@Param("talentId") Long talentId);
+
+    @Query("SELECT kudos.proofId FROM Talent talent JOIN talent.proofs proofs " +
+            "JOIN proofs.kudos kudos WHERE talent.id = :talentId GROUP BY kudos.proofId " +
+            "ORDER BY COUNT(kudos.proofId) DESC LIMIT 1")
+    Long findMostKudosedProof(@Param("talentId") Long talentId);
 }
