@@ -198,6 +198,21 @@ public class TalentServiceImpl implements TalentService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
+        if (talent.getProofs().size() < 1) {
+            return null;
+        }
+
+        if (talent.getSkills().size() < 1) {
+            return TalentStatistic.builder()
+                    .totalAmount(talent.getProofs().stream().map(proof -> proof.getKudos().size()).count())
+                    .skill(null)
+                    .proof(proofMapper.toProofDTO(
+                            proofRepository.findById(
+                                    talentRepository.findMostKudosedProof(
+                                            talent.getId())).get(), skillMapper))
+                    .build();
+        }
+
         return TalentStatistic.builder()
                 .totalAmount(talent.getProofs().stream().map(proof -> proof.getKudos().size()).count())
                 .skill(new SkillDTO(
