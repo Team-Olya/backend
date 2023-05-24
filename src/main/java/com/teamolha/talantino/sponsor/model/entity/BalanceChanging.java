@@ -22,9 +22,9 @@ public class BalanceChanging {
 
     private int amount;
 
-    @ManyToOne
-    @JoinColumn(name = "talent_id")
-    private Talent talent;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
+    @JoinColumn(name = "talent_id", nullable = true)
+    Talent talent;
 
     private LocalDateTime date;
 }

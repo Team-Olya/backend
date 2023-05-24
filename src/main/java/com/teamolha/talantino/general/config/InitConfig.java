@@ -49,7 +49,7 @@ public class InitConfig implements CommandLineRunner {
             if (account instanceof Talent) {
                 linkRepository.deleteByTalentId(account.getId());
                 proofRepository.deleteByTalentId(account.getId());
-                var balanceChanging = balanceChangingRepository.findByTalentId(account.getId());
+                var balanceChanging = balanceChangingRepository.findAllByTalent((Talent) account);
                 balanceChanging.forEach(changing -> {
                     changing.setTalent(null);
                     balanceChangingRepository.save(changing);

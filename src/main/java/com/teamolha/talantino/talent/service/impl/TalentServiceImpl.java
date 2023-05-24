@@ -10,6 +10,7 @@ import com.teamolha.talantino.skill.mapper.SkillMapper;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.skill.repository.SkillRepository;
+import com.teamolha.talantino.sponsor.repository.BalanceChangingRepository;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.mapper.TalentMapper;
 import com.teamolha.talantino.talent.model.entity.Kind;
@@ -67,6 +68,8 @@ public class TalentServiceImpl implements TalentService {
     private EmailHelper emailHelper;
 
     private EmailSender emailSender;
+
+    private BalanceChangingRepository balanceChangingRepository;
 
     @Override
     public void register(String email, String password, String name, String surname, String kind,
