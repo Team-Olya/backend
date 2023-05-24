@@ -43,5 +43,9 @@ public abstract class Account {
 
     private String verificationToken;
 
+    private Date deletionDate;
+
+    private String deletionToken;
+
     abstract public String getAvatar();
 }

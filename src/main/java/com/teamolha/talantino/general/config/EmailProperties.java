@@ -34,6 +34,9 @@ public class EmailProperties {
     @Value("${expire.verification.hours}")
     private Integer expireVerification;
 
+    @Value("${expire.deletion.days}")
+    private Integer expireDeletion;
+
     public String getEmail() {
         return env.getProperty("MAIL_USER");
     }

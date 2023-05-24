@@ -1,11 +1,14 @@
 package com.teamolha.talantino.talent.service.impl;
 
-import com.teamolha.talantino.account.model.AccountStatus;
 import com.teamolha.talantino.account.model.AccountRole;
+import com.teamolha.talantino.account.model.AccountStatus;
 import com.teamolha.talantino.general.email.EmailHelper;
 import com.teamolha.talantino.general.email.EmailSender;
+import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.repository.ProofRepository;
+import com.teamolha.talantino.skill.mapper.SkillMapper;
 import com.teamolha.talantino.skill.model.entity.Skill;
+import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.skill.repository.SkillRepository;
 import com.teamolha.talantino.sponsor.repository.BalanceChangingRepository;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
@@ -30,7 +33,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -40,6 +46,10 @@ import java.util.stream.Collectors;
 public class TalentServiceImpl implements TalentService {
 
     private TalentMapper mapper;
+
+    private ProofMapper proofMapper;
+
+    private SkillMapper skillMapper;
 
     private LinkRepository linkRepository;
 
@@ -154,7 +164,7 @@ public class TalentServiceImpl implements TalentService {
     }
 
     @Override
-    public void deleteTalent(long talentId, String email) {
+    public void deleteTalent(HttpServletRequest request, long talentId, String email) {
         var talent = talentRepository.findById(talentId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Talent with ID " + talentId + " not found"));
@@ -163,11 +173,11 @@ public class TalentServiceImpl implements TalentService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        balanceChangingRepository.findAllByTalent(talent)
-                .forEach(balanceChanging -> balanceChanging.setTalent(null));
-        linkRepository.deleteByTalent(talent);
-        proofRepository.deleteByTalent(talent);
-        talentRepository.delete(talent);
+        talent.setAccountStatus(AccountStatus.INACTIVE);
+        talent.setDeletionToken(UUID.randomUUID().toString());
+        talent.setDeletionDate(emailHelper.calculateDeletionDate());
+        talentRepository.save(talent);
+        emailSender.deactivateAccount(request, talent.getEmail(), talent.getDeletionToken());
     }
 
     @Override
@@ -176,6 +186,29 @@ public class TalentServiceImpl implements TalentService {
                 .stream()
                 .map(kind -> new KindDTO(kind.getId(), kind.getKind()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public TalentStatistic getStatistic(long talentId, String email) {
+        var talent = talentRepository.findById(talentId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Talent with ID " + talentId + " not found"));
+
+        if (!email.equals(talent.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        return TalentStatistic.builder()
+                .totalAmount(talent.getProofs().stream().map(proof -> proof.getKudos().size()).count())
+                .skill(new SkillDTO(
+                        skillRepository.findById(
+                                talentRepository.findMostKudosedSkill(
+                                        talent.getId())).get()))
+                .proof(proofMapper.toProofDTO(
+                        proofRepository.findById(
+                                talentRepository.findMostKudosedProof(
+                                        talent.getId())).get(), skillMapper))
+                .build();
     }
 
     private Long getPrevTalentId(long talentId) {

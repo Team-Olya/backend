@@ -21,6 +21,13 @@ public class EmailHelper {
         return new Date(cal.getTime().getTime());
     }
 
+    public Date calculateDeletionDate() {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(new Date().getTime());
+        cal.add(Calendar.DAY_OF_WEEK, emailProperties.getExpireDeletion());
+        return new Date(cal.getTime().getTime());
+    }
+
     public String generateUUIDToken() {
         return UUID.randomUUID().toString();
     }

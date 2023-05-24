@@ -1,6 +1,13 @@
 package com.teamolha.talantino.general.config;
 
+import com.teamolha.talantino.account.model.entity.Account;
+import com.teamolha.talantino.account.repository.AccountRepository;
+import com.teamolha.talantino.proof.repository.ProofRepository;
+import com.teamolha.talantino.sponsor.model.entity.BalanceChanging;
+import com.teamolha.talantino.sponsor.repository.BalanceChangingRepository;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
+import com.teamolha.talantino.talent.model.entity.Talent;
+import com.teamolha.talantino.talent.repository.LinkRepository;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -9,6 +16,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @Transactional
@@ -17,11 +26,38 @@ import java.util.Calendar;
 public class InitConfig implements CommandLineRunner {
 
     private TalentRepository talentRepository;
+
     private SponsorRepository sponsorRepository;
+
+    private AccountRepository accountRepository;
+
+    private LinkRepository linkRepository;
+
+    private ProofRepository proofRepository;
+
+    private BalanceChangingRepository balanceChangingRepository;
 
     @Override
     public void run(String... args) throws Exception {
-        talentRepository.deleteAllByVerificationExpireDate(Calendar.getInstance().getTime());
-        sponsorRepository.deleteAllByDeletionDateLessThanEqual(Calendar.getInstance().getTime());
+        Date curdate = Calendar.getInstance().getTime();
+        cascadeDeletion(accountRepository.findByVerificationExpireDateLessThanEqual(curdate));
+        cascadeDeletion(accountRepository.findByDeletionDateLessThanEqual(curdate));
+    }
+
+    private void cascadeDeletion(List<Account> accounts) {
+        for (Account account : accounts) {
+            if (account instanceof Talent) {
+                linkRepository.deleteByTalentId(account.getId());
+                proofRepository.deleteByTalentId(account.getId());
+                var balanceChanging = balanceChangingRepository.findByTalentId(account.getId());
+                balanceChanging.forEach(changing -> {
+                    changing.setTalent(null);
+                    balanceChangingRepository.save(changing);
+                });
+                talentRepository.deleteById(account.getId());
+            } else {
+                sponsorRepository.deleteById(account.getId());
+            }
+        }
     }
 }

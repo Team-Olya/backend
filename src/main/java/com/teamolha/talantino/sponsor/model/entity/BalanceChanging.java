@@ -15,16 +15,16 @@ import java.time.LocalDateTime;
 public class BalanceChanging {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @Column(name = "sponsor_id")
-    Long sponsorId;
+    private Long sponsorId;
 
-    int amount;
+    private int amount;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinColumn(name = "talent_id", nullable = true)
     Talent talent;
 
-    LocalDateTime date;
+    private LocalDateTime date;
 }

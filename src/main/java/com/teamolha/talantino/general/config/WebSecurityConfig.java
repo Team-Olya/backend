@@ -58,7 +58,6 @@ public class WebSecurityConfig {
                         .requestMatchers(antMatcher("/proofs/**/kudos")).permitAll()
 
                         .requestMatchers("/sponsor/register").permitAll()
-                        .requestMatchers("/sponsors/recover").permitAll()
 
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/api-docs/**").permitAll()
@@ -72,6 +71,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
 
                         .requestMatchers("/email-confirm").permitAll()
+                        .requestMatchers("/account-recover").permitAll()
                         .anyRequest().authenticated()
                 );
 

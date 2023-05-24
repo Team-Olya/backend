@@ -1,11 +1,11 @@
 package com.teamolha.talantino.proof.controller;
 
-import com.teamolha.talantino.proof.model.request.ProofRequest;
-import com.teamolha.talantino.proof.model.response.*;
-import com.teamolha.talantino.proof.service.ProofService;
 import com.teamolha.talantino.general.validation.ProofSort;
 import com.teamolha.talantino.general.validation.ProofStatus;
 import com.teamolha.talantino.general.validation.SortType;
+import com.teamolha.talantino.proof.model.request.ProofRequest;
+import com.teamolha.talantino.proof.model.response.*;
+import com.teamolha.talantino.proof.service.ProofService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
