@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -95,13 +96,13 @@ public class SponsorServiceImpl implements SponsorService {
                     .totalAmount(balanceChangingRepository.countBySponsorId(sponsor.getId()))
                     .build();
         }
-        Pageable pageable = PageRequest.of(page, size);
-        var balanceChangings = balanceChangingRepository.findDistinctBySponsorId(sponsor.getId(), pageable)
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "date"));
+        var balanceChangings = balanceChangingRepository.findBySponsorId(sponsor.getId(), pageable)
                 .stream()
                 .map(balanceChanging -> BalanceChangingDTO.builder()
                         .amount(balanceChanging.getAmount())
                         .date(balanceChanging.getDate())
-                        .talentId(balanceChanging.getTalent().getId())
+                        .talentId(balanceChanging.getTalent() == null ? null : balanceChanging.getTalent().getId())
                         .build())
                 .collect(Collectors.toList());
         return BalanceHistoryDTO.builder()

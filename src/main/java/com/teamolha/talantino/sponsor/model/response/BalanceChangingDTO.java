@@ -9,6 +9,6 @@ import java.time.LocalDateTime;
 public record BalanceChangingDTO(
         long amount,
         LocalDateTime date,
-        long talentId
+        Long talentId
 ) {
 }
