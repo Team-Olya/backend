@@ -2,12 +2,17 @@ package com.teamolha.talantino.sponsor.model.entity;
 
 import com.teamolha.talantino.account.model.entity.Account;
 import com.teamolha.talantino.proof.model.entity.Kudos;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -28,10 +33,6 @@ public class Sponsor extends Account {
             mappedBy = "sponsorId")
     @ToString.Exclude
     private List<Kudos> kudos;
-
-    private Date deletionDate;
-
-    private String deletionToken;
 
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST,
             CascadeType.DETACH, CascadeType.REFRESH},

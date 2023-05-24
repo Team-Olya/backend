@@ -47,8 +47,8 @@ public class SponsorController {
         sponsorService.deleteSponsor(request, auth, sponsorId);
     }
 
-    @PostMapping("/sponsors/recover")
-    public void recoverSponsor(@RequestParam String token) {
-        sponsorService.recoverSponsor(token);
-    }
+//    @PostMapping("/sponsors/recover")
+//    public void recoverSponsor(@RequestParam String token) {
+//        sponsorService.recoverSponsor(token);
+//    }
 }

@@ -85,6 +85,15 @@ public class AuthServiceImpl implements AuthService {
 
     }
 
+    public void recoverAccount(String token) {
+        var account = accountRepository.findByDeletionToken(token).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid token"));
+        account.setAccountStatus(AccountStatus.ACTIVE);
+        account.setDeletionDate(null);
+        account.setDeletionToken(null);
+        accountRepository.save(account);
+    }
+
     private LoginResponse getLoginResponse(String email) {
         var user = accountRepository.findByEmailIgnoreCase(email).get();
         var now = Instant.now();
@@ -111,10 +120,4 @@ public class AuthServiceImpl implements AuthService {
     private String createScope(Collection<String> authorities) {
         return authorities.stream().findFirst().stream().collect(Collectors.joining(" "));
     }
-
-//    private String createScope(Authentication authentication) {
-//        return authentication.getAuthorities()
-//                .stream().map(GrantedAuthority::getAuthority)
-//                .collect(Collectors.joining(" "));
-//    }
 }

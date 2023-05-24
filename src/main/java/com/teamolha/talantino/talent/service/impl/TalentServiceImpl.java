@@ -35,6 +35,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -160,7 +161,7 @@ public class TalentServiceImpl implements TalentService {
     }
 
     @Override
-    public void deleteTalent(long talentId, String email) {
+    public void deleteTalent(HttpServletRequest request, long talentId, String email) {
         var talent = talentRepository.findById(talentId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Talent with ID " + talentId + " not found"));
@@ -169,9 +170,11 @@ public class TalentServiceImpl implements TalentService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        linkRepository.deleteByTalent(talent);
-        proofRepository.deleteByTalent(talent);
-        talentRepository.delete(talent);
+        talent.setAccountStatus(AccountStatus.INACTIVE);
+        talent.setDeletionToken(UUID.randomUUID().toString());
+        talent.setDeletionDate(emailHelper.calculateDeletionDate());
+        talentRepository.save(talent);
+        emailSender.deactivateAccount(request, talent.getEmail(), talent.getDeletionToken());
     }
 
     @Override

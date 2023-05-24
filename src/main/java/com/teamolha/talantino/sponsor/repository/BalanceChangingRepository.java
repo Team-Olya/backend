@@ -11,5 +11,7 @@ public interface BalanceChangingRepository extends JpaRepository<BalanceChanging
 
     long countBySponsorId(Long sponsorId);
 
+    List<BalanceChanging> findByTalentId(Long id);
+
 
 }

@@ -134,19 +134,19 @@ public class SponsorServiceImpl implements SponsorService {
 
         sponsor.setAccountStatus(AccountStatus.INACTIVE);
         sponsor.setDeletionToken(UUID.randomUUID().toString());
-        sponsor.setDeletionDate(calculateDeletionDate(7));
+        sponsor.setDeletionDate(emailHelper.calculateDeletionDate());
         sponsorRepository.save(sponsor);
         emailSender.deactivateAccount(request, sponsor.getEmail(), sponsor.getDeletionToken());
     }
 
     @Override
     public void recoverSponsor(String token) {
-        var sponsor = sponsorRepository.findByDeletionToken(token).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid token"));
-        sponsor.setAccountStatus(AccountStatus.ACTIVE);
-        sponsor.setDeletionDate(null);
-        sponsor.setDeletionToken(null);
-        sponsorRepository.save(sponsor);
+//        var sponsor = sponsorRepository.findByDeletionToken(token).orElseThrow(() ->
+//                new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid token"));
+//        sponsor.setAccountStatus(AccountStatus.ACTIVE);
+//        sponsor.setDeletionDate(null);
+//        sponsor.setDeletionToken(null);
+//        sponsorRepository.save(sponsor);
     }
 
     private UpdatedSponsorResponse updateSponsor(Sponsor oldSponsor, SponsorUpdateRequest newSponsor) {
@@ -155,12 +155,5 @@ public class SponsorServiceImpl implements SponsorService {
         Optional.ofNullable(newSponsor.avatar()).ifPresent(oldSponsor::setAvatar);
         sponsorRepository.save(oldSponsor);
         return mapper.toUpdatedSponsor(oldSponsor);
-    }
-
-    private Date calculateDeletionDate(int deletionDateInDays) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(new Date().getTime());
-        cal.add(Calendar.DAY_OF_WEEK, deletionDateInDays);
-        return new Date(cal.getTime().getTime());
     }
 }

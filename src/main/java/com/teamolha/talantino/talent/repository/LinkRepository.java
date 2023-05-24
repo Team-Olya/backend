@@ -15,4 +15,6 @@ public interface LinkRepository extends JpaRepository<Link, Long> {
     Boolean existsLinkByUrl(String url);
 
     long deleteByTalent(Talent talent);
+
+    void deleteByTalentId(Long talentId);
 }

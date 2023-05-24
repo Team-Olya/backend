@@ -33,6 +33,8 @@ public interface ProofRepository extends JpaRepository<Proof, Long> {
 
     long deleteByTalent(Talent talent);
 
+    void deleteByTalentId(Long talentId);
+
     @Query(value = "SELECT T1.sponsor_id, SUM(T1.amount) " +
             "FROM kudos T1 " +
             "JOIN proof_skills T2 ON T1.proof_id = T2.proof_id " +
