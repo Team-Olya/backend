@@ -3,7 +3,6 @@ package com.teamolha.talantino.general.config;
 import com.teamolha.talantino.account.model.entity.Account;
 import com.teamolha.talantino.account.repository.AccountRepository;
 import com.teamolha.talantino.proof.repository.ProofRepository;
-import com.teamolha.talantino.sponsor.model.entity.BalanceChanging;
 import com.teamolha.talantino.sponsor.repository.BalanceChangingRepository;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.model.entity.Talent;
@@ -12,8 +11,13 @@ import com.teamolha.talantino.talent.repository.TalentRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -23,7 +27,8 @@ import java.util.List;
 @Transactional
 @Configuration
 @AllArgsConstructor
-public class InitConfig implements CommandLineRunner {
+@EnableScheduling
+public class SchedulingConfig {
 
     private TalentRepository talentRepository;
 
@@ -37,9 +42,10 @@ public class InitConfig implements CommandLineRunner {
 
     private BalanceChangingRepository balanceChangingRepository;
 
-    @Override
-    public void run(String... args) throws Exception {
+    @Scheduled(fixedRateString = "${deletion.expired.account.time}")
+    public void deleteExpiredAccount() throws InterruptedException {
         Date curdate = Calendar.getInstance().getTime();
+        log.info("Expired accounts deleted");
         cascadeDeletion(accountRepository.findByVerificationExpireDateLessThanEqual(curdate));
         cascadeDeletion(accountRepository.findByDeletionDateLessThanEqual(curdate));
     }
