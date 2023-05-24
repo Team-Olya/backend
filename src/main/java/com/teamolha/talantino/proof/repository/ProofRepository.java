@@ -35,12 +35,8 @@ public interface ProofRepository extends JpaRepository<Proof, Long> {
 
     void deleteByTalentId(Long talentId);
 
-    @Query(value = "SELECT T1.sponsor_id, SUM(T1.amount) " +
-            "FROM kudos T1 " +
-            "JOIN proof_skills T2 ON T1.proof_id = T2.proof_id " +
-            "WHERE T1.proof_id = :proofId AND T2.skill_id = :skillId " +
-            "GROUP BY T1.sponsor_id",
+    @Query(value = "SELECT sponsor_id, SUM(amount) FROM kudos WHERE proof_id=:proofId GROUP BY sponsor_id",
             countQuery = "SELECT COUNT(DISTINCT sponsor_id) FROM kudos WHERE proof_id=:proofId",
             nativeQuery = true)
-    List<Object[]> findSponsorsAndKudosOnProof(Pageable pageable, long proofId, long skillId);
+    List<Object[]> findSponsorsAndKudosOnProof(Pageable pageable, long proofId);
 }
