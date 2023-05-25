@@ -5,10 +5,11 @@ import com.teamolha.talantino.account.model.AccountStatus;
 import com.teamolha.talantino.general.email.EmailHelper;
 import com.teamolha.talantino.general.email.EmailSender;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
+import com.teamolha.talantino.proof.repository.KudosRepository;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.skill.mapper.SkillMapper;
 import com.teamolha.talantino.skill.model.entity.Skill;
-import com.teamolha.talantino.skill.model.request.SkillDTO;
+import com.teamolha.talantino.skill.model.request.FullSkillDTO;
 import com.teamolha.talantino.skill.repository.SkillRepository;
 import com.teamolha.talantino.sponsor.repository.BalanceChangingRepository;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
@@ -62,6 +63,8 @@ public class TalentServiceImpl implements TalentService {
     private SkillRepository skillRepository;
 
     private SponsorRepository sponsorRepository;
+
+    private KudosRepository kudosRepository;
 
     private PasswordEncoder passwordEncoder;
 
@@ -202,7 +205,12 @@ public class TalentServiceImpl implements TalentService {
             return null;
         }
 
-        if (talent.getSkills().size() < 1) {
+        var skill = skillRepository.findById(
+                talentRepository.findMostKudosedSkill(
+                        talent.getId()
+                )).orElse(null);
+
+        if (talent.getSkills().size() < 1 || skill == null) {
             return TalentStatistic.builder()
                     .totalAmount(talent.getProofs().stream().map(proof -> proof.getKudos().size()).count())
                     .skill(null)
@@ -213,12 +221,18 @@ public class TalentServiceImpl implements TalentService {
                     .build();
         }
 
+
+//        var amountKudos = proofRepository.findAll().stream().filter(p -> p.getSkills().contains(skill))
+//                .mapToInt(s -> s.getKudos().stream().mapToInt(Kudos::getAmount).sum()).sum();
+
+        var amountKudos = kudosRepository.findBySkillIdAndTalentId(skill.getId(), talent.getId());
+
         return TalentStatistic.builder()
                 .totalAmount(talent.getProofs().stream().map(proof -> proof.getKudos().size()).count())
-                .skill(new SkillDTO(
-                        skillRepository.findById(
-                                talentRepository.findMostKudosedSkill(
-                                        talent.getId())).get()))
+                .skill(FullSkillDTO.builder().id(skill.getId())
+                        .label(skill.getLabel())
+                        .icon(skill.getIcon())
+                        .totalKudos(amountKudos).build())
                 .proof(proofMapper.toProofDTO(
                         proofRepository.findById(
                                 talentRepository.findMostKudosedProof(
