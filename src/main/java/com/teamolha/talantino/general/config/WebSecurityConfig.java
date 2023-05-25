@@ -46,7 +46,7 @@ public class WebSecurityConfig {
         http
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/email").permitAll()
-                        .requestMatchers("/auth/me").permitAll()
+                        .requestMatchers("/auth/me").authenticated()
 
                         .requestMatchers("/talents/register").permitAll()
                         .requestMatchers("/talents").permitAll()
@@ -55,7 +55,7 @@ public class WebSecurityConfig {
 
                         .requestMatchers("/proofs").permitAll()
                         .requestMatchers(antMatcher("/proofs/*")).authenticated()
-                        .requestMatchers(antMatcher("/proofs/**/kudos")).permitAll()
+                        .requestMatchers(antMatcher("/proofs/**/kudos")).authenticated()
 
                         .requestMatchers("/sponsor/register").permitAll()
 
