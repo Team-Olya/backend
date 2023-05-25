@@ -4,26 +4,38 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teamolha.talantino.account.controller.AuthController;
 import com.teamolha.talantino.account.service.AuthService;
 import com.teamolha.talantino.admin.model.response.AdminProfile;
+import com.teamolha.talantino.general.config.WebSecurityConfig;
 import com.teamolha.talantino.sponsor.service.SponsorService;
+import com.teamolha.talantino.talent.model.request.CreateTalent;
 import com.teamolha.talantino.talent.model.response.LoginResponse;
 import com.teamolha.talantino.talent.service.TalentService;
 import jakarta.servlet.Filter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.Collections;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
@@ -34,6 +46,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@AutoConfigureWebMvc
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(controllers = AuthController.class)
 public class AuthControllerTest {
@@ -44,7 +57,7 @@ public class AuthControllerTest {
     @Autowired
     private Filter springSecurityFilterChain;
 
-//    @Autowired
+    //    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
@@ -81,7 +94,9 @@ public class AuthControllerTest {
                 .avatar("avatar")
                 .build();
 
-        Mockito.when(authService.login(Mockito.any(Authentication.class))).thenReturn(expectedResponseBody);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(email, password,
+                Collections.singleton(new SimpleGrantedAuthority("TALENT")));
+        Mockito.when(authService.login(authentication)).thenReturn(expectedResponseBody);
         mockMvc.perform(post("/login").with(httpBasic(email, password))).andDo(print()).andExpect(status().isOk()).andDo(print());
     }
 
@@ -94,7 +109,6 @@ public class AuthControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     public void givenMyProfile_whenUserIsAuthenticated_thenReturns200() throws Exception {
-//        MvcResult mvcResult = mockMvc.perform(get("/auth/me")).andExpect(status().isOk()).andReturn();
         AdminProfile expectedResponseBody = AdminProfile.builder()
                 .id(1L)
                 .role("ADMIN")
@@ -104,5 +118,18 @@ public class AuthControllerTest {
 
         Mockito.when(authService.myProfile(Mockito.any(Authentication.class))).thenReturn(expectedResponseBody);
         mockMvc.perform(get("/auth/me")).andExpect(status().isOk()).andDo(print());
+    }
+
+    @Test
+    @Disabled
+    public void givenTalentRegister_whenValidUrlAndContentType_thenReturns200() throws Exception {
+        CreateTalent createTalent = new CreateTalent("test@mail.com", "123456",
+                "Name", "Surname", "Java Developer");
+
+        mockMvc.perform(post("/talents/register")
+                        .content(objectMapper.writeValueAsString(createTalent))
+                        .characterEncoding("utf-8")
+                        .contentType("application/json")).andDo(print())
+                .andExpect(status().isOk()).andDo(print());
     }
 }
