@@ -7,6 +7,6 @@ public record FullSkillDTO(
         Long id,
         String label,
         String icon,
-        Integer totalKudos
+        Long totalKudos
 ) {
 }

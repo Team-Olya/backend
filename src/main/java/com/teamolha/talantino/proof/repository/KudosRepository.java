@@ -11,5 +11,5 @@ public interface KudosRepository extends JpaRepository<Kudos, Long> {
 
     boolean existsBySponsorIdAndProofIdAndSkillId(Long sponsorId, Long proofId, Long skillId);
 
-    void findBySkillIdAndTalentId(Long id, Long id1);
+//    void findBySkillIdAndTalentId(Long id, Long id1);
 }

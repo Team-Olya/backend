@@ -34,10 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -205,38 +202,22 @@ public class TalentServiceImpl implements TalentService {
             return null;
         }
 
-        var skill = skillRepository.findById(
-                talentRepository.findMostKudosedSkill(
-                        talent.getId()
-                )).orElse(null);
-
-        if (talent.getSkills().size() < 1 || skill == null) {
-            return TalentStatistic.builder()
-                    .totalAmount(talent.getProofs().stream().map(proof -> proof.getKudos().size()).count())
-                    .skill(null)
-                    .proof(proofMapper.toProofDTO(
-                            proofRepository.findById(
-                                    talentRepository.findMostKudosedProof(
-                                            talent.getId())).get(), skillMapper, true))
-                    .build();
-        }
-
-
-//        var amountKudos = proofRepository.findAll().stream().filter(p -> p.getSkills().contains(skill))
-//                .mapToInt(s -> s.getKudos().stream().mapToInt(Kudos::getAmount).sum()).sum();
-
-        var amountKudos = kudosRepository.findBySkillIdAndTalentId(skill.getId(), talent.getId());
+        var mostKudosedProof = proofRepository.findById((Long) talentRepository.findMostKudosedProof(talentId).get(0)[0]).orElse(null);
+        var queryResult = talentRepository.findMostKudosedSkill(talentId).get(0);
+        var mostKudosedSkill = skillRepository.findById((Long) queryResult[0]).orElse(null);
+        var totalKudos = (Long) queryResult[1];
 
         return TalentStatistic.builder()
                 .totalAmount(talent.getProofs().stream().map(proof -> proof.getKudos().size()).count())
-                .skill(FullSkillDTO.builder().id(skill.getId())
-                        .label(skill.getLabel())
-                        .icon(skill.getIcon())
-                        .totalKudos(amountKudos).build())
-                .proof(proofMapper.toProofDTO(
-                        proofRepository.findById(
-                                talentRepository.findMostKudosedProof(
-                                        talent.getId())).get(), skillMapper, true))
+                .skill(mostKudosedSkill != null
+                        ? FullSkillDTO.builder().id(mostKudosedSkill.getId())
+                        .label(mostKudosedSkill.getLabel())
+                        .icon(mostKudosedSkill.getIcon())
+                        .totalKudos(totalKudos).build()
+                        : null)
+                .proof(mostKudosedProof != null
+                        ? proofMapper.toProofDTO(mostKudosedProof, skillMapper, true)
+                        : null)
                 .build();
     }
 
