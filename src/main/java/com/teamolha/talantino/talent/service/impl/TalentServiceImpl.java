@@ -5,10 +5,11 @@ import com.teamolha.talantino.account.model.AccountStatus;
 import com.teamolha.talantino.general.email.EmailHelper;
 import com.teamolha.talantino.general.email.EmailSender;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
+import com.teamolha.talantino.proof.repository.KudosRepository;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.skill.mapper.SkillMapper;
 import com.teamolha.talantino.skill.model.entity.Skill;
-import com.teamolha.talantino.skill.model.request.SkillDTO;
+import com.teamolha.talantino.skill.model.request.FullSkillDTO;
 import com.teamolha.talantino.skill.repository.SkillRepository;
 import com.teamolha.talantino.sponsor.repository.BalanceChangingRepository;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
@@ -33,10 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -62,6 +60,8 @@ public class TalentServiceImpl implements TalentService {
     private SkillRepository skillRepository;
 
     private SponsorRepository sponsorRepository;
+
+    private KudosRepository kudosRepository;
 
     private PasswordEncoder passwordEncoder;
 
@@ -202,27 +202,22 @@ public class TalentServiceImpl implements TalentService {
             return null;
         }
 
-        if (talent.getSkills().size() < 1) {
-            return TalentStatistic.builder()
-                    .totalAmount(talent.getProofs().stream().map(proof -> proof.getKudos().size()).count())
-                    .skill(null)
-                    .proof(proofMapper.toProofDTO(
-                            proofRepository.findById(
-                                    talentRepository.findMostKudosedProof(
-                                            talent.getId())).get(), skillMapper, true))
-                    .build();
-        }
+        var mostKudosedProof = proofRepository.findById((Long) talentRepository.findMostKudosedProof(talentId).get(0)[0]).orElse(null);
+        var queryResult = talentRepository.findMostKudosedSkill(talentId).get(0);
+        var mostKudosedSkill = skillRepository.findById((Long) queryResult[0]).orElse(null);
+        var totalKudos = (Long) queryResult[1];
 
         return TalentStatistic.builder()
                 .totalAmount(talent.getProofs().stream().map(proof -> proof.getKudos().size()).count())
-                .skill(new SkillDTO(
-                        skillRepository.findById(
-                                talentRepository.findMostKudosedSkill(
-                                        talent.getId())).get()))
-                .proof(proofMapper.toProofDTO(
-                        proofRepository.findById(
-                                talentRepository.findMostKudosedProof(
-                                        talent.getId())).get(), skillMapper, true))
+                .skill(mostKudosedSkill != null
+                        ? FullSkillDTO.builder().id(mostKudosedSkill.getId())
+                        .label(mostKudosedSkill.getLabel())
+                        .icon(mostKudosedSkill.getIcon())
+                        .totalKudos(totalKudos).build()
+                        : null)
+                .proof(mostKudosedProof != null
+                        ? proofMapper.toProofDTO(mostKudosedProof, skillMapper, true)
+                        : null)
                 .build();
     }
 

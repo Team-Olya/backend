@@ -239,8 +239,9 @@ public class ProofServiceImpl implements ProofService {
         return KudosList.builder()
                 .totalAmount(proof.getKudos()
                         .stream()
-                        .mapToInt(Kudos::getAmount)
-                        .sum())
+                        .map(Kudos::getSponsorId)
+                        .distinct()
+                        .count())
                 .kudos(kudos).build();
     }
 

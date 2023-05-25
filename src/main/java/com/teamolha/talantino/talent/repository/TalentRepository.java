@@ -50,13 +50,16 @@ public interface TalentRepository extends JpaRepository<Talent, Long> {
             " HAVING COUNT(DISTINCT s) = :skillCount")
     List<Talent> findAllBySkills(@Param("skillList") List<Skill> skillList, @Param("skillCount") Long skillCount);
 
-    @Query("SELECT kudos.skillId FROM Talent talent JOIN talent.proofs proofs " +
-            "JOIN proofs.kudos kudos WHERE talent.id = :talentId  GROUP BY kudos.skillId " +
-            "ORDER BY COUNT(kudos.skillId) DESC LIMIT 1")
-    Long findMostKudosedSkill(@Param("talentId") Long talentId);
+    @Query(value = "SELECT kudos.skillId, SUM(kudos.amount) AS kudos_count FROM Kudos kudos " +
+            "JOIN Proof proof ON kudos.proofId = proof.id " +
+            "JOIN Talent talent ON proof.talent.id = talent.id " +
+            "WHERE talent.id = :talentId GROUP BY kudos.skillId ORDER BY kudos_count DESC LIMIT 1")
+    List<Object[]> findMostKudosedSkill(@Param("talentId") Long talentId);
 
-    @Query("SELECT kudos.proofId FROM Talent talent JOIN talent.proofs proofs " +
-            "JOIN proofs.kudos kudos WHERE talent.id = :talentId GROUP BY kudos.proofId " +
-            "ORDER BY COUNT(kudos.proofId) DESC LIMIT 1")
-    Long findMostKudosedProof(@Param("talentId") Long talentId);
+    @Query(value = "SELECT kudos.proofId, SUM(kudos.amount) AS kudos_count FROM Kudos kudos " +
+            "JOIN Proof proof ON kudos.proofId = proof.id " +
+            "JOIN Talent talent ON proof.talent.id = talent.id " +
+            "WHERE talent.id = :talentId GROUP BY kudos.proofId ORDER BY kudos_count DESC LIMIT 1")
+    List<Object[]> findMostKudosedProof(@Param("talentId") Long talentId);
+
 }
