@@ -109,7 +109,7 @@ public class AdminServiceImpl implements AdminService{
             Optional.of(skills).ifPresent(proof::setSkills);
         }
         proofRepository.save(proof);
-        return proofMapper.toProofDTO(proof, skillMapper);
+        return proofMapper.toProofDTO(proof, skillMapper, true);
     }
 
     @Override

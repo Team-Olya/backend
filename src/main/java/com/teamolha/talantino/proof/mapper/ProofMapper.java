@@ -20,22 +20,26 @@ import static org.mapstruct.ReportingPolicy.IGNORE;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = IGNORE)
 public interface ProofMapper {
 
-    default ProofDTO toProofDTO(Proof proof, SkillMapper skillMapper) {
+    default ProofDTO toProofDTO(Proof proof, SkillMapper skillMapper, boolean isAuthenticated) {
+        var talent = proof.getTalent();
+        var author = getAuthor(talent, isAuthenticated);
         return ProofDTO.builder()
                 .id(proof.getId())
                 .date(proof.getDate())
                 .title(proof.getTitle())
                 .description(proof.getDescription())
-                .authorId(proof.getTalent().getId())
+                .author(author)
                 .status(proof.getStatus())
                 .totalKudos(proof.getKudos().stream().mapToInt(Kudos::getAmount).sum())
                 .skills(proof.getSkills().stream().map(skill -> skillMapper.toProofSkillDTO(skill, proof)).collect(Collectors.toList()))
                 .build();
     }
 
-    default ProofDTO toProofDTO(Proof proof, Sponsor sponsor, SkillMapper skillMapper) {
+    default ProofDTO toProofDTO(Proof proof, Sponsor sponsor, SkillMapper skillMapper, boolean isAuthenticated) {
         boolean isKudosed = false;
         Integer totalKudosFromSponsor = null;
+        var talent = proof.getTalent();
+        var author = getAuthor(talent, isAuthenticated);
         if (sponsor != null) {
             isKudosed = sponsor.getKudos().stream().anyMatch(kudos -> kudos.getProofId().equals(proof.getId()));
             totalKudosFromSponsor = sponsor.getKudos().stream().filter(kudos ->
@@ -46,7 +50,7 @@ public interface ProofMapper {
                 .date(proof.getDate())
                 .title(proof.getTitle())
                 .description(proof.getDescription())
-                .authorId(proof.getTalent().getId())
+                .author(author)
                 .status(proof.getStatus())
                 .totalKudos(proof.getKudos().stream().mapToInt(Kudos::getAmount).sum())
                 .totalKudosFromSponsor(totalKudosFromSponsor)
@@ -64,12 +68,7 @@ public interface ProofMapper {
                     kudos.getProofId().equals(proof.getId())).mapToInt(Kudos::getAmount).sum();
         }
         var talent = proof.getTalent();
-        var author = isAuthenticated ? ProofAuthorDTO.builder()
-                .id(talent.getId())
-                .name(talent.getName())
-                .surname(talent.getSurname())
-                .avatar(talent.getAvatar())
-                .build() : null;
+        var author = getAuthor(talent, isAuthenticated);
         return ShortProofDTO.builder()
                 .id(proof.getId())
                 .date(proof.getDate())
@@ -98,5 +97,14 @@ public interface ProofMapper {
                 .proofAuthorAvatar(talent.getAvatar())
                 .reportedBy(account.getName() + " " + account.getSurname())
                 .build();
+    }
+
+    private ProofAuthorDTO getAuthor(Talent talent, boolean isAuthenticated) {
+        return isAuthenticated ? ProofAuthorDTO.builder()
+                .id(talent.getId())
+                .name(talent.getName())
+                .surname(talent.getSurname())
+                .avatar(talent.getAvatar())
+                .build() : null;
     }
 }

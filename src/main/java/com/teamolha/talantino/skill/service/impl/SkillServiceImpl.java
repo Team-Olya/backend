@@ -93,7 +93,8 @@ public class SkillServiceImpl implements SkillService {
                     .skillId(skillId)
                     .build());
         } else {
-            sponsorKudos.stream().filter(kudos -> kudos.getProofId().equals(proofId) && kudos.getSkillId().equals(skillId))
+            sponsorKudos.stream().filter(kudos -> kudos.getProofId().equals(proofId) &&
+                            (kudos.getSkillId() != null && kudos.getSkillId().equals(skillId)))
                     .forEach(kudos -> kudos.setAmount(kudos.getAmount() + amount));
         }
         sponsor.setKudos(sponsorKudos);

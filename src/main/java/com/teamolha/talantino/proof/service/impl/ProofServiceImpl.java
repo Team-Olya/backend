@@ -125,11 +125,11 @@ public class ProofServiceImpl implements ProofService {
         var proofs = status.equals("ALL") ?
                 proofRepository.findByTalent_Id(talentId, pageable)
                         .stream()
-                        .map(proof -> mapper.toProofDTO(proof, sponsor, skillMapper))
+                        .map(proof -> mapper.toProofDTO(proof, sponsor, skillMapper, auth != null))
                         .toList() :
                 proofRepository.findByStatusAndTalent_Id(status, talentId, pageable)
                         .stream()
-                        .map(proof -> mapper.toProofDTO(proof, sponsor, skillMapper))
+                        .map(proof -> mapper.toProofDTO(proof, sponsor, skillMapper, auth != null))
                         .toList();
 
         return TalentProofList.builder()
@@ -212,7 +212,7 @@ public class ProofServiceImpl implements ProofService {
 
     @Transactional(readOnly = true)
     @Override
-    public ProofDTO getProof(Long proofId) {
+    public ProofDTO getProof(Long proofId, Authentication auth) {
         Proof proof = getProofEntity(proofId);
 
         if (!proof.getStatus().equals(Status.PUBLISHED.name())) {
@@ -220,7 +220,11 @@ public class ProofServiceImpl implements ProofService {
                     "You can see only PUBLISHED proofs");
         }
 
-        return mapper.toProofDTO(proof, skillMapper);
+        var sponsor = sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
+
+        return sponsor == null
+                ? mapper.toProofDTO(proof, skillMapper, true)
+                : mapper.toProofDTO(proof, sponsor, skillMapper, true);
     }
 
     @Override
@@ -345,7 +349,7 @@ public class ProofServiceImpl implements ProofService {
         }
 
         proofRepository.save(proof);
-        return mapper.toProofDTO(proof, skillMapper);
+        return mapper.toProofDTO(proof, skillMapper, true);
     }
 
     private Talent getTalent(Long talentId) {

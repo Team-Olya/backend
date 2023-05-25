@@ -209,7 +209,7 @@ public class TalentServiceImpl implements TalentService {
                     .proof(proofMapper.toProofDTO(
                             proofRepository.findById(
                                     talentRepository.findMostKudosedProof(
-                                            talent.getId())).get(), skillMapper))
+                                            talent.getId())).get(), skillMapper, true))
                     .build();
         }
 
@@ -222,7 +222,7 @@ public class TalentServiceImpl implements TalentService {
                 .proof(proofMapper.toProofDTO(
                         proofRepository.findById(
                                 talentRepository.findMostKudosedProof(
-                                        talent.getId())).get(), skillMapper))
+                                        talent.getId())).get(), skillMapper, true))
                 .build();
     }
 

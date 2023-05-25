@@ -20,23 +20,23 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @AllArgsConstructor
 public class AuthController {
-    TalentService talentService;
-    AuthService authService;
-    SponsorService sponsorService;
+    public TalentService talentService;
+    public AuthService authService;
+    public SponsorService sponsorService;
 
     @GetMapping("/auth/me")
-    Object getMyProfile(Authentication authentication) {
+    public Object getMyProfile(Authentication authentication) {
         return authService.myProfile(authentication);
     }
 
     @PostMapping("/login")
-    LoginResponse login(Authentication authentication) {
+    public LoginResponse login(Authentication authentication) {
         return authService.login(authentication);
     }
 
     @PostMapping("/talents/register")
     @ResponseStatus(HttpStatus.CREATED)
-    void talentRegister (@RequestBody @Valid CreateTalent talent, HttpServletRequest request) {
+    public void talentRegister (@RequestBody @Valid CreateTalent talent, HttpServletRequest request) {
         talentService.register(
                 talent.email(),
                 talent.password(),
@@ -49,7 +49,7 @@ public class AuthController {
 
     @PostMapping("/sponsor/register")
     @ResponseStatus(HttpStatus.CREATED)
-    void sponsorRegister (@RequestBody @Valid CreateSponsor sponsor, HttpServletRequest request) {
+    public void sponsorRegister (@RequestBody @Valid CreateSponsor sponsor, HttpServletRequest request) {
         sponsorService.register (
                 sponsor.email(),
                 sponsor.password(),
@@ -60,7 +60,7 @@ public class AuthController {
     }
 
     @PostMapping("/email-confirm")
-    LoginResponse emailConfirm(@RequestParam String token) {
+    public LoginResponse emailConfirm(@RequestParam String token) {
         return authService.login(token);
     }
 

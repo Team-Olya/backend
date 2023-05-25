@@ -75,8 +75,8 @@ public class ProofController {
     }
 
     @GetMapping("/proofs/{proof-id}")
-    public ProofDTO getProof(@PathVariable("proof-id") Long proofId) {
-        return proofService.getProof(proofId);
+    public ProofDTO getProof(@PathVariable("proof-id") Long proofId, Authentication auth) {
+        return proofService.getProof(proofId, auth);
     }
 
     @GetMapping("/proofs/{proof-id}/kudos")

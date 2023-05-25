@@ -1,6 +1,7 @@
 package com.teamolha.talantino.proof.model.response;
 
 import com.teamolha.talantino.skill.model.request.ProofSkillDTO;
+import com.teamolha.talantino.talent.model.response.ProofAuthorDTO;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -12,7 +13,7 @@ public record ProofDTO(
         LocalDateTime date,
         String title,
         String description,
-        Long authorId,
+        ProofAuthorDTO author,
         String status,
         Integer totalKudos,
         Integer totalKudosFromSponsor,

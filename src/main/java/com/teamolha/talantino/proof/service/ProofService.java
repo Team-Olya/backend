@@ -17,7 +17,7 @@ public interface ProofService {
 
     void deleteProof(Long talentId, Long proofId, String email);
 
-    ProofDTO getProof(Long proofId);
+    ProofDTO getProof(Long proofId, Authentication auth);
 
     KudosList getKudos(Authentication auth, Long proofId, int page, int size);
 
