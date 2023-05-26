@@ -6,6 +6,7 @@ import com.teamolha.talantino.proof.controller.ProofController;
 import com.teamolha.talantino.proof.model.response.ProofDTO;
 import com.teamolha.talantino.proof.model.response.TalentProofList;
 import com.teamolha.talantino.proof.service.ProofService;
+import com.teamolha.talantino.skill.controller.SkillController;
 import com.teamolha.talantino.skill.model.request.ProofSkillDTO;
 import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.skill.model.response.SkillListDTO;
@@ -37,6 +38,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -45,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-@WebMvcTest(controllers = SkillControllerTest.class)
+@WebMvcTest(controllers = SkillController.class)
 @WithMockUser
 @WebAppConfiguration
 @ContextConfiguration
@@ -65,11 +67,11 @@ public class SkillControllerTest {
     @MockBean
     private SkillService skillService;
 
-    String search;
-    Long proofId;
-    Long skillId;
-    int amount;
-    SkillListDTO skillListDTO;
+    private String search;
+    private Long proofId;
+    private Long skillId;
+    private int amount;
+    private SkillListDTO skillListDTO;
 
     @BeforeEach
     public void setup() {
@@ -97,10 +99,16 @@ public class SkillControllerTest {
         skillId = 1L;
         amount = 100;
         search = "lead";
+
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .addFilters(springSecurityFilterChain)
+                .apply(springSecurity())
+                .build();
     }
 
     @Test
-    public void testGetSkillList() throws Exception {
+    public void givenSearch_thenStatusOkAndSkillListDTO() throws Exception {
         // Arrange
         String search = "java";
         SkillListDTO expectedResponse = skillListDTO;
@@ -110,13 +118,14 @@ public class SkillControllerTest {
         // Act & Assert
         mockMvc.perform(get("/skills").param("search", search))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse)));
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse)))
+                .andDo(print());
 
         verify(skillService).getSkillList(search);
     }
 
     @Test
-    public void testGetProofSkills() throws Exception {
+    public void givenProofId_thenStatusOkAndSkillListDTO() throws Exception {
         // Arrange
         long proofId = 123L;
         SkillListDTO expectedResponse = skillListDTO;
@@ -126,13 +135,15 @@ public class SkillControllerTest {
         // Act & Assert
         mockMvc.perform(get("/proofs/{proof-id}/skills", proofId))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse)));
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResponse)))
+                .andDo(print());
 
         verify(skillService).getProofSkills(proofId);
     }
 
     @Test
-    public void testSetKudosToSkill() throws Exception {
+    @WithMockUser
+    public void givenProofIdAndSkillId_thenStatusOK() throws Exception {
         // Arrange
         long proofId = 123L;
         long skillId = 456L;
@@ -140,8 +151,10 @@ public class SkillControllerTest {
 
         // Act & Assert
         mockMvc.perform(post("/proofs/{proof-id}/skills/{skill-id}/kudos", proofId, skillId)
-                        .param("amount", String.valueOf(amount)))
-                .andExpect(status().isOk());
+                        .param("amount", String.valueOf(amount))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andDo(print());
 
         verify(skillService).setKudosToSkill(any(Authentication.class), eq(proofId), eq(skillId), eq(amount));
     }
