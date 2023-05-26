@@ -198,14 +198,14 @@ public class TalentServiceImpl implements TalentService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        if (talent.getProofs().size() < 1) {
-            return null;
-        }
+        var queryResultForProof = talentRepository.findMostKudosedProof(talentId);
+        Long mostKudosedProofId = !queryResultForProof.isEmpty() ? (Long) queryResultForProof.get(0)[0] : null;
+        var mostKudosedProof = mostKudosedProofId != null ? proofRepository.findById(mostKudosedProofId).orElse(null) : null;
 
-        var mostKudosedProof = proofRepository.findById((Long) talentRepository.findMostKudosedProof(talentId).get(0)[0]).orElse(null);
-        var queryResult = talentRepository.findMostKudosedSkill(talentId).get(0);
-        var mostKudosedSkill = skillRepository.findById((Long) queryResult[0]).orElse(null);
-        var totalKudos = (Long) queryResult[1];
+        var queryResultForSkill = talentRepository.findMostKudosedSkill(talentId);
+        Long mostKudosedSkillId = !queryResultForSkill.isEmpty() ? (Long) queryResultForSkill.get(0)[0] : null;
+        var mostKudosedSkill = mostKudosedSkillId != null ? skillRepository.findById(mostKudosedSkillId).orElse(null) : null;
+        var totalKudos = !queryResultForSkill.isEmpty() ? (Long) queryResultForSkill.get(0)[1] : null;
 
         return TalentStatistic.builder()
                 .totalAmount(talent.getProofs().stream().map(proof -> proof.getKudos().size()).count())
