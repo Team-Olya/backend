@@ -63,9 +63,9 @@ public class MessageSendEvent {
     private EmbedCreateSpec createSpecForReportedTalent(ReportedTalentDTO reportedTalent, String refererUrl) {
         return EmbedCreateSpec.builder()
                 .color(Color.CINNABAR)
-                .title("")
+                .title(reportedTalent.fullName())
                 .url(createTalentUrl(refererUrl, reportedTalent.reportedTalentId()))
-                .author(reportedTalent.fullName(), createTalentUrl(refererUrl, reportedTalent.reportedTalentId()),
+                .author(reportedTalent.kind(), createTalentUrl(refererUrl, reportedTalent.reportedTalentId()),
                         reportedTalent.avatar())
                 .description(reportedTalent.description())
                 .addField("Report ID", String.valueOf(reportedTalent.id()), true)
