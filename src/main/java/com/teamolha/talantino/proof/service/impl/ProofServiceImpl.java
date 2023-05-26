@@ -432,7 +432,7 @@ public class ProofServiceImpl implements ProofService {
                 }
             });
         } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't put kudos on prufs without skills");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't put kudos on proofs without skills");
 //            if (!kudosRepository.existsBySponsorIdAndProofId(sponsor.getId(), proofId)) {
 //                sponsorKudos.add(Kudos.builder()
 //                        .amount(amount)
