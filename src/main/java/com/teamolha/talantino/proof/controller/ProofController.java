@@ -20,10 +20,10 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @AllArgsConstructor
 public class ProofController {
-    ProofService proofService;
+    private ProofService proofService;
 
     @GetMapping("/talents/{talent-id}/proofs")
-    TalentProofList getTalentProofs(
+    public TalentProofList getTalentProofs(
             Authentication auth,
             @PathVariable("talent-id") Long talentId,
             @RequestParam(required = false, defaultValue = "date") @Valid @ProofSort String sort,
@@ -37,7 +37,7 @@ public class ProofController {
 
     @PostMapping("/talents/{talent-id}/proofs")
     @ResponseStatus(HttpStatus.CREATED)
-    void createProof(
+    public void createProof(
             Authentication auth,
             @PathVariable("talent-id") Long talentId,
             @RequestBody @Valid ProofRequest proof) {
