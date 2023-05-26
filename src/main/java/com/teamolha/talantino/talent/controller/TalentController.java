@@ -55,4 +55,10 @@ public class TalentController {
     public TalentStatistic getTalentStatistic(@PathVariable("talent-id") long talentId, Authentication auth) {
         return talentService.getStatistic(talentId, auth.getName());
     }
+
+    @PostMapping("/talents/{talent-id}/report")
+    public ReportedTalentDTO reportTalent(Authentication auth, @PathVariable("talent-id") Long talentId,
+                                          HttpServletRequest request) {
+        return talentService.reportTalent(auth, talentId, request);
+    }
 }

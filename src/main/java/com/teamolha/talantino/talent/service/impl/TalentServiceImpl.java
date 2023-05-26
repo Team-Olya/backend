@@ -2,6 +2,8 @@ package com.teamolha.talantino.talent.service.impl;
 
 import com.teamolha.talantino.account.model.AccountRole;
 import com.teamolha.talantino.account.model.AccountStatus;
+import com.teamolha.talantino.account.repository.AccountRepository;
+import com.teamolha.talantino.general.discord.event.MessageSendEvent;
 import com.teamolha.talantino.general.email.EmailHelper;
 import com.teamolha.talantino.general.email.EmailSender;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
@@ -16,19 +18,23 @@ import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.mapper.TalentMapper;
 import com.teamolha.talantino.talent.model.entity.Kind;
 import com.teamolha.talantino.talent.model.entity.Link;
+import com.teamolha.talantino.talent.model.entity.ReportTalent;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.model.request.TalentUpdateRequest;
 import com.teamolha.talantino.talent.model.response.*;
 import com.teamolha.talantino.talent.repository.KindRepository;
 import com.teamolha.talantino.talent.repository.LinkRepository;
+import com.teamolha.talantino.talent.repository.ReportTalentRepository;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import com.teamolha.talantino.talent.service.TalentService;
+import discord4j.rest.http.client.ClientException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +48,8 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class TalentServiceImpl implements TalentService {
+
+    private ReportTalentRepository reportTalentRepository;
 
     private TalentMapper mapper;
 
@@ -61,9 +69,13 @@ public class TalentServiceImpl implements TalentService {
 
     private SponsorRepository sponsorRepository;
 
+    private AccountRepository accountRepository;
+
     private KudosRepository kudosRepository;
 
     private PasswordEncoder passwordEncoder;
+
+    private MessageSendEvent messageSendEvent;
 
     private EmailHelper emailHelper;
 
@@ -219,6 +231,63 @@ public class TalentServiceImpl implements TalentService {
                         ? proofMapper.toProofDTO(mostKudosedProof, skillMapper, true)
                         : null)
                 .build();
+    }
+
+    @Override
+    public ReportedTalentDTO reportTalent(Authentication auth, Long talentId, HttpServletRequest request) {
+        var account = accountRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        var talent = talentRepository.findById(talentId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Talent with ID " + talentId + " not found"));
+        if (talent.getAccountStatus().equals(AccountStatus.INACTIVE)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You cannot report a talent whose account is inactive");
+        }
+        if (talent.getId().equals(account.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You cannot report yourself");
+        }
+
+        ReportTalent reportTalent = reportTalentRepository.save(ReportTalent.builder().account(account).talent(talent).build());
+
+        ReportedTalentDTO reportedTalent = mapper.toReportTalentDTO(reportTalent.getId(), talent, account);
+
+        String referer = request.getHeader("Referer");
+        if (referer == null) {
+            referer = request.getScheme() + "://" + request.getHeader("host") + "/";
+        }
+
+        sendReportTalentMessage(reportedTalent, referer);
+        return reportedTalent;
+    }
+
+    @Override
+    public void approveReport(Long reportId) {
+        var report = reportTalentRepository.findById(reportId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
+        reportTalentRepository.deleteById(reportId);
+        var talent = report.getTalent();
+        if (!talentRepository.existsById(talent.getId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        talent.setAccountStatus(AccountStatus.INACTIVE);
+        talentRepository.save(talent);
+    }
+
+    @Override
+    public void rejectReport(Long reportId) {
+
+        reportTalentRepository.deleteById(reportId);
+    }
+
+    private void sendReportTalentMessage(ReportedTalentDTO reportedTalent, String referer) {
+        try {
+            messageSendEvent.sendReportTalentMessage(reportedTalent, referer);
+        } catch (ClientException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Moderator Bot exception");
+        }
     }
 
     private Long getPrevTalentId(long talentId) {

@@ -3,6 +3,7 @@ package com.teamolha.talantino.talent.service;
 import com.teamolha.talantino.talent.model.request.TalentUpdateRequest;
 import com.teamolha.talantino.talent.model.response.*;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -23,4 +24,10 @@ public interface TalentService {
     List<KindDTO> getTalentKinds();
 
     TalentStatistic getStatistic(long talentId, String email);
+
+    ReportedTalentDTO reportTalent(Authentication auth, Long talentId, HttpServletRequest request);
+
+    void approveReport(Long reportId);
+
+    void rejectReport(Long reportId);
 }

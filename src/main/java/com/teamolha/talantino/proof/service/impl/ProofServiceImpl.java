@@ -329,7 +329,7 @@ public class ProofServiceImpl implements ProofService {
 
     private void sendReportMessage(ReportedProofDTO reportedProof, String referer) {
         try {
-            messageSendEvent.sendMessage(reportedProof, referer);
+            messageSendEvent.sendReportProofMessage(reportedProof, referer);
         } catch (ClientException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Moderator Bot exception");
         }
