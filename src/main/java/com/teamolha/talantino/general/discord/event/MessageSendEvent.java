@@ -68,6 +68,8 @@ public class MessageSendEvent {
                 .author(reportedTalent.kind(), createTalentUrl(refererUrl, reportedTalent.reportedTalentId()),
                         reportedTalent.avatar())
                 .description(reportedTalent.description())
+                .addField("Email ", reportedTalent.email(), true)
+                .addField("Location ", reportedTalent.location(), true)
                 .addField("Report ID", String.valueOf(reportedTalent.id()), true)
                 .timestamp(Instant.now())
                 .footer("Reported by " + reportedTalent.reportedBy(), null)
