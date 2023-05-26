@@ -432,16 +432,17 @@ public class ProofServiceImpl implements ProofService {
                 }
             });
         } else {
-            if (!kudosRepository.existsBySponsorIdAndProofId(sponsor.getId(), proofId)) {
-                sponsorKudos.add(Kudos.builder()
-                        .amount(amount)
-                        .sponsorId(sponsor.getId())
-                        .proofId(proofId)
-                        .build());
-            } else {
-                sponsorKudos.stream().filter(kudos -> kudos.getProofId().equals(proofId))
-                        .forEach(kudos -> kudos.setAmount(kudos.getAmount() + amount));
-            }
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't put kudos on prufs without skills");
+//            if (!kudosRepository.existsBySponsorIdAndProofId(sponsor.getId(), proofId)) {
+//                sponsorKudos.add(Kudos.builder()
+//                        .amount(amount)
+//                        .sponsorId(sponsor.getId())
+//                        .proofId(proofId)
+//                        .build());
+//            } else {
+//                sponsorKudos.stream().filter(kudos -> kudos.getProofId().equals(proofId))
+//                        .forEach(kudos -> kudos.setAmount(kudos.getAmount() + amount));
+//            }
         }
     }
 
