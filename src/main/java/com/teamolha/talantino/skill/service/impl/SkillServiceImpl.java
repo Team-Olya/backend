@@ -75,13 +75,16 @@ public class SkillServiceImpl implements SkillService {
         if (sponsor.getBalance() < amount) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Not enough totalKudos");
         }
-        if (!skillRepository.existsById(skillId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill with ID " + skillId + " does not exist");
-        }
 
         var proof = getProofEntity(proofId);
+
+        var skill = skillRepository.findById(skillId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill with ID " + skillId + " does not exist"));
         if (!proof.getStatus().equals(Status.PUBLISHED.name())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only put kudos in published proofs");
+        }
+        if (!proof.getSkills().contains(skill)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't put kudos on proofs without skills");
         }
 
         List<Kudos> sponsorKudos = sponsor.getKudos();
