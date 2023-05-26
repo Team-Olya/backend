@@ -329,7 +329,7 @@ public class ProofServiceImpl implements ProofService {
 
     private void sendReportMessage(ReportedProofDTO reportedProof, String referer) {
         try {
-            messageSendEvent.sendMessage(reportedProof, referer);
+            messageSendEvent.sendReportProofMessage(reportedProof, referer);
         } catch (ClientException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Moderator Bot exception");
         }
@@ -432,7 +432,7 @@ public class ProofServiceImpl implements ProofService {
                 }
             });
         } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't put kudos on prufs without skills");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't put kudos on proofs without skills");
 //            if (!kudosRepository.existsBySponsorIdAndProofId(sponsor.getId(), proofId)) {
 //                sponsorKudos.add(Kudos.builder()
 //                        .amount(amount)
