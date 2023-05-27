@@ -1,10 +1,7 @@
 package com.teamolha.talantino.admin.service;
 
 import com.teamolha.talantino.admin.model.request.CreateAdmin;
-import com.teamolha.talantino.admin.model.response.AdminProofDTO;
-import com.teamolha.talantino.admin.model.response.AdminProofsDTO;
-import com.teamolha.talantino.admin.model.response.AdminTalentDTO;
-import com.teamolha.talantino.admin.model.response.AdminTalentsDTO;
+import com.teamolha.talantino.admin.model.response.*;
 import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.talent.model.response.KindDTO;
 
@@ -28,4 +25,8 @@ public interface AdminService {
     AdminProofsDTO getProofs(String title, int page, int size);
 
     AdminProofDTO getProof(Long proofId);
+
+    AdminSponsorsDTO getSponsors(String email, int page, int size);
+
+    AdminSponsorDTO getSponsor(Long sponsorId);
 }

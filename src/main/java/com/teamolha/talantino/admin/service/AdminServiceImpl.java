@@ -4,10 +4,7 @@ import com.teamolha.talantino.account.model.AccountStatus;
 import com.teamolha.talantino.admin.mapper.AdminMapper;
 import com.teamolha.talantino.admin.model.request.CreateAdmin;
 import com.teamolha.talantino.admin.model.entity.Admin;
-import com.teamolha.talantino.admin.model.response.AdminProofDTO;
-import com.teamolha.talantino.admin.model.response.AdminProofsDTO;
-import com.teamolha.talantino.admin.model.response.AdminTalentDTO;
-import com.teamolha.talantino.admin.model.response.AdminTalentsDTO;
+import com.teamolha.talantino.admin.model.response.*;
 import com.teamolha.talantino.admin.repository.AdminRepository;
 import com.teamolha.talantino.account.model.AccountRole;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
@@ -19,6 +16,7 @@ import com.teamolha.talantino.skill.mapper.SkillMapper;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.skill.repository.SkillRepository;
+import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.mapper.TalentMapper;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.model.response.*;
@@ -47,18 +45,15 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class AdminServiceImpl implements AdminService{
-    private final JwtEncoder jwtEncoder;
-    final PasswordEncoder passwordEncoder;
-    AdminRepository adminRepository;
-    TalentRepository talentRepository;
-    LinkRepository linkRepository;
-    ProofRepository proofRepository;
-    KindRepository kindRepository;
-    SkillRepository skillRepository;
-    TalentMapper talentMapper;
-    ProofMapper proofMapper;
-    SkillMapper skillMapper;
-    AdminMapper adminMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final AdminRepository adminRepository;
+    private final TalentRepository talentRepository;
+    private final LinkRepository linkRepository;
+    private final ProofRepository proofRepository;
+    private final KindRepository kindRepository;
+    private final SkillRepository skillRepository;
+    private final AdminMapper adminMapper;
+    private final SponsorRepository sponsorRepository;
 
     @Override
     public void deleteTalent(Long talentId) {
@@ -166,6 +161,38 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
+    public AdminSponsorsDTO getSponsors(String email, int page, int size) {
+        long totalAmount = sponsorRepository.countByEmailStartsWithIgnoreCase(email);
+
+        if (size <= 0 || page < 0) {
+            return AdminSponsorsDTO.builder()
+                    .amount(totalAmount)
+                    .build();
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        var sponsors = sponsorRepository.findByEmailStartsWithIgnoreCase(email, pageable);
+
+        return AdminSponsorsDTO.builder()
+                .amount(totalAmount)
+                .sponsors(sponsors.stream()
+                        .map(adminMapper::toAdminSponsorDTO)
+                        .collect(Collectors.toList())
+                )
+                .build();
+    }
+
+    @Override
+    public AdminSponsorDTO getSponsor(Long sponsorId) {
+        return adminMapper.toAdminSponsorDTO(sponsorRepository.findById(sponsorId).orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "Sponsor with ID " + sponsorId + " not found")
+                )
+        );
+    }
+
+    @Override
     public void createAdmin(CreateAdmin createAdmin) {
         if (adminRepository.count() == 0) {
             adminRepository.save(Admin.builder()
@@ -179,11 +206,5 @@ public class AdminServiceImpl implements AdminService{
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't create admin account, idiot hacker");
         }
-    }
-
-    private String createScope(Authentication authentication) {
-        return authentication.getAuthorities()
-                .stream().map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(" "));
     }
 }

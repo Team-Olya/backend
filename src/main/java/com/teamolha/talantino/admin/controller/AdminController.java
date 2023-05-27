@@ -1,26 +1,14 @@
 package com.teamolha.talantino.admin.controller;
 
 import com.teamolha.talantino.admin.model.request.CreateAdmin;
-import com.teamolha.talantino.admin.model.request.DeleteTalent;
-import com.teamolha.talantino.admin.model.response.AdminProofDTO;
-import com.teamolha.talantino.admin.model.response.AdminProofsDTO;
-import com.teamolha.talantino.admin.model.response.AdminTalentDTO;
-import com.teamolha.talantino.admin.model.response.AdminTalentsDTO;
+import com.teamolha.talantino.admin.model.response.*;
 import com.teamolha.talantino.admin.service.AdminService;
-import com.teamolha.talantino.proof.model.request.ProofRequest;
-import com.teamolha.talantino.proof.model.response.ProofDTO;
-import com.teamolha.talantino.skill.model.request.ProofSkillDTO;
 import com.teamolha.talantino.skill.model.request.SkillDTO;
-import com.teamolha.talantino.talent.model.request.TalentUpdateRequest;
 import com.teamolha.talantino.talent.model.response.KindDTO;
-import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
-import com.teamolha.talantino.talent.model.response.TalentsPageResponse;
-import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -88,5 +76,17 @@ public class AdminController {
     @DeleteMapping("/admin/skills/{skill-id}")
     public void deleteSkill(@PathVariable("skill-id") Long skillId) {
         adminService.deleteSkill(skillId);
+    }
+
+    @GetMapping("/admin/sponsors")
+    public AdminSponsorsDTO getSponsors(@RequestParam(value = "email", defaultValue = "") String email,
+                                        @RequestParam(value = "page", defaultValue = "0") int page,
+                                        @RequestParam(value = "size", defaultValue = "10") int size) {
+        return adminService.getSponsors(email, page, size);
+    }
+
+    @GetMapping("/admin/sponsors/{sponsor-id}")
+    public AdminSponsorDTO getSponsors(@PathVariable("sponsor-id") Long sponsorId) {
+        return adminService.getSponsor(sponsorId);
     }
 }
