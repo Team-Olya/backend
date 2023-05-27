@@ -1,11 +1,11 @@
 package com.teamolha.talantino.admin.mapper;
 
 import com.teamolha.talantino.admin.model.entity.Admin;
-import com.teamolha.talantino.admin.model.response.AdminProfile;
+import com.teamolha.talantino.admin.model.response.*;
 import com.teamolha.talantino.account.model.AccountRole;
-import com.teamolha.talantino.admin.model.response.AdminProofDTO;
-import com.teamolha.talantino.admin.model.response.AdminTalentDTO;
 import com.teamolha.talantino.proof.model.entity.Proof;
+import com.teamolha.talantino.sponsor.model.entity.Sponsor;
+import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import org.mapstruct.Mapper;
 
@@ -43,6 +43,19 @@ public interface AdminMapper {
                 .description(proof.getDescription())
                 .date(proof.getDate())
                 .status(proof.getStatus())
+                .build();
+    }
+
+    default AdminSponsorDTO toAdminSponsorDTO(Sponsor sponsor) {
+        return AdminSponsorDTO.builder()
+                .id(sponsor.getId())
+                .name(sponsor.getName())
+                .surname(sponsor.getSurname())
+                .balance(sponsor.getBalance())
+                .avatar(sponsor.getAvatar())
+                .accountStatus(sponsor.getAccountStatus())
+                .verificationExpireDate(sponsor.getVerificationExpireDate())
+                .deletionDate(sponsor.getDeletionDate())
                 .build();
     }
 }
