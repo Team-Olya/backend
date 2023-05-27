@@ -2,6 +2,10 @@ package com.teamolha.talantino.admin.controller;
 
 import com.teamolha.talantino.admin.model.request.CreateAdmin;
 import com.teamolha.talantino.admin.model.request.DeleteTalent;
+import com.teamolha.talantino.admin.model.response.AdminProofDTO;
+import com.teamolha.talantino.admin.model.response.AdminProofsDTO;
+import com.teamolha.talantino.admin.model.response.AdminTalentDTO;
+import com.teamolha.talantino.admin.model.response.AdminTalentsDTO;
 import com.teamolha.talantino.admin.service.AdminService;
 import com.teamolha.talantino.proof.model.request.ProofRequest;
 import com.teamolha.talantino.proof.model.response.ProofDTO;
@@ -9,6 +13,8 @@ import com.teamolha.talantino.skill.model.request.ProofSkillDTO;
 import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.talent.model.request.TalentUpdateRequest;
 import com.teamolha.talantino.talent.model.response.KindDTO;
+import com.teamolha.talantino.talent.model.response.TalentProfileResponse;
+import com.teamolha.talantino.talent.model.response.TalentsPageResponse;
 import com.teamolha.talantino.talent.model.response.UpdatedTalentResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -33,14 +39,17 @@ public class AdminController {
         adminService.createAdmin(createAdmin);
     }
 
-    @PostMapping("/admin/login")
-    public String login (Authentication authentication) {
-        return adminService.login(authentication);
+    @GetMapping("/admin/talents")
+    public AdminTalentsDTO getTalents(@RequestParam(value = "email", defaultValue = "") String email,
+                                      @RequestParam(value = "page", defaultValue = "0") int page,
+                                      @RequestParam(value = "size", defaultValue = "10") int size) {
+        return adminService.getTalents(email, page, size);
     }
 
-    @DeleteMapping("/admin/talent")
-    public void deleteTalent(@RequestBody DeleteTalent deleteTalent) {
-        adminService.deleteTalent(deleteTalent.email());
+
+    @GetMapping("/admin/talents/{talent-id}")
+    public AdminTalentDTO getTalent(@PathVariable("talent-id") Long talentId) {
+        return adminService.getTalent(talentId);
     }
 
     @DeleteMapping("/admin/talents/{talent-id}")
@@ -48,21 +57,21 @@ public class AdminController {
         adminService.deleteTalent(talentId);
     }
 
+    @GetMapping("/admin/proofs")
+    public AdminProofsDTO getProofs(@RequestParam(value = "title", defaultValue = "") String title,
+                                    @RequestParam(value = "page", defaultValue = "0") int page,
+                                    @RequestParam(value = "size", defaultValue = "10") int size) {
+        return adminService.getProofs(title, page, size);
+    }
+
+    @GetMapping("/admin/proofs/{proof-id}")
+    public AdminProofDTO getProof(@PathVariable("proof-id") Long proofId) {
+        return adminService.getProof(proofId);
+    }
+
     @DeleteMapping("/admin/proofs/{proof-id}")
     public void deleteProof(@PathVariable("proof-id") Long proofId) {
         adminService.deleteProof(proofId);
-    }
-
-    @PatchMapping("/admin/talents/{talent-id}")
-    public UpdatedTalentResponse editTalent(@PathVariable("talent-id") Long talentId,
-                                            @RequestBody TalentUpdateRequest newTalent) {
-        return adminService.editTalent(newTalent, talentId);
-    }
-
-    @PatchMapping("/admin/proofs/{proof-id}")
-    public ProofDTO editProof(@PathVariable("proof-id") Long proofId,
-                                @RequestBody ProofRequest newProof) {
-        return adminService.editProof(newProof, proofId);
     }
 
     @PatchMapping("/admin/talents/kinds/{kind-id}")
