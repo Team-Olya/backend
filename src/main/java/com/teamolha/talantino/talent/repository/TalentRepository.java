@@ -26,6 +26,10 @@ public interface TalentRepository extends JpaRepository<Talent, Long> {
 
     List<Talent> findByAccountStatusOrAccountStatusIsNull(AccountStatus accountStatus);
 
+    List<Talent> findByEmailStartsWithIgnoreCase(String email, Pageable pageable);
+
+    long countByEmailStartsWithIgnoreCase(String email);
+
     @Query(value = "SELECT prev_value FROM (SELECT *, LAG(id) OVER (ORDER BY id) AS prev_value FROM account " +
             "INNER JOIN ACCOUNT_AUTHORITIES auth ON account.id = auth.account_id WHERE (account_status = 'ACTIVE' " +
             "OR account_status IS NULL) AND auth.AUTHORITIES = 'TALENT') subquery WHERE id = :id",

@@ -19,6 +19,10 @@ public interface ProofRepository extends JpaRepository<Proof, Long> {
             nativeQuery = true)
     Long findNextProofId(long id);
 
+    List<Proof> findByTitleStartsWithIgnoreCase(String title, Pageable pageable);
+
+    long countByTitleStartsWithIgnoreCase(String title);
+
     List<Proof> findByStatus(String status, Pageable pageable);
 
     List<Proof> findByStatus(String status);
