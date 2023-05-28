@@ -7,13 +7,11 @@ import com.teamolha.talantino.general.discord.event.MessageSendEvent;
 import com.teamolha.talantino.general.email.EmailHelper;
 import com.teamolha.talantino.general.email.EmailSender;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
-import com.teamolha.talantino.proof.repository.KudosRepository;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.skill.mapper.SkillMapper;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.model.request.FullSkillDTO;
 import com.teamolha.talantino.skill.repository.SkillRepository;
-import com.teamolha.talantino.sponsor.repository.BalanceChangingRepository;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.mapper.TalentMapper;
 import com.teamolha.talantino.talent.model.entity.Kind;
@@ -41,7 +39,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -72,8 +73,6 @@ public class TalentServiceImpl implements TalentService {
 
     private AccountRepository accountRepository;
 
-    private KudosRepository kudosRepository;
-
     private PasswordEncoder passwordEncoder;
 
     private MessageSendEvent messageSendEvent;
@@ -81,8 +80,6 @@ public class TalentServiceImpl implements TalentService {
     private EmailHelper emailHelper;
 
     private EmailSender emailSender;
-
-    private BalanceChangingRepository balanceChangingRepository;
 
     @Override
     public void register(String email, String password, String name, String surname, String kind,
@@ -170,7 +167,7 @@ public class TalentServiceImpl implements TalentService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Talent with ID " + talentId + " not found!"));
 
-        if (!talent.getEmail().equals(email)) {
+        if (!talent.getEmail().equals(email) || talent.getAccountStatus().equals(AccountStatus.INACTIVE)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         return updateTalent(talent, updateTalent);
@@ -182,7 +179,7 @@ public class TalentServiceImpl implements TalentService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Talent with ID " + talentId + " not found"));
 
-        if (!email.equals(talent.getEmail())) {
+        if (!email.equals(talent.getEmail()) || talent.getAccountStatus().equals(AccountStatus.INACTIVE)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
@@ -242,6 +239,9 @@ public class TalentServiceImpl implements TalentService {
     public ReportedTalentDTO reportTalent(Authentication auth, Long talentId, HttpServletRequest request) {
         var account = accountRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (account.getAccountStatus().equals(AccountStatus.INACTIVE)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
 
         var talent = talentRepository.findById(talentId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,

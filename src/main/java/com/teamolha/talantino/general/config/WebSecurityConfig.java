@@ -26,6 +26,9 @@ import org.springframework.security.oauth2.server.resource.web.access.BearerToke
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -73,6 +76,9 @@ public class WebSecurityConfig {
 
                         .requestMatchers("/email-confirm").permitAll()
                         .requestMatchers("/account-recover").permitAll()
+
+                        // websockets
+                        .requestMatchers("/ws").permitAll()
                         .anyRequest().authenticated()
                 );
 
