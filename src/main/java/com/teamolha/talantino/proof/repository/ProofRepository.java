@@ -23,9 +23,13 @@ public interface ProofRepository extends JpaRepository<Proof, Long> {
 
     long countByTitleStartsWithIgnoreCase(String title);
 
-    List<Proof> findByStatus(String status, Pageable pageable);
+    @Query("SELECT p FROM Proof as p JOIN Talent as t" +
+            " ON p.talent.id = t.id WHERE p.status='PUBLISHED' AND t.accountStatus='ACTIVE'")
+    List<Proof> findByStatus(Pageable pageable);
 
-    List<Proof> findByStatus(String status);
+    @Query("SELECT p FROM Proof as p JOIN Talent as t" +
+            " ON p.talent.id = t.id WHERE p.status='PUBLISHED' AND t.accountStatus='ACTIVE'")
+    List<Proof> findByStatus();
 
     List<Proof> findByStatusAndTalent_Id(String status, long talentId, Pageable pageable);
 

@@ -75,7 +75,10 @@ public class WebSecurityConfig {
 
                         .requestMatchers("/email-confirm").permitAll()
                         .requestMatchers("/account-recover").permitAll()
-                        .anyRequest().permitAll()
+
+                        // websockets
+                        .requestMatchers("/ws").permitAll()
+                        .anyRequest().authenticated()
                 );
 
         http    .httpBasic(withDefaults())

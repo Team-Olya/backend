@@ -1,6 +1,7 @@
 package com.teamolha.talantino.proof.service.impl;
 
 import com.teamolha.talantino.account.model.AccountRole;
+import com.teamolha.talantino.account.model.AccountStatus;
 import com.teamolha.talantino.account.repository.AccountRepository;
 import com.teamolha.talantino.general.discord.event.MessageSendEvent;
 import com.teamolha.talantino.general.notification.WebSocketSender;
@@ -83,7 +84,7 @@ public class ProofServiceImpl implements ProofService {
     @Transactional(readOnly = true)
     @Override
     public ProofsPageDTO pageProofs(Authentication auth, String sort, String type, int page, int count) {
-        int totalAmount = proofRepository.findByStatus(Status.PUBLISHED.name()).size();
+        int totalAmount = proofRepository.findByStatus().size();
 
         if (count <= 0 || page < 0) return ProofsPageDTO.builder().totalAmount(totalAmount).build();
 
@@ -94,7 +95,7 @@ public class ProofServiceImpl implements ProofService {
         var sponsor = (auth == null) ? null :
                 sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
 
-        List<ShortProofDTO> proofs = proofRepository.findByStatus(Status.PUBLISHED.name(), pageable)
+        List<ShortProofDTO> proofs = proofRepository.findByStatus(pageable)
                 .stream().map(proof -> mapper.toShortProofDTO(proof, sponsor, skillMapper, auth != null)).toList();
 
         return ProofsPageDTO.builder()
@@ -149,7 +150,7 @@ public class ProofServiceImpl implements ProofService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Talent with ID " + talentId + " not found!"));
 
-        if (!email.equals(talent.getEmail())) {
+        if (!email.equals(talent.getEmail()) || talent.getAccountStatus().equals(AccountStatus.INACTIVE)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
@@ -179,7 +180,7 @@ public class ProofServiceImpl implements ProofService {
     public ProofDTO updateProof(String email, Long talentId, Long proofId, ProofRequest newProof) {
         var talent = getTalent(talentId);
 
-        if (!email.equals(talent.getEmail())) {
+        if (!email.equals(talent.getEmail()) || talent.getAccountStatus().equals(AccountStatus.INACTIVE)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
@@ -205,7 +206,7 @@ public class ProofServiceImpl implements ProofService {
     public void deleteProof(Long talentId, Long proofId, String email) {
         var talent = getTalent(talentId);
 
-        if (!email.equals(talent.getEmail())) {
+        if (!email.equals(talent.getEmail()) || talent.getAccountStatus().equals(AccountStatus.INACTIVE)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
@@ -254,6 +255,10 @@ public class ProofServiceImpl implements ProofService {
     public void setKudos(Authentication auth, Long proofId, int amount) {
         var sponsor = sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.FORBIDDEN, "Only sponsors have access to kudos"));
+        if (sponsor.getAccountStatus().equals(AccountStatus.INACTIVE)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         if (amount <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You must bet at least 1 kudos");
         }
@@ -291,6 +296,10 @@ public class ProofServiceImpl implements ProofService {
     public ReportedProofDTO reportProof(Authentication auth, Long proofId, HttpServletRequest request) {
         var account = accountRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (account.getAccountStatus().equals(AccountStatus.INACTIVE)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         var proof = getProofEntity(proofId);
 
         if (!proof.getStatus().equals(Status.PUBLISHED.name())) {

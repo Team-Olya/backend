@@ -1,6 +1,7 @@
 package com.teamolha.talantino.skill.service.impl;
 
 
+import com.teamolha.talantino.account.model.AccountStatus;
 import com.teamolha.talantino.general.notification.KudosNotification;
 import com.teamolha.talantino.general.notification.WebSocketSender;
 import com.teamolha.talantino.proof.model.Status;
@@ -74,6 +75,10 @@ public class SkillServiceImpl implements SkillService {
     public void setKudosToSkill(Authentication auth, Long proofId, Long skillId, int amount) {
         var sponsor = sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.FORBIDDEN, "Only sponsors have access to kudos"));
+        if (sponsor.getAccountStatus().equals(AccountStatus.INACTIVE)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         if (amount <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You must bet at least 1 kudos");
         }
