@@ -1,6 +1,8 @@
 package com.teamolha.talantino.skill.service.impl;
 
 
+import com.teamolha.talantino.general.notification.KudosNotification;
+import com.teamolha.talantino.general.notification.WebSocketSender;
 import com.teamolha.talantino.proof.model.Status;
 import com.teamolha.talantino.proof.model.entity.Kudos;
 import com.teamolha.talantino.proof.model.entity.Proof;
@@ -16,6 +18,7 @@ import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +42,8 @@ public class SkillServiceImpl implements SkillService {
     private ProofRepository proofRepository;
 
     private KudosRepository kudosRepository;
+
+    private WebSocketSender webSocketSender;
 
     @Override
     public SkillListDTO getSkillList(String search) {
@@ -100,6 +105,9 @@ public class SkillServiceImpl implements SkillService {
                             (kudos.getSkillId() != null && kudos.getSkillId().equals(skillId)))
                     .forEach(kudos -> kudos.setAmount(kudos.getAmount() + amount));
         }
+
+        webSocketSender.sendMessageToUser(proofId, amount, sponsor, proof);
+
         sponsor.setKudos(sponsorKudos);
         sponsor.setBalance(sponsor.getBalance() - amount);
         sponsorRepository.save(sponsor);
