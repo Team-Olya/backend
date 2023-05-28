@@ -52,6 +52,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/talents").permitAll()
                         .requestMatchers("/talents/**").authenticated()
                         .requestMatchers(antMatcher("/talents/*")).authenticated()
+                        .requestMatchers("/talents/kinds").permitAll()
 
                         .requestMatchers("/proofs").permitAll()
                         .requestMatchers(antMatcher("/proofs/*")).authenticated()

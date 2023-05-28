@@ -47,8 +47,9 @@ public class TalentController {
     }
 
     @GetMapping("/talents/kinds")
-    public List<KindDTO> getTalentKinds() {
-        return talentService.getTalentKinds();
+    public KindsDTO getTalentKinds(@RequestParam(defaultValue = "0") int page,
+                                        @RequestParam(defaultValue = "10") int size) {
+        return talentService.getTalentKinds(page, size);
     }
 
     @GetMapping("/talents/{talent-id}/statistic")
