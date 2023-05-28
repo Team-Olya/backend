@@ -28,6 +28,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -181,11 +182,15 @@ public class TalentServiceImpl implements TalentService {
     }
 
     @Override
-    public List<KindDTO> getTalentKinds() {
-        return kindRepository.findAll()
+    public KindsDTO getTalentKinds(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "id");
+        var amount = kindRepository.count();
+
+        return new KindsDTO(amount, kindRepository.findAll(pageable)
                 .stream()
                 .map(kind -> new KindDTO(kind.getId(), kind.getKind()))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+        );
     }
 
     @Override

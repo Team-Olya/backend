@@ -4,8 +4,6 @@ import com.teamolha.talantino.talent.model.request.TalentUpdateRequest;
 import com.teamolha.talantino.talent.model.response.*;
 import jakarta.servlet.http.HttpServletRequest;
 
-import java.util.List;
-
 public interface TalentService {
 
     void register(String email, String password, String name, String surname, String kind, HttpServletRequest request);
@@ -20,7 +18,7 @@ public interface TalentService {
 
     void deleteTalent(HttpServletRequest request, long talentId, String email);
 
-    List<KindDTO> getTalentKinds();
+    KindsDTO getTalentKinds(int page, int size);
 
     TalentStatistic getStatistic(long talentId, String email);
 }
