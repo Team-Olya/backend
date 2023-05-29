@@ -78,7 +78,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/account-recover").permitAll()
 
                         // websockets
-                        .requestMatchers("/ws").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         .anyRequest().authenticated()
                 );
 
