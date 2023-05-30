@@ -2,6 +2,8 @@ package com.teamolha.talantino.general.config;
 
 import com.teamolha.talantino.account.model.entity.Account;
 import com.teamolha.talantino.account.repository.AccountRepository;
+import com.teamolha.talantino.notification.model.entity.KudosNotification;
+import com.teamolha.talantino.notification.repository.KudosNotificationRepository;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.sponsor.repository.BalanceChangingRepository;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
@@ -36,6 +38,8 @@ public class SchedulingConfig {
 
     private AccountRepository accountRepository;
 
+    private KudosNotificationRepository notificationRepository;
+
     private LinkRepository linkRepository;
 
     private ProofRepository proofRepository;
@@ -46,8 +50,10 @@ public class SchedulingConfig {
     public void deleteExpiredAccount() throws InterruptedException {
         Date curdate = Calendar.getInstance().getTime();
         log.info("Expired accounts deleted");
+        log.info("Expired notifications deleted");
         cascadeDeletion(accountRepository.findByVerificationExpireDateLessThanEqual(curdate));
         cascadeDeletion(accountRepository.findByDeletionDateLessThanEqual(curdate));
+        notificationRepository.deleteByExpirationDateLessThanEqualAndReadTrue(curdate);
     }
 
     private void cascadeDeletion(List<Account> accounts) {

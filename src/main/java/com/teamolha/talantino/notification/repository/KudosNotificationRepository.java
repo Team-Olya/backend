@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -13,4 +14,6 @@ public interface KudosNotificationRepository extends JpaRepository<KudosNotifica
     long countByToTalentEmailIgnoreCase(String email);
 
     List<KudosNotification> findByToTalentEmailIgnoreCase(String email, Pageable pageable);
+
+    void deleteByExpirationDateLessThanEqualAndReadTrue(Date expirationDate);
 }

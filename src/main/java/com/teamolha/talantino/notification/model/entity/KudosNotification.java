@@ -44,5 +44,5 @@ public class KudosNotification {
     private Talent toTalent;
 
     @Column(columnDefinition = "boolean default false")
-    private boolean isRead;
+    private boolean read;
 }

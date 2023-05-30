@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class KudosNotificationService {
 
-    @Value("${expire.deletion.days}")
+    @Value("${expire.notification.days}")
     private Integer expireDays;
 
     private final TalentRepository talentRepository;
