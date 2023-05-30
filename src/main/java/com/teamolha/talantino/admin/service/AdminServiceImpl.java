@@ -18,6 +18,7 @@ import com.teamolha.talantino.skill.mapper.SkillMapper;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.skill.repository.SkillRepository;
+import com.teamolha.talantino.sponsor.repository.BalanceChangingRepository;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.mapper.TalentMapper;
 import com.teamolha.talantino.talent.model.entity.Talent;
@@ -58,6 +59,7 @@ public class AdminServiceImpl implements AdminService{
     private final SkillRepository skillRepository;
     private final AdminMapper adminMapper;
     private final SponsorRepository sponsorRepository;
+    private final BalanceChangingRepository balanceChangingRepository;
 
     @Override
     public void deleteTalent(Long talentId) {
@@ -67,6 +69,11 @@ public class AdminServiceImpl implements AdminService{
         linkRepository.deleteByTalent(talent);
         proofRepository.deleteByTalent(talent);
         notificationRepository.deleteByToTalentId(talentId);
+        var balanceChanging = balanceChangingRepository.findAllByTalent(talent);
+        balanceChanging.forEach(changing -> {
+            changing.setTalent(null);
+            balanceChangingRepository.save(changing);
+        });
         talentRepository.delete(talent);
     }
 
