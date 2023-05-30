@@ -66,6 +66,7 @@ public class SchedulingConfig {
                     changing.setTalent(null);
                     balanceChangingRepository.save(changing);
                 });
+                notificationRepository.deleteByToTalentId(account.getId());
                 talentRepository.deleteById(account.getId());
             } else {
                 sponsorRepository.deleteById(account.getId());

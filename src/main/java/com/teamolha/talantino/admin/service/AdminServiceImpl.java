@@ -8,6 +8,7 @@ import com.teamolha.talantino.admin.model.entity.Admin;
 import com.teamolha.talantino.admin.model.response.*;
 import com.teamolha.talantino.admin.repository.AdminRepository;
 import com.teamolha.talantino.account.model.AccountRole;
+import com.teamolha.talantino.notification.repository.KudosNotificationRepository;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.model.Status;
 import com.teamolha.talantino.proof.model.response.ProofsPageDTO;
@@ -46,6 +47,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class AdminServiceImpl implements AdminService{
+    private final KudosNotificationRepository notificationRepository;
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final AdminRepository adminRepository;
@@ -64,6 +66,7 @@ public class AdminServiceImpl implements AdminService{
         );
         linkRepository.deleteByTalent(talent);
         proofRepository.deleteByTalent(talent);
+        notificationRepository.deleteByToTalentId(talentId);
         talentRepository.delete(talent);
     }
 

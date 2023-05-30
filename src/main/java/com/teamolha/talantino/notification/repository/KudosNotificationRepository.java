@@ -1,6 +1,7 @@
 package com.teamolha.talantino.notification.repository;
 
 import com.teamolha.talantino.notification.model.entity.KudosNotification;
+import com.teamolha.talantino.talent.model.entity.Talent;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,6 +13,8 @@ import java.util.List;
 public interface KudosNotificationRepository extends JpaRepository<KudosNotification, Long> {
 
     long countByReadFalseAndToTalentEmailIgnoreCase(String email);
+
+    void deleteByToTalentId(Long talentId);
 
     long countByToTalentEmailIgnoreCase(String email);
 
