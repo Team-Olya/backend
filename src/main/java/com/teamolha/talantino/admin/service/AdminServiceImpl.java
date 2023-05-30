@@ -1,6 +1,7 @@
 package com.teamolha.talantino.admin.service;
 
 import com.teamolha.talantino.account.model.AccountStatus;
+import com.teamolha.talantino.account.repository.AccountRepository;
 import com.teamolha.talantino.admin.mapper.AdminMapper;
 import com.teamolha.talantino.admin.model.request.CreateAdmin;
 import com.teamolha.talantino.admin.model.entity.Admin;
@@ -45,6 +46,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class AdminServiceImpl implements AdminService{
+    private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final AdminRepository adminRepository;
     private final TalentRepository talentRepository;
@@ -190,6 +192,17 @@ public class AdminServiceImpl implements AdminService{
                                 "Sponsor with ID " + sponsorId + " not found")
                 )
         );
+    }
+
+    @Override
+    public void unbannedAccount(Long accountId) {
+        var account = accountRepository.findById(accountId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (account.getAccountStatus().equals(AccountStatus.ACTIVE)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Account is already active");
+        }
+        account.setAccountStatus(AccountStatus.ACTIVE);
+        accountRepository.save(account);
     }
 
     @Override

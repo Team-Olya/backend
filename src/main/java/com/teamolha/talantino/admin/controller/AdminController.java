@@ -89,4 +89,9 @@ public class AdminController {
     public AdminSponsorDTO getSponsors(@PathVariable("sponsor-id") Long sponsorId) {
         return adminService.getSponsor(sponsorId);
     }
+
+    @PatchMapping("/admin/accounts/{account-id}")
+    public void unbannedAccount(@PathVariable("account-id") Long accountId) {
+        adminService.unbannedAccount(accountId);
+    }
 }

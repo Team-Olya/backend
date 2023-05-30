@@ -29,4 +29,6 @@ public interface AdminService {
     AdminSponsorsDTO getSponsors(String email, int page, int size);
 
     AdminSponsorDTO getSponsor(Long sponsorId);
+
+    void unbannedAccount(Long accountId);
 }
