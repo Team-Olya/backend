@@ -44,7 +44,7 @@ public interface ProofRepository extends JpaRepository<Proof, Long> {
 
     void deleteByTalentId(Long talentId);
 
-    @Query("SELECT k.sponsorId, SUM(k.amount), MAX(k.id) FROM Kudos k WHERE k.proofId = :proofId GROUP BY k.id ORDER BY SUM(k.amount) DESC")
+    @Query("SELECT k.sponsorId, SUM(k.amount) FROM Kudos k WHERE k.proofId = :proofId GROUP BY k.sponsorId ORDER BY SUM(k.amount) DESC")
     List<Object[]> findSponsorsAndKudosOnProof(@Param("proofId") Long proofId, Pageable pageable);
 
 
