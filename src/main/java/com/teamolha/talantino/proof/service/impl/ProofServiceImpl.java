@@ -237,6 +237,15 @@ public class ProofServiceImpl implements ProofService {
     @Override
     public KudosList getKudos(Authentication auth, Long proofId, int page, int size) {
         var proof = getProofEntity(proofId);
+        if(page < 0 || size < 1) {
+            return KudosList.builder()
+                    .totalAmount(proof.getKudos()
+                            .stream()
+                            .map(Kudos::getSponsorId)
+                            .distinct()
+                            .count())
+                    .build();
+        }
         var talent = (auth == null) ? null :
                 talentRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
         List<KudosDTO> kudos = new ArrayList<>();
@@ -385,9 +394,9 @@ public class ProofServiceImpl implements ProofService {
     private List<KudosDTO> getKudos(Long proofId, int page, int size) {
         List<KudosDTO> kudos = new ArrayList<>();
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("sponsor_id").descending());
+        Pageable pageable = PageRequest.of(page, size);
 
-        List<Object[]> list = proofRepository.findSponsorsAndKudosOnProof(pageable, proofId);
+        List<Object[]> list = proofRepository.findSponsorsAndKudosOnProof(proofId, pageable);
 
         for (Object[] elem : list) {
             long sponsorId = ((Number) elem[0]).longValue();
@@ -408,11 +417,12 @@ public class ProofServiceImpl implements ProofService {
                                     k.getSkillId() == currentSkill.getId())
                             .mapToLong(Kudos::getAmount)
                             .sum();
-
-                    skills.add(SkillKudosDTO.builder()
-                            .skill(skillMapper.toSkillDTO(currentSkill))
-                            .amountOfKudos(kudosAmount)
-                            .build());
+                    if(kudosAmount > 0) {
+                        skills.add(SkillKudosDTO.builder()
+                                .skill(skillMapper.toSkillDTO(currentSkill))
+                                .amountOfKudos(kudosAmount)
+                                .build());
+                    }
                 }
                 kudos.add(KudosDTO.builder()
                         .sponsor(sponsorMapper.toShortSponsorDTO(sponsor))
