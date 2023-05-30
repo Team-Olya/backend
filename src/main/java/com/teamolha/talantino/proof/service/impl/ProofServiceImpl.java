@@ -5,6 +5,7 @@ import com.teamolha.talantino.account.model.AccountStatus;
 import com.teamolha.talantino.account.repository.AccountRepository;
 import com.teamolha.talantino.general.discord.event.MessageSendEvent;
 import com.teamolha.talantino.notification.WebSocketSender;
+import com.teamolha.talantino.notification.repository.KudosNotificationRepository;
 import com.teamolha.talantino.notification.service.KudosNotificationService;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.model.Status;
@@ -79,6 +80,8 @@ public class ProofServiceImpl implements ProofService {
     private final BalanceChangingRepository balanceChangingRepository;
 
     private KudosNotificationService notificationService;
+
+    private final KudosNotificationRepository kudosNotificationRepository;
 
 //    private WebSocketSender webSocketSender;
 
@@ -213,6 +216,7 @@ public class ProofServiceImpl implements ProofService {
 
         Proof proof = getProofEntity(proofId);
         if (proof.getTalent().getId() == talent.getId()) {
+            kudosNotificationRepository.deleteByProofId(proofId);
             proofRepository.delete(proof);
         } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
