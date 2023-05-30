@@ -1,5 +1,6 @@
 package com.teamolha.talantino.notification.service;
 
+import com.teamolha.talantino.account.model.AccountStatus;
 import com.teamolha.talantino.notification.WebSocketSender;
 import com.teamolha.talantino.notification.mapper.KudosNotificationMapper;
 import com.teamolha.talantino.notification.model.entity.KudosNotification;
@@ -15,12 +16,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,15 +44,16 @@ public class KudosNotificationService {
     public void saveNotification(Sponsor sponsor, Proof proof, int amount, Talent talent) {
         Date currentDate = new Date(Calendar.getInstance().getTime().getTime());
 
-        KudosNotification notification = KudosNotification.builder()
-                .fromSponsor(sponsor)
-                .toTalent(talent)
-                .proof(proof)
-                .amount(amount)
-                .receivingDate(currentDate)
-                .expirationDate(calculateExpiredDate(currentDate))
-                .build();
-        addNotificationToTalent(talent, notification);
+        KudosNotification notification =
+                notificationRepository.save(KudosNotification.builder()
+                        .fromSponsor(sponsor)
+                        .toTalent(talent)
+                        .proof(proof)
+                        .amount(amount)
+                        .receivedDate(currentDate)
+                        .expirationDate(calculateExpiredDate(currentDate))
+                        .build());
+//        addNotificationToTalent(talent, notification);
 
         KudosNotificationDTO notificationDTO = notificationMapper.toKudosNotificationDTO(notification);
         webSocketSender.sendMessageToUser(notificationDTO);
@@ -79,10 +82,29 @@ public class KudosNotificationService {
             return NotificationList.builder()
                     .totalAmount(notificationRepository.countByToTalentEmailIgnoreCase(email))
                     .notifications(notificationRepository.findByToTalentEmailIgnoreCase(auth.getName(), pageable)
-                    .stream().map(notificationMapper::toKudosNotificationDTO).collect(Collectors.toList()))
+                            .stream().map(notificationMapper::toKudosNotificationDTO).collect(Collectors.toList()))
                     .build();
         }
 
         return null;
+    }
+
+    public boolean markNotificationAsRead(Authentication auth, long id) {
+        if (auth != null) {
+            var notification = notificationRepository.findById(id).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND));
+            var talent = talentRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND));
+            if (!talent.getEmail().equals(notification.getToTalent().getEmail()) ||
+                    talent.getAccountStatus().equals(AccountStatus.INACTIVE)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+            if (notification.isRead()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Notification is already read");
+            }
+            notification.setRead(true);
+            return true;
+        }
+        return false;
     }
 }

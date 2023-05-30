@@ -32,7 +32,7 @@ public class KudosNotification {
     @NotNull
     private Proof proof;
 
-    private Date receivingDate;
+    private Date receivedDate;
 
     private Date expirationDate;
 
@@ -42,4 +42,7 @@ public class KudosNotification {
     @JoinColumn(name = "to_talent_id")
     @NotNull
     private Talent toTalent;
+
+    @Column(columnDefinition = "boolean default false")
+    private boolean isRead;
 }

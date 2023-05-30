@@ -4,9 +4,7 @@ import com.teamolha.talantino.notification.model.response.NotificationList;
 import com.teamolha.talantino.notification.service.KudosNotificationService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -19,5 +17,10 @@ public class NotificationController {
                                                 @RequestParam(required = false, defaultValue = "10") Integer size,
                                                 @RequestParam(required = false, defaultValue = "0") Integer page) {
         return notificationService.getAllNotifications(auth, size, page);
+    }
+
+    @PatchMapping("/notifications/{notification-id}")
+    public boolean markNotificationAsRead(Authentication auth, @PathVariable("notification-id") long id) {
+        return notificationService.markNotificationAsRead(auth, id);
     }
 }

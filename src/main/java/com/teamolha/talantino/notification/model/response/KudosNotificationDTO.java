@@ -13,6 +13,8 @@ import java.util.Date;
 @Builder
 public class KudosNotificationDTO {
 
+    private long id;
+
     @NotNull
     private String fromSponsor;
 
@@ -28,9 +30,12 @@ public class KudosNotificationDTO {
     private long proofId;
 
     @NotNull
-    private Date receivingDate;
+    private Date receivedDate;
 
     @NotNull
     @JsonIgnore
     private String toTalent;
+
+    @NotNull
+    private boolean isRead;
 }

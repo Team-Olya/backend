@@ -11,13 +11,15 @@ public interface KudosNotificationMapper {
 
     default KudosNotificationDTO toKudosNotificationDTO(KudosNotification notification) {
         return KudosNotificationDTO.builder()
+                .id(notification.getId())
                 .fromSponsor(notification.getFromSponsor().getName() + " " + notification.getFromSponsor().getSurname())
                 .sponsorAvatar(notification.getFromSponsor().getAvatar())
                 .amount(notification.getAmount())
                 .proofId(notification.getProof().getId())
                 .proofTitle(notification.getProof().getTitle())
                 .toTalent(notification.getToTalent().getEmail())
-                .receivingDate(notification.getReceivingDate())
+                .receivedDate(notification.getReceivedDate())
+                .isRead(notification.isRead())
                 .build();
     }
 }
