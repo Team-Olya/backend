@@ -79,6 +79,7 @@ public class AdminServiceImpl implements AdminService{
 
     @Override
     public void deleteProof(Long proofId) {
+        notificationRepository.deleteByProofId(proofId);
         proofRepository.deleteById(proofId);
     }
 
