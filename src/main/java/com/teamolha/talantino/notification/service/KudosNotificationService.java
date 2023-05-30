@@ -83,6 +83,7 @@ public class KudosNotificationService {
                     .totalAmount(notificationRepository.countByToTalentEmailIgnoreCase(email))
                     .notifications(notificationRepository.findByToTalentEmailIgnoreCaseOrderByIdDesc(auth.getName(), pageable)
                             .stream().map(notificationMapper::toKudosNotificationDTO).collect(Collectors.toList()))
+                    .unreadAmount(notificationRepository.countByReadFalseAndToTalentEmailIgnoreCase(email))
                     .build();
         }
 

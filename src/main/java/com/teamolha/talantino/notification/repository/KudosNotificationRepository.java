@@ -11,6 +11,8 @@ import java.util.List;
 @Repository
 public interface KudosNotificationRepository extends JpaRepository<KudosNotification, Long> {
 
+    long countByReadFalseAndToTalentEmailIgnoreCase(String email);
+
     long countByToTalentEmailIgnoreCase(String email);
 
     List<KudosNotification> findByToTalentEmailIgnoreCaseOrderByIdDesc(String email, Pageable pageable);
