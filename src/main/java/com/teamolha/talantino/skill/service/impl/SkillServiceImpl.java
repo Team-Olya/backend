@@ -2,8 +2,8 @@ package com.teamolha.talantino.skill.service.impl;
 
 
 import com.teamolha.talantino.account.model.AccountStatus;
-import com.teamolha.talantino.general.notification.KudosNotification;
-import com.teamolha.talantino.general.notification.WebSocketSender;
+import com.teamolha.talantino.notification.WebSocketSender;
+import com.teamolha.talantino.notification.service.KudosNotificationService;
 import com.teamolha.talantino.proof.model.Status;
 import com.teamolha.talantino.proof.model.entity.Kudos;
 import com.teamolha.talantino.proof.model.entity.Proof;
@@ -11,7 +11,6 @@ import com.teamolha.talantino.proof.repository.KudosRepository;
 import com.teamolha.talantino.proof.repository.ProofRepository;
 import com.teamolha.talantino.skill.mapper.SkillMapper;
 import com.teamolha.talantino.skill.model.entity.Skill;
-import com.teamolha.talantino.skill.model.request.ProofSkillDTO;
 import com.teamolha.talantino.skill.model.response.SkillListDTO;
 import com.teamolha.talantino.skill.repository.SkillRepository;
 import com.teamolha.talantino.skill.service.SkillService;
@@ -19,7 +18,6 @@ import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +42,9 @@ public class SkillServiceImpl implements SkillService {
 
     private KudosRepository kudosRepository;
 
-    private WebSocketSender webSocketSender;
+    private KudosNotificationService notificationService;
+
+//    private WebSocketSender webSocketSender;
 
     @Override
     public SkillListDTO getSkillList(String search) {
@@ -111,7 +111,7 @@ public class SkillServiceImpl implements SkillService {
                     .forEach(kudos -> kudos.setAmount(kudos.getAmount() + amount));
         }
 
-        webSocketSender.sendMessageToUser(proofId, amount, sponsor, proof);
+        notificationService.saveNotification(sponsor, proof, amount, proof.getTalent());
 
         sponsor.setKudos(sponsorKudos);
         sponsor.setBalance(sponsor.getBalance() - amount);

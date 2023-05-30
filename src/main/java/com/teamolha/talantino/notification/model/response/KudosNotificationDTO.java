@@ -1,4 +1,4 @@
-package com.teamolha.talantino.general.notification;
+package com.teamolha.talantino.notification.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
@@ -6,10 +6,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @Builder
-public class KudosNotification {
+public class KudosNotificationDTO {
 
     @NotNull
     private String fromSponsor;
@@ -24,6 +26,9 @@ public class KudosNotification {
 
     @NotNull
     private long proofId;
+
+    @NotNull
+    private Date receivingDate;
 
     @NotNull
     @JsonIgnore

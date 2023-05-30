@@ -1,6 +1,7 @@
 package com.teamolha.talantino.talent.model.entity;
 
 import com.teamolha.talantino.account.model.entity.Account;
+import com.teamolha.talantino.notification.model.entity.KudosNotification;
 import com.teamolha.talantino.proof.model.entity.Proof;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import jakarta.persistence.*;
@@ -55,4 +56,10 @@ public class Talent extends Account {
             inverseJoinColumns = @JoinColumn(name = "skill_id"))
     @ToString.Exclude
     private List<Skill> skills;
+
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST,
+            CascadeType.DETACH, CascadeType.REFRESH},
+            mappedBy = "toTalent")
+    @ToString.Exclude
+    private List<KudosNotification> notifications;
 }
