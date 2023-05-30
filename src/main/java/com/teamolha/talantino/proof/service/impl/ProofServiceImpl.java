@@ -4,13 +4,13 @@ import com.teamolha.talantino.account.model.AccountRole;
 import com.teamolha.talantino.account.model.AccountStatus;
 import com.teamolha.talantino.account.repository.AccountRepository;
 import com.teamolha.talantino.general.discord.event.MessageSendEvent;
-import com.teamolha.talantino.general.notification.WebSocketSender;
+import com.teamolha.talantino.notification.WebSocketSender;
+import com.teamolha.talantino.notification.service.KudosNotificationService;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.model.Status;
 import com.teamolha.talantino.proof.model.entity.Kudos;
 import com.teamolha.talantino.proof.model.entity.Proof;
 import com.teamolha.talantino.proof.model.entity.Report;
-import com.teamolha.talantino.general.notification.KudosNotification;
 import com.teamolha.talantino.proof.model.request.ProofRequest;
 import com.teamolha.talantino.proof.model.response.*;
 import com.teamolha.talantino.proof.repository.KudosRepository;
@@ -35,7 +35,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -79,7 +78,9 @@ public class ProofServiceImpl implements ProofService {
 
     private final BalanceChangingRepository balanceChangingRepository;
 
-    private WebSocketSender webSocketSender;
+    private KudosNotificationService notificationService;
+
+//    private WebSocketSender webSocketSender;
 
     @Transactional(readOnly = true)
     @Override
@@ -279,7 +280,7 @@ public class ProofServiceImpl implements ProofService {
         List<Kudos> sponsorKudos = sponsor.getKudos();
         setKudosOnProof(proofId, amount, sponsor, skills, sponsorKudos);
 
-        webSocketSender.sendMessageToUser(proofId, amount, sponsor, proof);
+        notificationService.saveNotification(sponsor, proof, amount, proof.getTalent());
 
         sponsor.setKudos(sponsorKudos);
         sponsor.setBalance(sponsor.getBalance() - amount);
@@ -449,16 +450,6 @@ public class ProofServiceImpl implements ProofService {
             });
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't put kudos on proofs without skills");
-//            if (!kudosRepository.existsBySponsorIdAndProofId(sponsor.getId(), proofId)) {
-//                sponsorKudos.add(Kudos.builder()
-//                        .amount(amount)
-//                        .sponsorId(sponsor.getId())
-//                        .proofId(proofId)
-//                        .build());
-//            } else {
-//                sponsorKudos.stream().filter(kudos -> kudos.getProofId().equals(proofId))
-//                        .forEach(kudos -> kudos.setAmount(kudos.getAmount() + amount));
-//            }
         }
     }
 
