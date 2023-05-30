@@ -67,8 +67,8 @@ public class AdminServiceImpl implements AdminService{
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Talent doesn't exist")
         );
         linkRepository.deleteByTalent(talent);
-        proofRepository.deleteByTalent(talent);
         notificationRepository.deleteByToTalentId(talentId);
+        proofRepository.deleteByTalent(talent);
         var balanceChanging = balanceChangingRepository.findAllByTalent(talent);
         balanceChanging.forEach(changing -> {
             changing.setTalent(null);
