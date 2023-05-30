@@ -13,7 +13,7 @@ public interface KudosNotificationRepository extends JpaRepository<KudosNotifica
 
     long countByToTalentEmailIgnoreCase(String email);
 
-    List<KudosNotification> findByToTalentEmailIgnoreCase(String email, Pageable pageable);
+    List<KudosNotification> findByToTalentEmailIgnoreCaseOrderByIdDesc(String email, Pageable pageable);
 
     void deleteByExpirationDateLessThanEqualAndReadTrue(Date expirationDate);
 }
