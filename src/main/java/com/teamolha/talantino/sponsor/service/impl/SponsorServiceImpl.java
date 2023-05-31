@@ -140,16 +140,6 @@ public class SponsorServiceImpl implements SponsorService {
         emailSender.deactivateAccount(request, sponsor.getEmail(), sponsor.getDeletionToken());
     }
 
-    @Override
-    public void recoverSponsor(String token) {
-//        var sponsor = sponsorRepository.findByDeletionToken(token).orElseThrow(() ->
-//                new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid token"));
-//        sponsor.setAccountStatus(AccountStatus.ACTIVE);
-//        sponsor.setDeletionDate(null);
-//        sponsor.setDeletionToken(null);
-//        sponsorRepository.save(sponsor);
-    }
-
     private UpdatedSponsorResponse updateSponsor(Sponsor oldSponsor, SponsorUpdateRequest newSponsor) {
         Optional.ofNullable(newSponsor.name()).ifPresent(oldSponsor::setName);
         Optional.ofNullable(newSponsor.surname()).ifPresent(oldSponsor::setSurname);

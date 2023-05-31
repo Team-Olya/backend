@@ -83,8 +83,6 @@ public class ProofServiceImpl implements ProofService {
 
     private final KudosNotificationRepository kudosNotificationRepository;
 
-//    private WebSocketSender webSocketSender;
-
     @Transactional(readOnly = true)
     @Override
     public ProofsPageDTO pageProofs(Authentication auth, String sort, String type, int page, int count) {

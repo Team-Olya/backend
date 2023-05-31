@@ -53,7 +53,6 @@ public class KudosNotificationService {
                         .receivedDate(currentDate)
                         .expirationDate(calculateExpiredDate(currentDate))
                         .build());
-//        addNotificationToTalent(talent, notification);
 
         KudosNotificationDTO notificationDTO = notificationMapper.toKudosNotificationDTO(notification);
         webSocketSender.sendMessageToUser(notificationDTO);
@@ -64,14 +63,6 @@ public class KudosNotificationService {
         cal.setTimeInMillis(currentDate.getTime());
         cal.add(Calendar.DAY_OF_WEEK, expireDays);
         return new Date(cal.getTime().getTime());
-    }
-
-    private void addNotificationToTalent(Talent talent, KudosNotification notification) {
-        var talentNotifications = talent.getNotifications();
-        if (!talentNotifications.contains(notification)) {
-            talentNotifications.add(notification);
-            talentRepository.save(talent);
-        }
     }
 
     public NotificationList getAllNotifications(Authentication auth, Integer size, Integer page) {

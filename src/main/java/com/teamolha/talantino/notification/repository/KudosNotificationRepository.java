@@ -18,6 +18,8 @@ public interface KudosNotificationRepository extends JpaRepository<KudosNotifica
 
     void deleteByProofId(Long proofId);
 
+    void deleteByFromSponsorId(Long sponsorId);
+
     long countByToTalentEmailIgnoreCase(String email);
 
     List<KudosNotification> findByToTalentEmailIgnoreCaseOrderByIdDesc(String email, Pageable pageable);

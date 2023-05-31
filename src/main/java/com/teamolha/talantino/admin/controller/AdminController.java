@@ -23,7 +23,6 @@ public class AdminController {
     @PostMapping("/admin/create")
     @ResponseStatus(HttpStatus.CREATED)
     public void createAdmin (@RequestBody @Valid CreateAdmin createAdmin) {
-        log.error(createAdmin.toString());
         adminService.createAdmin(createAdmin);
     }
 

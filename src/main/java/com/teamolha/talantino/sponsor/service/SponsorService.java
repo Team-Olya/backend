@@ -18,9 +18,5 @@ public interface SponsorService {
 
     void deleteSponsor(HttpServletRequest request, Authentication auth, long sponsorId);
 
-    void recoverSponsor(String token);
-
     BalanceHistoryDTO getBalanceHistory(Authentication auth, int page, int size);
-
-//    List<SponsorKudos> getKudosHistory(Authentication auth);
 }

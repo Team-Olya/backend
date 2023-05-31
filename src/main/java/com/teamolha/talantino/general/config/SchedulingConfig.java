@@ -69,6 +69,7 @@ public class SchedulingConfig {
                 notificationRepository.deleteByToTalentId(account.getId());
                 talentRepository.deleteById(account.getId());
             } else {
+                notificationRepository.deleteByFromSponsorId(account.getId());
                 sponsorRepository.deleteById(account.getId());
             }
         }

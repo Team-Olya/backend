@@ -44,8 +44,6 @@ public class SkillServiceImpl implements SkillService {
 
     private KudosNotificationService notificationService;
 
-//    private WebSocketSender webSocketSender;
-
     @Override
     public SkillListDTO getSkillList(String search) {
         List<Skill> skills = (search == null) ?
