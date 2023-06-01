@@ -5,6 +5,7 @@ import com.teamolha.talantino.talent.model.entity.Talent;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -19,9 +20,17 @@ public interface ProofRepository extends JpaRepository<Proof, Long> {
             nativeQuery = true)
     Long findNextProofId(long id);
 
-    List<Proof> findByStatus(String status, Pageable pageable);
+    List<Proof> findByTitleStartsWithIgnoreCase(String title, Pageable pageable);
 
-    List<Proof> findByStatus(String status);
+    long countByTitleStartsWithIgnoreCase(String title);
+
+    @Query("SELECT p FROM Proof as p JOIN Talent as t" +
+            " ON p.talent.id = t.id WHERE p.status='PUBLISHED' AND t.accountStatus='ACTIVE'")
+    List<Proof> findByStatus(Pageable pageable);
+
+    @Query("SELECT p FROM Proof as p JOIN Talent as t" +
+            " ON p.talent.id = t.id WHERE p.status='PUBLISHED' AND t.accountStatus='ACTIVE'")
+    List<Proof> findByStatus();
 
     List<Proof> findByStatusAndTalent_Id(String status, long talentId, Pageable pageable);
 
@@ -33,7 +42,10 @@ public interface ProofRepository extends JpaRepository<Proof, Long> {
 
     long deleteByTalent(Talent talent);
 
-    @Query(value = "SELECT sponsor_id, SUM(amount) FROM kudos WHERE proof_id=:proofId GROUP BY sponsor_id",
-            nativeQuery = true)
-    List<Object[]> findSponsorsAndKudosOnProof(long proofId);
+    void deleteByTalentId(Long talentId);
+
+    @Query("SELECT k.sponsorId, SUM(k.amount) FROM Kudos k WHERE k.proofId = :proofId GROUP BY k.sponsorId ORDER BY SUM(k.amount) DESC")
+    List<Object[]> findSponsorsAndKudosOnProof(@Param("proofId") Long proofId, Pageable pageable);
+
+
 }

@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 
 public record ProofRequest(
-        @Size(min = 2, max = 80)
+        @Size(min = 2, max = 160)
         String title,
         @Size(min = 2, max = 2000)
         String description,

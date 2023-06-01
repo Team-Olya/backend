@@ -3,48 +3,71 @@ insert into kind (kind) values ('JS Developer');
 insert into kind (kind) values ('Java Developer');
 insert into kind (kind) values ('Project Manager');
 
-insert into talent (name, surname, email, password, kind_id, experience, description, location)
-values ('Olha', 'Shutylieva', 'os@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 4, 5,
+insert into account (name, surname, email, password, account_status)
+values ('Olha', 'Shutylieva', 'os@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 'ACTIVE');
+insert into account (name, surname, email, password, account_status)
+values ('Alexey', 'Pedun', 'ap@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 'ACTIVE');
+insert into account (name, surname, email, password, account_status)
+values ('Ekaterina', 'Nikitenko', 'en@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 'ACTIVE');
+insert into account (name, surname, email, password, account_status)
+values ('Anastasiia', 'Mashchenko', 'am@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 'ACTIVE');
+insert into account (name, surname, email, password, account_status)
+values ('Max', 'Koropets', 'mk@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 'ACTIVE');
+insert into account (name, surname, email, password, account_status)
+values ('Bohdan', 'Rohozianskyi', 'br@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 'ACTIVE');
+insert into account (name, surname, email, password, account_status)
+values ('Maksym', 'Lavrovskyi', 'ml@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 'ACTIVE');
+insert into account (name, surname, email, password, account_status)
+values ('Dmytro', 'Kataiev', 'dk@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 'ACTIVE');
+insert into account (name, surname, email, password, account_status)
+values ('Vladyslav', 'Liubchyk', 'vl@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 'ACTIVE');
+insert into account (name, surname, email, password, account_status)
+values ('Yaroslava', 'Nechaieva', 'yn@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 'ACTIVE');
+insert into account (name, surname, email, password, account_status)
+values ('Sofiia', 'Kazantseva', 'sk@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 'ACTIVE');
+
+insert into talent (id, kind_id, experience, description, location)
+values (1, 4, 5,
         'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
         'Ukraine');
-insert into talent (name, surname, email, password, kind_id, experience, description, location)
-values ('Alexey', 'Pedun', 'ap@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 1, 5,
+insert into talent (id, kind_id, experience, description, location)
+values (2, 1, 5,
         'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
         'Ukraine');
-insert into talent (name, surname, email, password, kind_id, experience, description, location)
-values ('Ekaterina', 'Nikitenko', 'en@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 1, 5,
+insert into talent (id, kind_id, experience, description, location)
+values (3, 1, 5,
         'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
         'Ukraine');
-insert into talent (name, surname, email, password, kind_id, experience, description, location)
-values ('Anastasiia', 'Mashchenko', 'am@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 1, 5,
+insert into talent (id, kind_id, experience, description, location)
+values (4, 1, 5,
         'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
         'Ukraine');
-insert into talent (name, surname, email, password, kind_id, experience, description, location)
-values ('Max', 'Koropets', 'mk@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 1, 5,
+insert into talent (id, kind_id, experience, description, location)
+values (5, 1, 5,
         'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
         'Ukraine');
-insert into talent (name, surname, email, password, kind_id, experience, description, location)
-values ('Bohdan', 'Rohozianskyi', 'br@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 2, 5,
+insert into talent (id, kind_id, experience, description, location)
+values (6, 2, 5,
         'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
         'Ukraine');
-insert into talent (name, surname, email, password, kind_id, experience, description, location)
-values ('Maksym', 'Lavrovskyi', 'ml@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 2, 5,
+insert into talent (id, kind_id, experience, description, location)
+values (7, 2, 5,
         'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
         'Ukraine');
-insert into talent (name, surname, email, password, kind_id, experience, description, location)
-values ('Dmytro', 'Kataiev', 'dk@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 2, 5,
+insert into talent (id, kind_id, experience, description, location)
+values (8, 2, 5,
         'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
         'Ukraine');
-insert into talent (name, surname, email, password, kind_id, experience, description, location)
-values ('Vladyslav', 'Liubchyk', 'vl@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 3, 5,
+insert into talent (id, kind_id, experience, description, location)
+values (9, 3, 5,
         'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
         'Ukraine');
-insert into talent (name, surname, email, password, kind_id, experience, description, location)
-values ('Yaroslava', 'Nechaieva', 'yn@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 3, 5,
+insert into talent (id, kind_id, experience, description, location)
+values (10, 3, 5,
         'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
         'Ukraine');
-insert into talent (name, surname, email, password, kind_id, experience, description, location)
-values ('Sofiia', 'Kazantseva', 'sk@mail.com', '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 3, 5,
+insert into talent (id, kind_id, experience, description, location)
+values (11, 3, 5,
         'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
         'Ukraine');
 
@@ -64,17 +87,17 @@ insert into link (url, talent_id) values ('https://dota2.com', 10);
 insert into link (url, talent_id) values ('https://blizzard.com', 10);
 insert into link (url, talent_id) values ('https://softserveinc.com', 11);
 
-insert into talent_authorities (authorities, talent_id) values ('TALENT', 1);
-insert into talent_authorities (authorities, talent_id) values ('TALENT', 2);
-insert into talent_authorities (authorities, talent_id) values ('TALENT', 3);
-insert into talent_authorities (authorities, talent_id) values ('TALENT', 4);
-insert into talent_authorities (authorities, talent_id) values ('TALENT', 5);
-insert into talent_authorities (authorities, talent_id) values ('TALENT', 6);
-insert into talent_authorities (authorities, talent_id) values ('TALENT', 7);
-insert into talent_authorities (authorities, talent_id) values ('TALENT', 8);
-insert into talent_authorities (authorities, talent_id) values ('TALENT', 9);
-insert into talent_authorities (authorities, talent_id) values ('TALENT', 10);
-insert into talent_authorities (authorities, talent_id) values ('TALENT', 11);
+insert into account_authorities (authorities, account_id) values ('TALENT', 1);
+insert into account_authorities (authorities, account_id) values ('TALENT', 2);
+insert into account_authorities (authorities, account_id) values ('TALENT', 3);
+insert into account_authorities (authorities, account_id) values ('TALENT', 4);
+insert into account_authorities (authorities, account_id) values ('TALENT', 5);
+insert into account_authorities (authorities, account_id) values ('TALENT', 6);
+insert into account_authorities (authorities, account_id) values ('TALENT', 7);
+insert into account_authorities (authorities, account_id) values ('TALENT', 8);
+insert into account_authorities (authorities, account_id) values ('TALENT', 9);
+insert into account_authorities (authorities, account_id) values ('TALENT', 10);
+insert into account_authorities (authorities, account_id) values ('TALENT', 11);
 
 insert into proof (publication_date, title, description, talent_id, status)
 values (CURRENT_TIMESTAMP, 'Java Spring Boot project', 'lil morty', 1, 'PUBLISHED');
@@ -142,6 +165,7 @@ insert into proof_skills (proof_id, skill_id) values (1, 2);
 insert into proof_skills (proof_id, skill_id) values (2, 3);
 insert into proof_skills (proof_id, skill_id) values (3, 4);
 insert into proof_skills (proof_id, skill_id) values (3, 5);
+insert into proof_skills (proof_id, skill_id) values (4, 5);
 insert into proof_skills (proof_id, skill_id) values (5, 6);
 insert into proof_skills (proof_id, skill_id) values (6, 7);
 insert into proof_skills (proof_id, skill_id) values (7, 8);
@@ -171,27 +195,34 @@ insert into talent_skills (talent_id, skill_id) values (10, 10);
 insert into talent_skills (talent_id, skill_id) values (10, 1);
 insert into talent_skills (talent_id, skill_id) values (11, 5);
 insert into talent_skills (talent_id, skill_id) values (11, 7);
-insert into sponsor (name, surname, email, password, balance)
+
+insert into account (name, surname, email, password, account_status)
 values ('Халифа', 'ибн Заид аль-Нахайян', 'sponsor1@mail.com',
-        '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', '100');
+        '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 'ACTIVE');
 
-insert into sponsor (name, surname, email, password, balance)
+insert into account (name, surname, email, password, account_status)
 values ('Мохаммед', 'Хусейн Али аль-Амуди', 'sponsor2@mail.com',
-    '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', '100');
+    '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 'ACTIVE');
 
-insert into sponsor (name, surname, email, password, balance)
+insert into account (name, surname, email, password, account_status)
 values ('Абдул', 'Азиз аль-Гурар', 'sponsor3@mail.com',
-    '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', '100');
+    '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 'ACTIVE');
 
-insert into sponsor (name, surname, email, password, balance)
+insert into account (name, surname, email, password, account_status)
 values ('Мансур', 'ибн Заид аль-Нахайян', 'sponsor4@mail.com',
-        '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', '100');
+        '$2a$12$twzKjMPahMiUZ/JumzboTOx9oqJnN4RX7B6hUoN7s5NajdLgygJr6', 'ACTIVE');
 
-insert into sponsor_authorities (authorities, sponsor_id) values ('SPONSOR', 1);
-insert into sponsor_authorities (authorities, sponsor_id) values ('SPONSOR', 2);
-insert into sponsor_authorities (authorities, sponsor_id) values ('SPONSOR', 3);
-insert into sponsor_authorities (authorities, sponsor_id) values ('SPONSOR', 4);
+insert into sponsor(id, balance) values (12, 100);
+insert into sponsor(id, balance) values (13, 100);
+insert into sponsor(id, balance) values (14, 100);
+insert into sponsor(id, balance) values (15, 100);
 
-insert into kudos (sponsor_id, proof_id, amount) values ('1', '1', '2');
-insert into kudos (sponsor_id, proof_id, amount) values ('2', '1', '3');
-insert into kudos (sponsor_id, proof_id, amount) values ('1', '4', '5');
+insert into account_authorities (authorities, account_id) values ('SPONSOR', 12);
+insert into account_authorities (authorities, account_id) values ('SPONSOR', 13);
+insert into account_authorities (authorities, account_id) values ('SPONSOR', 14);
+insert into account_authorities (authorities, account_id) values ('SPONSOR', 15);
+
+insert into kudos (sponsor_id, proof_id, skill_id, amount) values ('12', '1', '1', '2');
+insert into kudos (sponsor_id, proof_id, skill_id, amount) values ('12', '1', '2', '2');
+insert into kudos (sponsor_id, proof_id, skill_id, amount) values ('13', '1', '2', '3');
+insert into kudos (sponsor_id, proof_id, skill_id, amount) values ('12', '4', '5', '5');

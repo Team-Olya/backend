@@ -3,7 +3,6 @@ package com.teamolha.talantino.proof.model.entity;
 import com.teamolha.talantino.general.validation.ProofStatus;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.talent.model.entity.Talent;
-import com.teamolha.talantino.general.validation.ProofStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

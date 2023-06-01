@@ -2,8 +2,8 @@ package com.teamolha.talantino.sponsor.controller;
 
 import com.teamolha.talantino.sponsor.model.request.AddKudosRequest;
 import com.teamolha.talantino.sponsor.model.request.SponsorUpdateRequest;
-import com.teamolha.talantino.sponsor.model.response.BalanceAddingDTO;
-import com.teamolha.talantino.sponsor.model.response.SponsorKudos;
+import com.teamolha.talantino.sponsor.model.response.BalanceChangingDTO;
+import com.teamolha.talantino.sponsor.model.response.BalanceHistoryDTO;
 import com.teamolha.talantino.sponsor.model.response.SponsorProfileResponse;
 import com.teamolha.talantino.sponsor.model.response.UpdatedSponsorResponse;
 import com.teamolha.talantino.sponsor.service.SponsorService;
@@ -28,13 +28,10 @@ public class SponsorController {
     }
 
     @GetMapping("/sponsors/balance/history")
-    public List<BalanceAddingDTO> getBalanceAddingHistory(Authentication auth) {
-        return sponsorService.getBalanceAddingHistory(auth);
-    }
-
-    @GetMapping("/sponsors/kudos")
-    public List<SponsorKudos> getKudosHistory(Authentication auth) {
-        return sponsorService.getKudosHistory(auth);
+    public BalanceHistoryDTO getBalanceHistory(Authentication auth,
+                                               @RequestParam(defaultValue = "0") int page,
+                                               @RequestParam(defaultValue = "10") int size) {
+        return sponsorService.getBalanceHistory(auth, page, size);
     }
 
     @PatchMapping("/sponsors/{sponsor-id}")
@@ -50,8 +47,8 @@ public class SponsorController {
         sponsorService.deleteSponsor(request, auth, sponsorId);
     }
 
-    @PostMapping("/sponsors/recover")
-    public void recoverSponsor(@RequestParam String token) {
-        sponsorService.recoverSponsor(token);
-    }
+//    @PostMapping("/sponsors/recover")
+//    public void recoverSponsor(@RequestParam String token) {
+//        sponsorService.recoverSponsor(token);
+//    }
 }

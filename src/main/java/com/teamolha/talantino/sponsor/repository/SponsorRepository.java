@@ -1,8 +1,8 @@
 package com.teamolha.talantino.sponsor.repository;
 
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.Date;
 import java.util.List;
@@ -16,4 +16,8 @@ public interface SponsorRepository extends JpaRepository<Sponsor, Long> {
     Optional<Sponsor> findByDeletionToken(String deletionToken);
 
     void deleteAllByDeletionDateLessThanEqual(Date deletionDate);
+
+    List<Sponsor> findByEmailStartsWithIgnoreCase(String email, Pageable pageable);
+
+    long countByEmailStartsWithIgnoreCase(String email);
 }

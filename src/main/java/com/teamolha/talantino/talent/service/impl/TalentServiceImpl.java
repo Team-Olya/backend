@@ -1,35 +1,48 @@
 package com.teamolha.talantino.talent.service.impl;
 
-import com.teamolha.talantino.admin.model.AccountStatus;
-import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.account.model.AccountRole;
+import com.teamolha.talantino.account.model.AccountStatus;
+import com.teamolha.talantino.account.repository.AccountRepository;
+import com.teamolha.talantino.general.discord.event.MessageSendEvent;
+import com.teamolha.talantino.general.email.EmailHelper;
+import com.teamolha.talantino.general.email.EmailSender;
+import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.repository.ProofRepository;
+import com.teamolha.talantino.skill.mapper.SkillMapper;
 import com.teamolha.talantino.skill.model.entity.Skill;
+import com.teamolha.talantino.skill.model.request.FullSkillDTO;
 import com.teamolha.talantino.skill.repository.SkillRepository;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
-import com.teamolha.talantino.talent.mapper.Mappers;
+import com.teamolha.talantino.talent.mapper.TalentMapper;
 import com.teamolha.talantino.talent.model.entity.Kind;
 import com.teamolha.talantino.talent.model.entity.Link;
+import com.teamolha.talantino.talent.model.entity.ReportTalent;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.model.request.TalentUpdateRequest;
 import com.teamolha.talantino.talent.model.response.*;
 import com.teamolha.talantino.talent.repository.KindRepository;
 import com.teamolha.talantino.talent.repository.LinkRepository;
+import com.teamolha.talantino.talent.repository.ReportTalentRepository;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import com.teamolha.talantino.talent.service.TalentService;
+import discord4j.rest.http.client.ClientException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,24 +51,39 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class TalentServiceImpl implements TalentService {
 
-    Mappers mapper;
+    private ReportTalentRepository reportTalentRepository;
 
-    LinkRepository linkRepository;
+    private TalentMapper mapper;
 
-    TalentRepository talentRepository;
+    private ProofMapper proofMapper;
 
-    KindRepository kindRepository;
+    private SkillMapper skillMapper;
 
-    ProofRepository proofRepository;
+    private LinkRepository linkRepository;
 
-    SkillRepository skillRepository;
+    private TalentRepository talentRepository;
 
-    SponsorRepository sponsorRepository;
+    private KindRepository kindRepository;
 
-    PasswordEncoder passwordEncoder;
+    private ProofRepository proofRepository;
+
+    private SkillRepository skillRepository;
+
+    private SponsorRepository sponsorRepository;
+
+    private AccountRepository accountRepository;
+
+    private PasswordEncoder passwordEncoder;
+
+    private MessageSendEvent messageSendEvent;
+
+    private EmailHelper emailHelper;
+
+    private EmailSender emailSender;
 
     @Override
-    public void register(String email, String password, String name, String surname, String kind) {
+    public void register(String email, String password, String name, String surname, String kind,
+                         HttpServletRequest request) {
         if (talentRepository.existsByEmailIgnoreCase(email) || sponsorRepository.existsByEmailIgnoreCase(email)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     email + " is already occupied!"
@@ -68,6 +96,7 @@ public class TalentServiceImpl implements TalentService {
                             .build()
             );
         }
+        String token = emailHelper.generateUUIDToken();
         talentRepository.save(
                 Talent.builder()
                         .email(email)
@@ -75,9 +104,13 @@ public class TalentServiceImpl implements TalentService {
                         .name(name)
                         .surname(surname)
                         .kind(kindRepository.findByKindIgnoreCase(kind))
-                        .authorities(List.of(Roles.TALENT.name()))
+                        .authorities(List.of(AccountRole.TALENT.name()))
+                        .accountStatus(AccountStatus.INACTIVE)
+                        .verificationExpireDate(emailHelper.calculateExpireVerificationDate())
+                        .verificationToken(token)
                         .build()
         );
+        emailSender.verificationAccount(request, email, token);
     }
 
     @Override
@@ -134,14 +167,43 @@ public class TalentServiceImpl implements TalentService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Talent with ID " + talentId + " not found!"));
 
-        if (!talent.getEmail().equals(email)) {
+        if (!talent.getEmail().equals(email) || talent.getAccountStatus().equals(AccountStatus.INACTIVE)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         return updateTalent(talent, updateTalent);
     }
 
     @Override
-    public void deleteTalent(long talentId, String email) {
+    public void deleteTalent(HttpServletRequest request, long talentId, String email) {
+        var talent = talentRepository.findById(talentId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Talent with ID " + talentId + " not found"));
+
+        if (!email.equals(talent.getEmail()) || talent.getAccountStatus().equals(AccountStatus.INACTIVE)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        talent.setAccountStatus(AccountStatus.INACTIVE);
+        talent.setDeletionToken(UUID.randomUUID().toString());
+        talent.setDeletionDate(emailHelper.calculateDeletionDate());
+        talentRepository.save(talent);
+        emailSender.deactivateAccount(request, talent.getEmail(), talent.getDeletionToken());
+    }
+
+    @Override
+    public KindsDTO getTalentKinds(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "id");
+        var amount = kindRepository.count();
+
+        return new KindsDTO(amount, kindRepository.findAll(pageable)
+                .stream()
+                .map(kind -> new KindDTO(kind.getId(), kind.getKind()))
+                .collect(Collectors.toList())
+        );
+    }
+
+    @Override
+    public TalentStatistic getStatistic(long talentId, String email) {
         var talent = talentRepository.findById(talentId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Talent with ID " + talentId + " not found"));
@@ -150,9 +212,87 @@ public class TalentServiceImpl implements TalentService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        linkRepository.deleteByTalent(talent);
-        proofRepository.deleteByTalent(talent);
-        talentRepository.delete(talent);
+        var queryResultForProof = talentRepository.findMostKudosedProof(talentId);
+        Long mostKudosedProofId = !queryResultForProof.isEmpty() ? (Long) queryResultForProof.get(0)[0] : null;
+        var mostKudosedProof = mostKudosedProofId != null ? proofRepository.findById(mostKudosedProofId).orElse(null) : null;
+
+        var queryResultForSkill = talentRepository.findMostKudosedSkill(talentId);
+        Long mostKudosedSkillId = !queryResultForSkill.isEmpty() ? (Long) queryResultForSkill.get(0)[0] : null;
+        var mostKudosedSkill = mostKudosedSkillId != null ? skillRepository.findById(mostKudosedSkillId).orElse(null) : null;
+        var totalKudos = !queryResultForSkill.isEmpty() ? (Long) queryResultForSkill.get(0)[1] : null;
+
+        return TalentStatistic.builder()
+                .totalAmount(talent.getProofs().stream().map(proof -> proof.getKudos().size()).count())
+                .skill(mostKudosedSkill != null
+                        ? FullSkillDTO.builder().id(mostKudosedSkill.getId())
+                        .label(mostKudosedSkill.getLabel())
+                        .icon(mostKudosedSkill.getIcon())
+                        .totalKudos(totalKudos).build()
+                        : null)
+                .proof(mostKudosedProof != null
+                        ? proofMapper.toProofDTO(mostKudosedProof, skillMapper, true)
+                        : null)
+                .build();
+    }
+
+    @Override
+    public ReportedTalentDTO reportTalent(Authentication auth, Long talentId, HttpServletRequest request) {
+        var account = accountRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (account.getAccountStatus().equals(AccountStatus.INACTIVE)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        var talent = talentRepository.findById(talentId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Talent with ID " + talentId + " not found"));
+        if (talent.getAccountStatus().equals(AccountStatus.INACTIVE)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You cannot report a talent whose account is inactive");
+        }
+        if (talent.getId().equals(account.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You cannot report yourself");
+        }
+
+        ReportTalent reportTalent = reportTalentRepository.save(ReportTalent.builder().account(account).talent(talent).build());
+
+        ReportedTalentDTO reportedTalent = mapper.toReportTalentDTO(reportTalent.getId(), talent, account);
+
+        String referer = request.getHeader("Referer");
+        if (referer == null) {
+            referer = request.getScheme() + "://" + request.getHeader("host") + "/";
+        }
+
+        sendReportTalentMessage(reportedTalent, referer);
+        return reportedTalent;
+    }
+
+    @Override
+    public void approveReport(Long reportId) {
+        var report = reportTalentRepository.findById(reportId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
+        reportTalentRepository.deleteById(reportId);
+        var talent = report.getTalent();
+        if (!talentRepository.existsById(talent.getId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        talent.setAccountStatus(AccountStatus.INACTIVE);
+        talentRepository.save(talent);
+    }
+
+    @Override
+    public void rejectReport(Long reportId) {
+
+        reportTalentRepository.deleteById(reportId);
+    }
+
+    private void sendReportTalentMessage(ReportedTalentDTO reportedTalent, String referer) {
+        try {
+            messageSendEvent.sendReportTalentMessage(reportedTalent, referer);
+        } catch (ClientException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Moderator Bot exception");
+        }
     }
 
     private Long getPrevTalentId(long talentId) {

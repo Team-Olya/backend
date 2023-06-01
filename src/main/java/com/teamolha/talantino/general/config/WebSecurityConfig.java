@@ -3,17 +3,11 @@ package com.teamolha.talantino.general.config;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
-import com.teamolha.talantino.admin.model.entity.Admin;
-import com.teamolha.talantino.admin.repository.AdminRepository;
-import com.teamolha.talantino.talent.model.entity.Talent;
-import com.teamolha.talantino.sponsor.model.entity.Sponsor;
-import com.teamolha.talantino.sponsor.repository.SponsorRepository;
-import com.teamolha.talantino.talent.model.entity.Talent;
-import com.teamolha.talantino.talent.repository.TalentRepository;
-import com.teamolha.talantino.talent.mapper.Mappers;
+import com.teamolha.talantino.account.mapper.AccountMapper;
+import com.teamolha.talantino.account.model.entity.Account;
+import com.teamolha.talantino.account.repository.AccountRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
@@ -30,9 +24,11 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -42,7 +38,6 @@ import java.util.Optional;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
-
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
@@ -53,20 +48,20 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/login").permitAll()
-                        .requestMatchers("/auth/me").permitAll()
+                        .requestMatchers("/email").permitAll()
+                        .requestMatchers("/auth/me").authenticated()
 
                         .requestMatchers("/talents/register").permitAll()
                         .requestMatchers("/talents").permitAll()
                         .requestMatchers("/talents/**").authenticated()
                         .requestMatchers(antMatcher("/talents/*")).authenticated()
+                        .requestMatchers("/talents/kinds").permitAll()
 
                         .requestMatchers("/proofs").permitAll()
                         .requestMatchers(antMatcher("/proofs/*")).authenticated()
-                        .requestMatchers(antMatcher("/proofs/**/kudos")).permitAll()
+                        .requestMatchers(antMatcher("/proofs/**/kudos")).authenticated()
 
                         .requestMatchers("/sponsor/register").permitAll()
-                        .requestMatchers("/sponsors/recover").permitAll()
 
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/api-docs/**").permitAll()
@@ -75,9 +70,15 @@ public class WebSecurityConfig {
                         .requestMatchers(antMatcher("/h2/**")).permitAll()
 
                         .requestMatchers("/skills").permitAll()
-                        .requestMatchers("/test").authenticated()
+
                         .requestMatchers("/admin/create").permitAll()
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+
                         .requestMatchers("/email-confirm").permitAll()
+                        .requestMatchers("/account-recover").permitAll()
+
+                        // websockets
+                        .requestMatchers("/ws/**").permitAll()
                         .anyRequest().authenticated()
                 );
 
@@ -121,23 +122,13 @@ public class WebSecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(
-            AdminRepository adminRepository,
-            SponsorRepository sponsorRepository,
-            TalentRepository talentRepository,
-            Mappers mapper
+            AccountRepository accountRepository,
+            AccountMapper mapper
     ) {
         return email -> {
-            Optional<Talent> talent = talentRepository.findByEmailIgnoreCase(email);
-            if (talent.isPresent()) {
-                return mapper.toUserDetails(talent.get());
-            }
-            Optional<Admin> admin = adminRepository.findByLoginIgnoreCase(email);
-            if (admin.isPresent()) {
-                return mapper.toUserDetails(admin.get());
-            }
-            Optional<Sponsor> sponsor = sponsorRepository.findByEmailIgnoreCase(email);
-            if (sponsor.isPresent()) {
-                return mapper.toUserDetails(sponsor.get());
+            Optional<Account> account = accountRepository.findByEmailIgnoreCase(email);
+            if (account.isPresent()) {
+                return mapper.toUserDetails(account.get());
             }
             throw new UsernameNotFoundException("User not found with email: " + email);
         };

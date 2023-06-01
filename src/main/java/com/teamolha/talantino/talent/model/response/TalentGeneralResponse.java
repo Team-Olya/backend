@@ -1,6 +1,5 @@
 package com.teamolha.talantino.talent.model.response;
 
-import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.model.request.SkillDTO;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import lombok.*;

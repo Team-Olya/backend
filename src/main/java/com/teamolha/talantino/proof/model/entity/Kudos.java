@@ -11,13 +11,16 @@ import lombok.*;
 @AllArgsConstructor
 public class Kudos {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @Column(name = "sponsor_id")
-    Long sponsorId;
+    private Long sponsorId;
 
     @Column(name = "proof_id")
-    Long proofId;
+    private Long proofId;
 
-    int amount;
+    @Column(name = "skill_id")
+    private Long skillId;
+
+    private int amount;
 }

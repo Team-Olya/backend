@@ -2,13 +2,15 @@ package com.teamolha.talantino.general.aws;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectResult;
-import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.account.model.AccountRole;
+import com.teamolha.talantino.account.model.entity.Account;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Objects;
 
 import static org.apache.http.entity.ContentType.*;
 
@@ -44,14 +47,13 @@ public class S3Service {
             throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
         }
 
-        var user = auth.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                .toList().contains(Roles.TALENT.name())
-                ? talentRepository.findByEmailIgnoreCase(auth.getName()).get()
-                : sponsorRepository.findByEmailIgnoreCase(auth.getName()).get();
-
+        var user = getUser(auth);
         try {
             File file1 = convertMultiPartToFile(file);
             String fileName = generateFileName(user, file);
+            if (user.getAvatar() != null) {
+                deleteFile(auth);
+            }
             PutObjectResult objectResult = s3.putObject(bucketName, fileName, file1);
             if (user instanceof Talent) {
                 ((Talent) user).setAvatar(generateUrl(fileName));
@@ -77,35 +79,49 @@ public class S3Service {
     }
 
     private File convertMultiPartToFile(MultipartFile file) throws IOException {
-        File convFile = new File(file.getOriginalFilename());
+        File convFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
         FileOutputStream fos = new FileOutputStream(convFile);
         fos.write(file.getBytes());
         fos.close();
         return convFile;
     }
 
-    private String generateFileName(Object user, MultipartFile file) {
-        Long id;
-        String role;
-
-        if (user instanceof Talent) {
-            role = "talent";
-            id = ((Talent) user).getId();
-        } else {
-            role = "sponsor";
-            id = ((Sponsor) user).getId();
-        }
-
-        return String.format("%s-%d.%s", role, id, getFileExtension(file));
+    private String generateFileName(Account user, MultipartFile file) {
+        return String.format("avatars/%d/%s", user.getId(), file.getOriginalFilename());
     }
 
     private String generateUrl(String filename) {
         return String.format("https://%s.s3.amazonaws.com/%s", bucketName, filename);
     }
 
-    public static String getFileExtension(MultipartFile file) {
-        String originalFilename = file.getOriginalFilename();
-        int dotIndex = StringUtils.lastIndexOf(originalFilename, '.');
-        return StringUtils.substring(originalFilename, dotIndex + 1);
+    public void deleteFile(Authentication auth) {
+        var user = getUser(auth);
+        String filename = getFileName(user.getAvatar());
+        if (filename != null) {
+            s3.deleteObject(bucketName, filename);
+        }
+        if (user instanceof Talent) {
+            ((Talent) user).setAvatar(null);
+            talentRepository.save((Talent) user);
+        } else {
+            ((Sponsor) user).setAvatar(null);
+            sponsorRepository.save((Sponsor) user);
+        }
+    }
+
+    private String getFileName(String avatarUrl) {
+        String splitBy = String.format("https://%s.s3.amazonaws.com/", bucketName);
+        if (avatarUrl.contains(splitBy)) {
+            String[] parts = avatarUrl.split(splitBy);
+            return parts[1];
+        }
+        return null;
+    }
+
+    private Account getUser(Authentication auth) {
+        return auth.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                .toList().contains(AccountRole.TALENT.name())
+                ? talentRepository.findByEmailIgnoreCase(auth.getName()).get()
+                : sponsorRepository.findByEmailIgnoreCase(auth.getName()).get();
     }
 }

@@ -1,25 +1,27 @@
 package com.teamolha.talantino.sponsor.service.impl;
 
-import com.teamolha.talantino.general.config.Roles;
-import com.teamolha.talantino.general.email.utils.EmailUtil;
-import com.teamolha.talantino.proof.mapper.ProofMapper;
-import com.teamolha.talantino.proof.repository.ProofRepository;
+import com.teamolha.talantino.account.model.AccountRole;
+import com.teamolha.talantino.account.model.AccountStatus;
+import com.teamolha.talantino.general.email.EmailHelper;
+import com.teamolha.talantino.general.email.EmailSender;
 import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
-import com.teamolha.talantino.sponsor.model.SponsorStatus;
-import com.teamolha.talantino.sponsor.model.entity.BalanceAdding;
+import com.teamolha.talantino.sponsor.model.entity.BalanceChanging;
 import com.teamolha.talantino.sponsor.model.entity.Sponsor;
 import com.teamolha.talantino.sponsor.model.request.AddKudosRequest;
 import com.teamolha.talantino.sponsor.model.request.SponsorUpdateRequest;
-import com.teamolha.talantino.sponsor.model.response.BalanceAddingDTO;
-import com.teamolha.talantino.sponsor.model.response.SponsorKudos;
+import com.teamolha.talantino.sponsor.model.response.BalanceChangingDTO;
+import com.teamolha.talantino.sponsor.model.response.BalanceHistoryDTO;
 import com.teamolha.talantino.sponsor.model.response.SponsorProfileResponse;
 import com.teamolha.talantino.sponsor.model.response.UpdatedSponsorResponse;
-import com.teamolha.talantino.sponsor.repository.BalanceAddingRepository;
+import com.teamolha.talantino.sponsor.repository.BalanceChangingRepository;
 import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.sponsor.service.SponsorService;
 import com.teamolha.talantino.talent.repository.TalentRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,18 +40,18 @@ public class SponsorServiceImpl implements SponsorService {
     private SponsorMapper mapper;
     private TalentRepository talentRepository;
     private SponsorRepository sponsorRepository;
-    private EmailUtil emailUtil;
-    private BalanceAddingRepository balanceAddingRepository;
-    private ProofMapper proofMapper;
-    private ProofRepository proofRepository;
+    private EmailSender emailSender;
+    private BalanceChangingRepository balanceChangingRepository;
+    private EmailHelper emailHelper;
 
     @Override
-    public void register(String email, String password, String name, String surname) {
+    public void register(String email, String password, String name, String surname, HttpServletRequest request) {
         if (talentRepository.existsByEmailIgnoreCase(email) || sponsorRepository.existsByEmailIgnoreCase(email)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     email + " is already occupied!"
             );
         }
+        String token = emailHelper.generateUUIDToken();
         sponsorRepository.save(
                 Sponsor.builder()
                         .email(email)
@@ -57,9 +59,13 @@ public class SponsorServiceImpl implements SponsorService {
                         .name(name)
                         .surname(surname)
                         .balance(0L)
-                        .authorities(List.of(Roles.SPONSOR.name()))
+                        .accountStatus(AccountStatus.INACTIVE)
+                        .verificationExpireDate(emailHelper.calculateExpireVerificationDate())
+                        .verificationToken(token)
+                        .authorities(List.of(AccountRole.SPONSOR.name()))
                         .build()
         );
+        emailSender.verificationAccount(request, email, token);
     }
 
     @Override
@@ -72,7 +78,7 @@ public class SponsorServiceImpl implements SponsorService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "We can't pay to your card, sorry");
         }
         sponsor.setBalance(sponsor.getBalance() + addKudosRequest.amount());
-        balanceAddingRepository.save(BalanceAdding.builder()
+        balanceChangingRepository.save(BalanceChanging.builder()
                 .amount(addKudosRequest.amount())
                 .sponsorId(sponsor.getId())
                 .date(LocalDateTime.now(ZoneOffset.UTC))
@@ -81,30 +87,28 @@ public class SponsorServiceImpl implements SponsorService {
     }
 
     @Override
-    public List<BalanceAddingDTO> getBalanceAddingHistory(Authentication auth) {
+    public BalanceHistoryDTO getBalanceHistory(Authentication auth, int page, int size) {
         var sponsor = sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow( () ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Sponsor is not found")
         );
-        return balanceAddingRepository.findAllBySponsorId(sponsor.getId())
+        if (size <= 0 || page < 0) {
+            return BalanceHistoryDTO.builder()
+                    .totalAmount(balanceChangingRepository.countBySponsorId(sponsor.getId()))
+                    .build();
+        }
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "date"));
+        var balanceChangings = balanceChangingRepository.findBySponsorId(sponsor.getId(), pageable)
                 .stream()
-                .map(balanceAdding -> BalanceAddingDTO.builder()
-                        .amount(balanceAdding.getAmount())
-                        .date(balanceAdding.getDate())
+                .map(balanceChanging -> BalanceChangingDTO.builder()
+                        .amount(balanceChanging.getAmount())
+                        .date(balanceChanging.getDate())
+                        .talentId(balanceChanging.getTalent() == null ? null : balanceChanging.getTalent().getId())
                         .build())
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<SponsorKudos> getKudosHistory(Authentication auth) {
-        var sponsor = sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow( () ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Sponsor is not found")
-        );
-        return sponsor.getKudos().stream()
-                .map(kudos -> SponsorKudos.builder()
-                        .proofDTO(proofMapper.toProofDTO(proofRepository.findById(kudos.getProofId()).orElseThrow(), sponsor))
-                        .amount(kudos.getAmount())
-                        .build())
-                .collect(Collectors.toList());
+        return BalanceHistoryDTO.builder()
+                .totalAmount(balanceChangingRepository.countBySponsorId(sponsor.getId()))
+                .balanceChangings(balanceChangings)
+                .build();
     }
 
     @Override
@@ -129,21 +133,11 @@ public class SponsorServiceImpl implements SponsorService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        sponsor.setStatus(SponsorStatus.INACTIVE);
+        sponsor.setAccountStatus(AccountStatus.INACTIVE);
         sponsor.setDeletionToken(UUID.randomUUID().toString());
-        sponsor.setDeletionDate(calculateDeletionDate(7));
+        sponsor.setDeletionDate(emailHelper.calculateDeletionDate());
         sponsorRepository.save(sponsor);
-        emailUtil.deactivateAccount(request, sponsor.getEmail(), sponsor.getDeletionToken());
-    }
-
-    @Override
-    public void recoverSponsor(String token) {
-        var sponsor = sponsorRepository.findByDeletionToken(token).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid token"));
-        sponsor.setStatus(SponsorStatus.ACTIVE);
-        sponsor.setDeletionDate(null);
-        sponsor.setDeletionToken(null);
-        sponsorRepository.save(sponsor);
+        emailSender.deactivateAccount(request, sponsor.getEmail(), sponsor.getDeletionToken());
     }
 
     private UpdatedSponsorResponse updateSponsor(Sponsor oldSponsor, SponsorUpdateRequest newSponsor) {
@@ -152,12 +146,5 @@ public class SponsorServiceImpl implements SponsorService {
         Optional.ofNullable(newSponsor.avatar()).ifPresent(oldSponsor::setAvatar);
         sponsorRepository.save(oldSponsor);
         return mapper.toUpdatedSponsor(oldSponsor);
-    }
-
-    private Date calculateDeletionDate(int deletionDateInDays) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(new Date().getTime());
-        cal.add(Calendar.DAY_OF_WEEK, deletionDateInDays);
-        return new Date(cal.getTime().getTime());
     }
 }

@@ -6,7 +6,7 @@ import java.util.List;
 
 @Builder
 public record KudosList(
-    long totalAmount,
-    List<KudosDTO> kudos
+        long totalAmount,
+        List<KudosDTO> kudos
 ) {
 }

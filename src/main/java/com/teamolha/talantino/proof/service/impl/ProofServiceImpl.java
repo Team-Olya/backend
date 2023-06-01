@@ -1,26 +1,35 @@
 package com.teamolha.talantino.proof.service.impl;
 
-import com.teamolha.talantino.general.config.Roles;
+import com.teamolha.talantino.account.model.AccountRole;
+import com.teamolha.talantino.account.model.AccountStatus;
+import com.teamolha.talantino.account.repository.AccountRepository;
+import com.teamolha.talantino.general.discord.event.MessageSendEvent;
+import com.teamolha.talantino.notification.WebSocketSender;
+import com.teamolha.talantino.notification.repository.KudosNotificationRepository;
+import com.teamolha.talantino.notification.service.KudosNotificationService;
 import com.teamolha.talantino.proof.mapper.ProofMapper;
 import com.teamolha.talantino.proof.model.Status;
 import com.teamolha.talantino.proof.model.entity.Kudos;
 import com.teamolha.talantino.proof.model.entity.Proof;
-import com.teamolha.talantino.proof.model.response.KudosDTO;
+import com.teamolha.talantino.proof.model.entity.Report;
 import com.teamolha.talantino.proof.model.request.ProofRequest;
-import com.teamolha.talantino.proof.model.response.ProofDTO;
-import com.teamolha.talantino.proof.model.response.ProofsPageDTO;
-import com.teamolha.talantino.proof.model.response.ShortProofDTO;
-import com.teamolha.talantino.proof.model.response.TalentProofList;
 import com.teamolha.talantino.proof.model.response.*;
 import com.teamolha.talantino.proof.repository.KudosRepository;
 import com.teamolha.talantino.proof.repository.ProofRepository;
+import com.teamolha.talantino.proof.repository.ReportRepository;
 import com.teamolha.talantino.proof.service.ProofService;
+import com.teamolha.talantino.skill.mapper.SkillMapper;
 import com.teamolha.talantino.skill.model.entity.Skill;
 import com.teamolha.talantino.skill.repository.SkillRepository;
-import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.sponsor.mapper.SponsorMapper;
+import com.teamolha.talantino.sponsor.model.entity.BalanceChanging;
+import com.teamolha.talantino.sponsor.model.entity.Sponsor;
+import com.teamolha.talantino.sponsor.repository.BalanceChangingRepository;
+import com.teamolha.talantino.sponsor.repository.SponsorRepository;
 import com.teamolha.talantino.talent.model.entity.Talent;
 import com.teamolha.talantino.talent.repository.TalentRepository;
+import discord4j.rest.http.client.ClientException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -35,12 +44,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -48,18 +55,38 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ProofServiceImpl implements ProofService {
 
-    ProofMapper mapper;
-    ProofRepository proofRepository;
-    SkillRepository skillRepository;
-    SponsorMapper sponsorMapper;
-    TalentRepository talentRepository;
-    SponsorRepository sponsorRepository;
-    KudosRepository kudosRepository;
+    private final ProofMapper mapper;
+
+    private final AccountRepository accountRepository;
+
+    private final ProofRepository proofRepository;
+
+    private final SkillRepository skillRepository;
+
+    private final SponsorMapper sponsorMapper;
+
+    private final TalentRepository talentRepository;
+
+    private final SponsorRepository sponsorRepository;
+
+    private final KudosRepository kudosRepository;
+
+    private final ReportRepository reportRepository;
+
+    private final MessageSendEvent messageSendEvent;
+
+    private final SkillMapper skillMapper;
+
+    private final BalanceChangingRepository balanceChangingRepository;
+
+    private KudosNotificationService notificationService;
+
+    private final KudosNotificationRepository kudosNotificationRepository;
 
     @Transactional(readOnly = true)
     @Override
     public ProofsPageDTO pageProofs(Authentication auth, String sort, String type, int page, int count) {
-        int totalAmount = proofRepository.findByStatus(Status.PUBLISHED.name()).size();
+        int totalAmount = proofRepository.findByStatus().size();
 
         if (count <= 0 || page < 0) return ProofsPageDTO.builder().totalAmount(totalAmount).build();
 
@@ -70,8 +97,8 @@ public class ProofServiceImpl implements ProofService {
         var sponsor = (auth == null) ? null :
                 sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
 
-        List<ShortProofDTO> proofs = proofRepository.findByStatus(Status.PUBLISHED.name(), pageable)
-                .stream().map(proof -> mapper.toShortProofDTO(proof, sponsor)).toList();
+        List<ShortProofDTO> proofs = proofRepository.findByStatus(pageable)
+                .stream().map(proof -> mapper.toShortProofDTO(proof, sponsor, skillMapper, auth != null)).toList();
 
         return ProofsPageDTO.builder()
                 .totalAmount(totalAmount)
@@ -106,11 +133,11 @@ public class ProofServiceImpl implements ProofService {
         var proofs = status.equals("ALL") ?
                 proofRepository.findByTalent_Id(talentId, pageable)
                         .stream()
-                        .map(proof -> mapper.toProofDTO(proof, sponsor))
+                        .map(proof -> mapper.toProofDTO(proof, sponsor, skillMapper, auth != null))
                         .toList() :
                 proofRepository.findByStatusAndTalent_Id(status, talentId, pageable)
                         .stream()
-                        .map(proof -> mapper.toProofDTO(proof, sponsor))
+                        .map(proof -> mapper.toProofDTO(proof, sponsor, skillMapper, auth != null))
                         .toList();
 
         return TalentProofList.builder()
@@ -125,7 +152,7 @@ public class ProofServiceImpl implements ProofService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Talent with ID " + talentId + " not found!"));
 
-        if (!email.equals(talent.getEmail())) {
+        if (!email.equals(talent.getEmail()) || talent.getAccountStatus().equals(AccountStatus.INACTIVE)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
@@ -155,7 +182,7 @@ public class ProofServiceImpl implements ProofService {
     public ProofDTO updateProof(String email, Long talentId, Long proofId, ProofRequest newProof) {
         var talent = getTalent(talentId);
 
-        if (!email.equals(talent.getEmail())) {
+        if (!email.equals(talent.getEmail()) || talent.getAccountStatus().equals(AccountStatus.INACTIVE)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
@@ -181,19 +208,20 @@ public class ProofServiceImpl implements ProofService {
     public void deleteProof(Long talentId, Long proofId, String email) {
         var talent = getTalent(talentId);
 
-        if (!email.equals(talent.getEmail())) {
+        if (!email.equals(talent.getEmail()) || talent.getAccountStatus().equals(AccountStatus.INACTIVE)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
         Proof proof = getProofEntity(proofId);
         if (proof.getTalent().getId() == talent.getId()) {
+            kudosNotificationRepository.deleteByProofId(proofId);
             proofRepository.delete(proof);
         } else throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public ProofDTO getProof(Long proofId) {
+    public ProofDTO getProof(Long proofId, Authentication auth) {
         Proof proof = getProofEntity(proofId);
 
         if (!proof.getStatus().equals(Status.PUBLISHED.name())) {
@@ -201,23 +229,37 @@ public class ProofServiceImpl implements ProofService {
                     "You can see only PUBLISHED proofs");
         }
 
-        return mapper.toProofDTO(proof);
+        var sponsor = sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
+
+        return sponsor == null
+                ? mapper.toProofDTO(proof, skillMapper, true)
+                : mapper.toProofDTO(proof, sponsor, skillMapper, true);
     }
 
     @Override
-    public KudosList getKudos(Authentication auth, Long proofId) {
+    public KudosList getKudos(Authentication auth, Long proofId, int page, int size) {
         var proof = getProofEntity(proofId);
+        if(page < 0 || size < 1) {
+            return KudosList.builder()
+                    .totalAmount(proof.getKudos()
+                            .stream()
+                            .map(Kudos::getSponsorId)
+                            .distinct()
+                            .count())
+                    .build();
+        }
         var talent = (auth == null) ? null :
                 talentRepository.findByEmailIgnoreCase(auth.getName()).orElse(null);
         List<KudosDTO> kudos = new ArrayList<>();
         if (talent != null && proof.getTalent().getId() == talent.getId()) {
-            kudos = getKudos(proofId);
+            kudos = getKudos(proofId, page, size);
         }
         return KudosList.builder()
                 .totalAmount(proof.getKudos()
                         .stream()
-                        .mapToInt(Kudos::getAmount)
-                        .sum())
+                        .map(Kudos::getSponsorId)
+                        .distinct()
+                        .count())
                 .kudos(kudos).build();
     }
 
@@ -225,6 +267,10 @@ public class ProofServiceImpl implements ProofService {
     public void setKudos(Authentication auth, Long proofId, int amount) {
         var sponsor = sponsorRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.FORBIDDEN, "Only sponsors have access to kudos"));
+        if (sponsor.getAccountStatus().equals(AccountStatus.INACTIVE)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         if (amount <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You must bet at least 1 kudos");
         }
@@ -237,22 +283,85 @@ public class ProofServiceImpl implements ProofService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only put kudos in published proofs");
         }
 
-        List<Kudos> sponsorKudos = sponsor.getKudos();
-        if (!kudosRepository.existsBySponsorIdAndProofId(sponsor.getId(), proofId)) {
-            sponsorKudos.add(Kudos.builder()
-                    .amount(amount)
-                    .sponsorId(sponsor.getId())
-                    .proofId(proofId)
-                    .build());
-        } else {
-            sponsorKudos.stream().filter(kudos -> kudos.getProofId().equals(proofId))
-                    .forEach(kudos -> kudos.setAmount(kudos.getAmount() + amount));
+        List<Skill> skills = proof.getSkills();
+        if (!skills.isEmpty() && amount % skills.size() != 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The number of kudos should be a multiple of the number of skills");
         }
+
+        List<Kudos> sponsorKudos = sponsor.getKudos();
+        setKudosOnProof(proofId, amount, sponsor, skills, sponsorKudos);
+
+        notificationService.saveNotification(sponsor, proof, amount, proof.getTalent());
+
         sponsor.setKudos(sponsorKudos);
         sponsor.setBalance(sponsor.getBalance() - amount);
         sponsorRepository.save(sponsor);
+        balanceChangingRepository.save(BalanceChanging.builder()
+                .sponsorId(sponsor.getId())
+                .amount(-amount)
+                .talent(proof.getTalent())
+                .date(LocalDateTime.now(ZoneOffset.UTC))
+                .build());
     }
 
+    @Override
+    public ReportedProofDTO reportProof(Authentication auth, Long proofId, HttpServletRequest request) {
+        var account = accountRepository.findByEmailIgnoreCase(auth.getName()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (account.getAccountStatus().equals(AccountStatus.INACTIVE)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        var proof = getProofEntity(proofId);
+
+        if (!proof.getStatus().equals(Status.PUBLISHED.name())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You can't report not PUBLISHED proof");
+        }
+        if (reportRepository.existsByProofAndAccount(proof, account)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Your complaint is already under consideration by the moderators!");
+        }
+        if (account.getId().equals(proof.getTalent().getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You can't report your own proof");
+        }
+        Report report = reportRepository.save(Report.builder().proof(proof).account(account).build());
+
+        ReportedProofDTO reportedProof = mapper.toReportDTO(report.getId(), proof, account);
+
+        // todo for localhost use this:
+        String referer = request.getHeader("Referer");
+        if (referer == null) {
+            referer = request.getScheme() + "://" + request.getHeader("host") + "/";
+        }
+        sendReportMessage(reportedProof, referer);
+        return reportedProof;
+    }
+
+    @Override
+    public void rejectReport(Long reportId) {
+        reportRepository.deleteById(reportId);
+    }
+
+    @Override
+    public void approveReport(Long reportId) {
+        var report = reportRepository.findById(reportId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND));
+        reportRepository.deleteById(reportId);
+        Long proofId = report.getProof().getId();
+        if (proofRepository.existsById(proofId)) {
+            proofRepository.deleteById(proofId);
+        }
+    }
+
+    private void sendReportMessage(ReportedProofDTO reportedProof, String referer) {
+        try {
+            messageSendEvent.sendReportProofMessage(reportedProof, referer);
+        } catch (ClientException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Moderator Bot exception");
+        }
+    }
 
     private ProofDTO editProof(Proof proof, ProofRequest newProof) {
         Optional.ofNullable(newProof.title()).ifPresent(proof::setTitle);
@@ -269,7 +378,7 @@ public class ProofServiceImpl implements ProofService {
         }
 
         proofRepository.save(proof);
-        return mapper.toProofDTO(proof);
+        return mapper.toProofDTO(proof, skillMapper, true);
     }
 
     private Talent getTalent(Long talentId) {
@@ -284,25 +393,83 @@ public class ProofServiceImpl implements ProofService {
                         "Proof with ID " + proofId + " not found"));
     }
 
-    private List<KudosDTO> getKudos(Long proofId) {
+    private List<KudosDTO> getKudos(Long proofId, int page, int size) {
         List<KudosDTO> kudos = new ArrayList<>();
-        List<Object[]> list = proofRepository.findSponsorsAndKudosOnProof(proofId);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<Object[]> list = proofRepository.findSponsorsAndKudosOnProof(proofId, pageable);
+
         for (Object[] elem : list) {
             long sponsorId = ((Number) elem[0]).longValue();
             int amount = ((Number) elem[1]).intValue();
-            sponsorRepository.findById(sponsorId).ifPresentOrElse(sponsor -> kudos.add(KudosDTO.builder()
-                    .sponsor(sponsorMapper.toShortSponsorDTO(sponsor))
-                    .amountOfKudos(amount)
-                    .build()), () -> kudos.add(KudosDTO.builder().sponsor(null).amountOfKudos(amount).build()));
+
+            var sponsor = sponsorRepository.findById(sponsorId).orElse(null);
+            var proof = proofRepository.findById(proofId).orElseThrow();
+
+            if (sponsor != null) {
+                List<SkillKudosDTO> skills = new ArrayList<>();
+                int countSkills = proof.getSkills().size();
+                for (int i = 0; i < countSkills; i++) {
+                    var currentSkill = proof.getSkills().get(i);
+
+                    var kudosAmount = kudosRepository.findAll().stream()
+                            .filter(k -> k.getProofId() == proofId &&
+                                    k.getSponsorId() == sponsorId &&
+                                    k.getSkillId() == currentSkill.getId())
+                            .mapToLong(Kudos::getAmount)
+                            .sum();
+                    if(kudosAmount > 0) {
+                        skills.add(SkillKudosDTO.builder()
+                                .skill(skillMapper.toSkillDTO(currentSkill))
+                                .amountOfKudos(kudosAmount)
+                                .build());
+                    }
+                }
+                kudos.add(KudosDTO.builder()
+                        .sponsor(sponsorMapper.toShortSponsorDTO(sponsor))
+                        .amountOfKudos(amount)
+                        .skills(skills)
+                        .build());
+            } else {
+                kudos.add(KudosDTO.builder()
+                        .sponsor(null)
+                        .amountOfKudos(amount)
+                        .skills(new ArrayList<>())
+                        .build());
+            }
         }
         return kudos;
     }
 
+    private void setKudosOnProof(Long proofId, int amount, Sponsor sponsor, List<Skill> skills, List<Kudos> sponsorKudos) {
+        if (!skills.isEmpty()) {
+            int amountForEachSkill = amount / skills.size();
+            skills.forEach(skill -> {
+                if (!kudosRepository.existsBySponsorIdAndProofIdAndSkillId(sponsor.getId(), proofId, skill.getId())) {
+                    sponsorKudos.add(Kudos.builder()
+                            .amount(amountForEachSkill)
+                            .sponsorId(sponsor.getId())
+                            .proofId(proofId)
+                            .skillId(skill.getId())
+                            .build());
+                } else {
+                    sponsorKudos.stream().filter(kudos ->
+                                    kudos.getProofId().equals(proofId) &&
+                                            (kudos.getSkillId() != null && kudos.getSkillId().equals(skill.getId())))
+                            .forEach(kudos -> kudos.setAmount(kudos.getAmount() + amountForEachSkill));
+                }
+            });
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't put kudos on proofs without skills");
+        }
+    }
+
     private boolean isTalent(Authentication auth) {
-        return auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList().contains(Roles.TALENT.name());
+        return auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList().contains(AccountRole.TALENT.name());
     }
 
     private boolean isSponsor(Authentication auth) {
-        return auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList().contains(Roles.SPONSOR.name());
+        return auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList().contains(AccountRole.SPONSOR.name());
     }
 }
