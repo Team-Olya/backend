@@ -53,7 +53,7 @@ public class MessageSendEvent {
                 .url(createTalentUrl(refererUrl, reportedProof.proofAuthorId()))
                 .author(reportedProof.proofAuthor(), createTalentUrl(refererUrl, reportedProof.proofAuthorId()),
                         reportedProof.proofAuthorAvatar())
-                .description(reportedProof.description())
+                .description(reportedProof.description() != null ? reportedProof.description() : "")
                 .addField("Report ID", String.valueOf(reportedProof.id()), true)
                 .timestamp(Instant.now())
                 .footer("Reported by " + reportedProof.reportedBy(), null)
@@ -67,10 +67,11 @@ public class MessageSendEvent {
                 .url(createTalentUrl(refererUrl, reportedTalent.reportedTalentId()))
                 .author(reportedTalent.kind(), createTalentUrl(refererUrl, reportedTalent.reportedTalentId()),
                         reportedTalent.avatar())
-                .description(reportedTalent.description())
+                .description(reportedTalent.description() != null ? reportedTalent.description() : "")
                 .addField("Report ID", String.valueOf(reportedTalent.id()), true)
                 .addField("Email ", reportedTalent.email(), true)
-                .addField("Location ", reportedTalent.location(), true)
+                .addField("Location ", reportedTalent.location() != null ? reportedTalent.location() :
+                        "no country", true)
                 .timestamp(Instant.now())
                 .footer("Reported by " + reportedTalent.reportedBy(), null)
                 .build();
